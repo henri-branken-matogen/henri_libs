@@ -1,6 +1,3 @@
-USER_KEY = "my_name"
-PASSWORD_KEY = "my_pass"
-SCOPE_KEY = "matogen_hb"
 SF_URL = 'https://os27104.eu-west-1.snowflakecomputing.com/'
 
 
