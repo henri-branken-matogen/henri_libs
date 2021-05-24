@@ -495,6 +495,31 @@ def derive_first_mob(arr):
 udf_derive_first_mob = udf(derive_first_mob, returnType=StringType())
 
 
+def derive_quarter(stamp_val):
+    """
+    A function that takes a yyyymm integer stamp, and converts the mm part to Quarter format.
+    Say, for example, that the input is the integer 202006, then the output would be the string "2020Q2".
+    :param stamp_val: A year-month stamp that is in integer format.  `stamp_val` must therefore contain
+    6 digits.
+    :return: A string containing (1) the year of `stamp_val` in string format, and (2) the Quarter in which
+    the mm part of `stamp_val` gets classified into.
+    """
+    yyyy = str(stamp_val)[0:4]
+    mm = str(stamp_val)[4:]
+    if mm in ("01", "02", "03"):
+        suffix = "Q1"
+    elif mm in ("04", "05", "06"):
+        suffix = "Q2"
+    elif mm in ("07", "08", "09"):
+        suffix = "Q3"
+    else:
+        suffix = "Q4"
+    return yyyy + suffix
+
+
+udf_derive_quarter = udf(derive_quarter, returnType=StringType())
+
+
 def element_extraction(profile, n_chars_p_chunk, pipe_present=True, point_in_time=1):
     """
     Return the MONTH_01 element present in the profile.  This should be the left-most element.
