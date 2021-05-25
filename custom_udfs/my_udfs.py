@@ -914,6 +914,35 @@ mob_category_schema = StructType([
 udf_mob_category = udf(mob_category, returnType=mob_category_schema)
 
 
+def norm_contact_number(number_1):
+    """
+    Takes an input contact number, and then sanitizes it to the correct format.
+    We want all contact numbers in a column to conform to the same notation.
+    :param number_1: The raw, input contact number.
+    :return: A sanitized contact number.
+    """
+    if number_1 in [None, np.nan, "", "."]:
+        return None
+
+    number_2 = str(number_1)
+    if number_2.endswith(".0"):
+        number_2 = number_2[:-2]
+
+    if len(number_2) == 9:
+        return "0" + number_2
+    elif (len(number_2) == 10) and (number_2[0] == 0):
+        return number_2
+    elif (number_2[0:3] == "+27") and (len(number_2) == 12):
+        return "0" + number_2[3:]
+    elif (number_2[0:2] == "27") and (len(number_2) == 11):
+        return "0" + number_2[2:]
+    else:
+        return None
+
+
+udf_norm_contact_no = udf(norm_contact_number, returnType=StringType())
+
+
 def normalise_profile(profile, type_name, mapping_dict=PROF_TYPE_PROF_LENGTH_MAP):
     """
     A function that ensures that any 60-MONTH string profile satisfies certain requirements.
