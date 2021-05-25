@@ -940,7 +940,7 @@ def norm_contact_number(number_1):
         return None
 
 
-udf_norm_contact_no = udf(norm_contact_number, returnType=StringType())
+udf_norm_contact_number = udf(norm_contact_number, returnType=StringType())
 
 
 def normalise_profile(profile, type_name, mapping_dict=PROF_TYPE_PROF_LENGTH_MAP):
