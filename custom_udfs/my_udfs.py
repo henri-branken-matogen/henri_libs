@@ -919,6 +919,7 @@ def norm_contact_number(number_1):
     Takes an input contact number, and then sanitizes it to the correct format.
     We want all contact numbers in a column to conform to the same notation.
     :param number_1: The raw, input contact number.
+    Can be of type integer, float, or string.
     :return: A sanitized contact number.
     """
     if number_1 in [None, np.nan, "", "."]:
@@ -930,7 +931,7 @@ def norm_contact_number(number_1):
 
     if len(number_2) == 9:
         return "0" + number_2
-    elif (len(number_2) == 10) and (number_2[0] == 0):
+    elif (len(number_2) == 10) and (number_2[0] == "0"):
         return number_2
     elif (number_2[0:3] == "+27") and (len(number_2) == 12):
         return "0" + number_2[3:]
