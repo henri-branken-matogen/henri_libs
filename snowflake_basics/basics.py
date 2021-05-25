@@ -1,9 +1,12 @@
-SF_URL = 'https://os27104.eu-west-1.snowflakecomputing.com/'
+USER_KEY = "my_name"
+PASSWORD_KEY = "my_pass"
+SF_URL_KEY = "SF_URL_KEY"
 
 
-def read_snowflake(user, password, query, spark_sess, database="DEV", schema="MATOGEN", warehouse="MATOGEN_WH"):
+def read_snowflake(user, password, query, spark_sess, sf_url, database="DEV",
+                   schema="MATOGEN", warehouse="MATOGEN_WH"):
     options = {
-        'sfUrl': SF_URL,
+        'sfUrl': sf_url,
         'sfUser': user,
         'sfPassword': password,
         'sfDatabase': database,
@@ -19,10 +22,11 @@ def read_snowflake(user, password, query, spark_sess, database="DEV", schema="MA
     return sdf
 
 
-def write_snowflake(user, password, sdf, tablename,
-                    database="DEV", schema="MATOGEN", warehouse="MATOGEN_WH", mode="overwrite"):
+def write_snowflake(user, password, sdf, tablename, sf_url,
+                    database="DEV", schema="MATOGEN", warehouse="MATOGEN_WH",
+                    mode="overwrite"):
     options = {
-        'sfUrl': 'https://os27104.eu-west-1.snowflakecomputing.com/',
+        'sfUrl': sf_url,
         'sfUser': user,
         'sfPassword': password,
         'sfDatabase': database,
