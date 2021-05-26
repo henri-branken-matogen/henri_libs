@@ -1,7 +1,7 @@
 from pyspark.sql.types import StringType, IntegerType, StructType, StructField, DateType
 from pyspark.sql.functions import udf
 import math
-from datetime import datetime
+from datetime import datetime, date
 import numpy as np
 from dateutil.relativedelta import relativedelta
 
