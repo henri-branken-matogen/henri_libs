@@ -886,7 +886,7 @@ def make_proxy_date(monthid_stamp):
     mid_str = str(monthid_stamp)
     yyyy = int(mid_str[:4])
     mm = int(mid_str[4:])
-    dte_proxy = datetime.date(year=yyyy, month=mm, day=1)
+    dte_proxy = date(year=yyyy, month=mm, day=1)
     return dte_proxy
 
 
