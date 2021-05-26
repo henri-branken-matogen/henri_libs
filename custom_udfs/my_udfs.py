@@ -914,6 +914,23 @@ mob_category_schema = StructType([
 udf_mob_category = udf(mob_category, returnType=mob_category_schema)
 
 
+def mback_from_dte(dte_val, ref_dte):
+    """
+    Calculate how many number of months "back into past" `dte_val` is from `ref_dte`.
+    :param dte_val: The starting point value.  A column that is of Date Type.
+    :param ref_dte: The reference date.  Date Type.
+    :return: The difference between dte_val and ref_dte in terms of months.
+    """
+    year_ref_dte = ref_dte.year
+    month_ref_dte = ref_dte.month
+    del_1 = (year_ref_dte - dte_val.year) * 12
+    del_2 = month_ref_dte - dte_val.month
+    return del_1 + del_2
+
+
+udf_mback_from_dte = udf(mback_from_dte, returnType=IntegerType())
+
+
 def norm_contact_number(number_1):
     """
     Takes an input contact number, and then sanitizes it to the correct format.
