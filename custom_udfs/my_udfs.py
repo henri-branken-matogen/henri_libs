@@ -877,6 +877,22 @@ def intel_truncate(val):
 udf_intel_truncate = udf(intel_truncate, returnType=IntegerType())
 
 
+def make_proxy_date(monthid_stamp):
+    """
+    Make a Proxy Date from an Integer that is in the format of ccyymm.  E.g.: 202108.
+    :param monthid_stamp: A year-month stamp in integer format.
+    :return: Return a proxy date that is in date format.  The day of the date is defaulted to "1".
+    """
+    mid_str = str(monthid_stamp)
+    yyyy = int(mid_str[:4])
+    mm = int(mid_str[4:])
+    dte_proxy = datetime.date(year=yyyy, month=mm, day=1)
+    return dte_proxy
+
+
+udf_make_proxy_date = udf(make_proxy_date, returnType=DateType())
+
+
 def mob_category(profile, point_in_time=1):
     """
     From the MONTH_01 (i.e. index 0) element of MOB_profile, determine whether the Account is
