@@ -206,7 +206,8 @@ def date_comparison(dte_m0m, dte_m1m):
 udf_date_comparison = udf(date_comparison, returnType=StringType())
 
 
-def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance, cd0, cd1, cd2, cd3, cd4):
+def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance, cd0, cd1, cd2, cd3, cd4,
+                           an_a, an_b):
     """
     Function that returns single-character strings that represent the Delinquency Status of the Client.
     :param cust_status:  The status of the customer as reflected in the original Service Line Age file.
@@ -218,6 +219,8 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
     :param cd2:  Ageing Bucket 2.  I.e. month 2 (60 days).
     :param cd3:  Ageing Bucket 3.  I.e. month 3 (90 days).
     :param cd4:  Ageing Bucket 4.  I.e. month 4 (120 days).
+    :param an_a:  Vodacom, Analysis A field.  A text string.
+    :param an_b:  Vodacom, Analysis B field.  A text string.
     :return:
     [1] 'delinquency_attribute'
     A single-character string that is either one of ['A', 'C', 'P', 'D', '0', '1', '2', '3', '4'].
@@ -255,6 +258,8 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
     # Concatenate the `cred_ctrl_group` and `sub_ctrl_group` to create `control_groups`:
     cred_ctrl_group = str(cred_ctrl_group).strip().upper()
     control_groups = str(str(cred_ctrl_group) + "|" + str(sub_ctrl_group)).strip().upper()
+    an_a = " ".join(an_a.split()).upper()
+    an_b = " ".join(an_b.split()).upper()
 
     # Generate an Account Age by working backwards, as the account could be highly in arrears,
     # with a zero (cleared) current balance.
@@ -287,12 +292,36 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
         gbipx_attribute = "X"
         delinquency_attribute = "D"
         delinquency_trigger = "A. Deceased"
+    elif "FINANCE" in an_b:
+        gbipx_attribute = "X"
+        delinquency_attribute = "X"
+        delinquency_trigger = "X. Financial Reconciliation"
+    elif "ONBIL" in an_b:
+        gbipx_attribute = "X"
+        delinquency_attribute = "X"
+        delinquency_trigger = "X. On Biller"
+    elif "BUSINESS" in an_b:
+        gbipx_attribute = "X"
+        delinquency_attribute = "X"
+        delinquency_trigger = "X. Enterprise Account"
     # >>> Bad Attributes (B) <<<
     elif "FRAUD" in control_groups:
         gbipx_attribute = "B"
         delinquency_attribute = "A"
         delinquency_trigger = "B. Fraud"
     elif ageing_attribute == "4":
+        gbipx_attribute = "B"
+        delinquency_attribute = "4"
+        delinquency_trigger = "C. CD4 (120+ days)"
+    elif "PREWRITEOF" in an_a:
+        gbipx_attribute = "B"
+        delinquency_attribute = "4"
+        delinquency_trigger = "C. CD4 (120+ days)"
+    elif "ARCHIVED" in an_b:
+        gbipx_attribute = "B"
+        delinquency_attribute = "4"
+        delinquency_trigger = "C. CD4 (120+ days)"
+    elif "PRECLOSED" in an_a:
         gbipx_attribute = "B"
         delinquency_attribute = "4"
         delinquency_trigger = "C. CD4 (120+ days)"
@@ -353,6 +382,10 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
         delinquency_attribute = "A"
         delinquency_trigger = "K. Payment Arrangement"
     elif "LEGAL" in control_groups:
+        gbipx_attribute = "B"
+        delinquency_attribute = "A"
+        delinquency_trigger = "L. Legal Action"
+    elif "LEGAL" in an_b:
         gbipx_attribute = "B"
         delinquency_attribute = "A"
         delinquency_trigger = "L. Legal Action"
@@ -432,6 +465,10 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
         gbipx_attribute = "B"
         delinquency_attribute = "A"
         delinquency_trigger = "M. External Debt Collector"
+    elif "PRE_LEGAL" in an_b:
+        gbipx_attribute = "B"
+        delinquency_attribute = "A"
+        delinquency_trigger = "M. External Debt Collector"
     elif "SUSPEND" in cust_status:
         gbipx_attribute = "B"
         delinquency_attribute = "A"
@@ -459,6 +496,15 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
         gbipx_attribute = "P"
         delinquency_attribute = "P"
         delinquency_trigger = "S. Paid-up Account"
+    # >>> Default when the Control Group is not found. <<<
+    elif "COLLECTION" in an_a:
+        gbipx_attribute = "B"
+        delinquency_attribute = "2"
+        delinquency_trigger = "E. CD2 (60 days)"
+    elif "CURRENT" in an_a:
+        gbipx_attribute = "G"
+        delinquency_attribute = "0"
+        delinquency_trigger = "Q. CD0 (Current)"
     else:
         pass
     return ageing_attribute, gbipx_attribute, delinquency_attribute, delinquency_trigger
