@@ -258,8 +258,14 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
     # Concatenate the `cred_ctrl_group` and `sub_ctrl_group` to create `control_groups`:
     cred_ctrl_group = str(cred_ctrl_group).strip().upper()
     control_groups = str(str(cred_ctrl_group) + "|" + str(sub_ctrl_group)).strip().upper()
-    an_a = " ".join(an_a.split()).upper()
-    an_b = " ".join(an_b.split()).upper()
+    if an_a in [None, ""]:
+        an_a = "."  # assign default string value of '.'
+    else:
+        an_a = " ".join(an_a.split()).upper()
+    if an_b in [None, ""]:
+        an_b = "."  # assign default string value of '.'
+    else:
+        an_b = " ".join(an_b.split()).upper()
 
     # Generate an Account Age by working backwards, as the account could be highly in arrears,
     # with a zero (cleared) current balance.
