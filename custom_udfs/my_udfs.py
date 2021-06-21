@@ -1138,6 +1138,15 @@ def number_to_padded_text(num_value, n_chars):
 udf_number_to_padded_text = udf(number_to_padded_text, returnType=StringType())
 
 
+def simul(val_a, val_b):
+    if (val_a == 1) and (val_b == 1):
+        return 1
+    else:
+        return None
+
+udf_simul = udf(simul, returnType=IntegerType())
+
+
 def starting_mob(acctact_dte, statement_dte):
     """
     Determines the Month-01 value for Months-On-Book.  It does so by determining the number of elapsed months from the

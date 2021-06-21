@@ -77,6 +77,24 @@ def distinct_stats(sdf_base, *args):
     return None
 
 
+def equal_comp(sdf_base, col_a_name, col_b_name, on_col_name, id_col_names):
+    sdf_comp = sdf_base\
+        .select(*[id_col_names[0], id_col_names[1], on_col_name, col_a_name, col_b_name])
+    sdf_comp_1 = sdf_comp\
+        .withColumn("comparison",
+                    F.when((F.col(col_a_name).isNull() & F.col(col_b_name).isNull()), "equality")\
+                     .when(F.col(col_a_name).isNull(), "left value is NULL")\
+                     .when(F.col(col_b_name).isNull(), "right value is NULL")\
+                     .when(F.col(col_a_name) == F.col(col_b_name), "equality")\
+                     .when(F.col(col_a_name) != F.col(col_b_name), "no equality")
+                 )
+    sdf_sample = sdf_comp_1\
+        .filter(sdf_comp_1.comparison == "no equality")
+    sdf_sample.display()
+    count_distribution(sdf_comp_1, "comparison")
+    return None
+
+
 def extract_date_tag(val, override=False, **dte_data):
     """
     Function that returns a MMMYY tag, for example JAN21.
