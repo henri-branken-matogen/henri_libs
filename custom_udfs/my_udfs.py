@@ -1,4 +1,4 @@
-from pyspark.sql.types import StringType, IntegerType, StructType, StructField, DateType
+from pyspark.sql.types import (StringType, IntegerType, StructType, StructField, DateType, LongType)
 from pyspark.sql.functions import udf
 import math
 from datetime import datetime, date
@@ -926,7 +926,7 @@ def intel_truncate(val):
         return None
 
 
-udf_intel_truncate = udf(intel_truncate, returnType=IntegerType())
+udf_intel_truncate = udf(intel_truncate, returnType=LongType())
 
 
 def make_proxy_date(monthid_stamp):
