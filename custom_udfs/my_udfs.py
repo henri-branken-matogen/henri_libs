@@ -1029,7 +1029,7 @@ def norm_contact_number(number_1):
 udf_norm_contact_number = udf(norm_contact_number, returnType=StringType())
 
 
-def normalise_profile(profile, type_name, mapping_dict=PROF_TYPE_PROF_LENGTH_MAP):
+def normalise_profile(profile, type_name):
     """
     A function that ensures that any 60-MONTH string profile satisfies certain requirements.
     It can be used to: [1] truncate redundant chunks from the string (therefore making it of the right length),
@@ -1048,13 +1048,12 @@ def normalise_profile(profile, type_name, mapping_dict=PROF_TYPE_PROF_LENGTH_MAP
     'PMT' > Represents the Payment Profile.
     This key is used to look up supplementary data in a dictionary about the total profile length,
     the length per chunk, and length per element.
-    :param mapping_dict: The dictionary that is used to consult additional information about the string profile.
     :return:  A string profile that is [1] of the correct length, and [2] contains the correct amount of pipes
     as derived from the `mapping_dict`.
     """
-    length_max = mapping_dict.get(type_name)[2]
-    length_p_chunk = mapping_dict.get(type_name)[1]
-    length_p_element = mapping_dict.get(type_name)[0]
+    length_max = PROF_TYPE_PROF_LENGTH_MAP.get(type_name)[2]
+    length_p_chunk = PROF_TYPE_PROF_LENGTH_MAP.get(type_name)[1]
+    length_p_element = PROF_TYPE_PROF_LENGTH_MAP.get(type_name)[0]
     if profile in (None, "", np.nan, np.NaN, np.NAN):
         if length_p_element <= 1:
             profile_normed = "." * length_max
@@ -1138,11 +1137,22 @@ def number_to_padded_text(num_value, n_chars):
 udf_number_to_padded_text = udf(number_to_padded_text, returnType=StringType())
 
 
+def one_month_back(profile, type_name):
+    n_chars_chunk = PROF_TYPE_PROF_LENGTH_MAP[type_name][1]
+    profile_1 = profile[n_chars_chunk:]
+    profile_2 = normalise_profile(profile=profile_1, type_name=type_name)
+    return profile_2
+
+
+udf_one_month_back = udf(one_month_back, returnType=StringType())
+
+
 def simul(val_a, val_b):
     if (val_a == 1) and (val_b == 1):
         return 1
     else:
         return None
+
 
 udf_simul = udf(simul, returnType=IntegerType())
 
