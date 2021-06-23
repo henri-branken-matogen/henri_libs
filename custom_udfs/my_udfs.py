@@ -256,7 +256,12 @@ def delinquency_attributes(cust_status, cred_ctrl_group, sub_ctrl_group, balance
     delinquency_trigger = "LAST CASE: no description."
 
     # Concatenate the `cred_ctrl_group` and `sub_ctrl_group` to create `control_groups`:
-    cred_ctrl_group = str(cred_ctrl_group).strip().upper()
+    if cred_ctrl_group in [None, ".", ""]:
+        cred_ctrl_group = ""
+    if sub_ctrl_group in [None, ".", ""]:
+        sub_ctrl_group = ""
+    cred_ctrl_group = str(cred_ctrl_group).replace(" ", "").upper()
+    sub_ctrl_group = str(sub_ctrl_group).replace(" ", "").upper()
     control_groups = str(str(cred_ctrl_group) + "|" + str(sub_ctrl_group)).strip().upper()
     if an_a in [None, ""]:
         an_a = "."  # assign default string value of '.'
