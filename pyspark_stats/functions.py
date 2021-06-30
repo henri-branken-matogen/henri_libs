@@ -82,12 +82,12 @@ def equal_comp(sdf_base, col_a_name, col_b_name, on_col_name, id_col_names):
         .select(*[id_col_names[0], id_col_names[1], on_col_name, col_a_name, col_b_name])
     sdf_comp_1 = sdf_comp\
         .withColumn("comparison",
-                    F.when((F.col(col_a_name).isNull() & F.col(col_b_name).isNull()), "equality")\
-                     .when(F.col(col_a_name).isNull(), "left value is NULL")\
-                     .when(F.col(col_b_name).isNull(), "right value is NULL")\
-                     .when(F.col(col_a_name) == F.col(col_b_name), "equality")\
+                    F.when((F.col(col_a_name).isNull() & F.col(col_b_name).isNull()), "equality")
+                     .when(F.col(col_a_name).isNull(), "left value is NULL")
+                     .when(F.col(col_b_name).isNull(), "right value is NULL")
+                     .when(F.col(col_a_name) == F.col(col_b_name), "equality")
                      .when(F.col(col_a_name) != F.col(col_b_name), "no equality")
-                 )
+                    )
     sdf_sample = sdf_comp_1\
         .filter(sdf_comp_1.comparison == "no equality")
     sdf_sample.display()
@@ -166,6 +166,23 @@ def null_percs_entire(sdf_base, fancy=False):
     else:
         sdf_return.show()
     return None
+
+
+def pct_dev(val_old, val_new):
+    """
+    Calculates the percentage deviation of `val_new` away from `val_old`.
+    The calculation is performed via [(val_new - val_old) / val_old * 100].
+    In case `val_old` is 0, then 99999 is returned to avoid DivisionByZero error.
+    :param val_old: The previous value in the time series.  A Real Number.
+    :param val_new:  The latest value in the time series.  A Real Number.
+    :return:  The percentage deviation normalised to percentage format.
+    The returned value is therefore not in ratio format.  A Real Number.
+    """
+    numerator = (val_new - val_old) * 100.0
+    if val_old == 0:  # To prevent DivisionByZero error.
+        return 99999
+    else:
+        return numerator / val_old
 
 
 def show_null_stats(sdf_base, *args):
