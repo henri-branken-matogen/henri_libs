@@ -179,7 +179,7 @@ def pct_dev(val_old, val_new):
     The returned value is therefore not in ratio format.  A Real Number.
     """
     numerator = (val_new - val_old) * 100.0
-    if val_old == 0:  # To prevent DivisionByZero error.
+    if val_old == 0:  # To prevent DivisionByZero Error.
         return 99999
     else:
         return numerator / val_old
