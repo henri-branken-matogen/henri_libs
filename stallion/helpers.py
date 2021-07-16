@@ -41,3 +41,48 @@ def gen_stamp_suffixes(ccyymm_01, steps):
         stamp = dte.strftime("%Y%m")
         lookup_dict[n_months] = stamp
     return lookup_dict
+
+
+def gen_year_month_str_pairs(yyyy_latest=9999, mm_latest=99, today_switch=True):
+    """
+    Generate a tuple of (y_2, m_2, y_1, m_1) strings where (y_2, m_2) pertains to the year and month number of the
+    latest/current month.  (y_1, m_1) pertains to the year and month number of exactly 1 month before (y_2, m_2).
+    :param yyyy_latest:  The latest year.  Of type String.
+    :param mm_latest:  The latest month.  Of type String.
+    :param today_switch:  A Boolean value (True or False).  True by default.
+    If True, then override `yyyy_latest` and `mm_latest`, and infer `y_2`, `m_2`, `y_1`, `m_1` from the date data of
+    today.
+    If False, use the user-supplied `yyyy_latest` and `mm_latest`, and infer `y_2`, `m_2`, `y_1`, `m_1` from those two
+    parameters.
+    :return:  Return the four values (y_2, m_2, y_1, m_1) in tuple format.  All values are of type string.
+    """
+    # Use the date-data pertaining to today's date.
+    if today_switch:
+        # Extract the year and month pertaining to today's date.
+        yyyy_latest = date.today().year
+        mm_latest = date.today().month
+        # Construct a date from `yyyy_latest` and `mm_latest`.
+        dte_latest = date(year=yyyy_latest, month=mm_latest, day=10)
+        # Go back 1 month into the past w.r.t. `dte_latest`, therefore generating `dte_prev`.
+        dte_prev = dte_latest - relativedelta(months=1)
+        # Compute `yyyy_slaf` and `mm_slaf` from `dte_latest`.
+        yyyy_slaf = str(dte_latest.year)
+        mm_slaf = str(dte_latest.month)
+        # Compute `yyyy_prev` and `mm_prev` from `dte_prev`.
+        yyyy_prev = str(dte_prev.year)
+        mm_prev = str(dte_prev.month)
+        # Return the four values (y_2, m_2, y_1, m_1) based on today's date-related data.
+        return yyyy_slaf, mm_slaf, yyyy_prev, mm_prev
+    else:
+        # Construct a date from `yyyy_latest` and `mm_latest`.
+        dte_latest = date(year=yyyy_latest, month=mm_latest, day=10)
+        # Go back 1 month into the past w.r.t. `dte_latest`, therefore generating `dte_prev`.
+        dte_prev = dte_latest - relativedelta(months=1)
+        # Compute `yyyy_slaf` and `mm_slaf` from `dte_latest`.
+        yyyy_slaf = str(dte_latest.year)
+        mm_slaf = str(dte_latest.month)
+        # Compute `yyyy_prev` and `mm_prev` from `dte_prev`.
+        yyyy_prev = str(dte_prev.year)
+        mm_prev = str(dte_prev.month)
+        # Return the four values (y_2, m_2, y_1, m_1) based on `yyyy_latest` and `mm_latest` parameters.
+        return yyyy_slaf, mm_slaf, yyyy_prev, mm_prev
