@@ -132,6 +132,19 @@ def extract_date_tag(val, override=False, **dte_data):
         return None
 
 
+def get_extrema(sdf_base, colname):
+    x_min = sdf_base\
+        .groupby()\
+        .agg(F.min(colname))\
+        .first()[0]
+    x_max = sdf_base\
+        .groupby()\
+        .agg(F.max(colname))\
+        .first()[0]
+    print(f"Minimum value of {colname} is:    {x_min}.")
+    print(f"Maximum value of {colname} is:    {x_max}.")
+
+
 def isolate(sdf_base, pkey_name, pkey_vals, *cols):
     """
     A very handy function that can be used for QA purposes and troubleshooting bugs.
