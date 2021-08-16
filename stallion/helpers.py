@@ -20,7 +20,7 @@ def compare(value, cutoffs, label):
     return None
 
 
-def gen_stamp_suffixes(ccyymm_01, steps, reverse=False):
+def gen_stamp_suffixes(ccyymm_01, steps, reversal=False):
     """
     Generate and return a list of 36 ccyymm stamps.
     The first stamp in the list is the most recent, and corresponds to month 01.
