@@ -45,7 +45,7 @@ def gen_stamp_suffixes(ccyymm_01, steps, reversal=False):
     else:
         for n_months in range(1, steps + 1):
             x = steps - n_months
-            dte = dte_00 - relativedelta(months=x)
+            dte = dte_01 - relativedelta(months=x)
             stamp = dte.strftime("%Y%m")
             lookup_dict[n_months] = stamp
         return lookup_dict
