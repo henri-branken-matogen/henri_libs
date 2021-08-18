@@ -1,5 +1,4 @@
 import snowflake_basics.spark_session as ss
-import snowflake_basics.dbutils_session as dbs
 import os
 
 
