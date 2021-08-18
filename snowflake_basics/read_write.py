@@ -66,6 +66,8 @@ def write_out_csvgz(sdf, fp_base, fn):
       .option("delimiter", "|")\
       .option("compression", "gzip")\
       .csv(fp_absolute)
+
+    print(fp_absolute, fp_gz)
     #
     # # Find the ".csv.gz" file of interest
     # entity = [x.path for x in dbs.fs.ls(fp_absolute) if x.path.endswith(".csv.gz")][0]
