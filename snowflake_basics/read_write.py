@@ -1,4 +1,5 @@
 import snowflake_basics.spark_session as ss
+import os
 
 
 USER_KEY = "my_name"
@@ -44,3 +45,36 @@ def write_snowflake(user, password, sdf, tablename, sf_url,
         .option('dbtable', tablename)\
         .mode(mode)\
         .save()
+
+
+def write_out_csvgz(sdf, fp_base, fn):
+    """
+    Write a PySpark Dataset out to .csv.gz format.
+    :param sdf:  The PySpark dataset we wish to fetch from the s3 bucket via awscli tools.
+    :param fp_base:  The parent directory of the dataset.  Type String.
+    :param fn:  The filename of the dataset.  Type String.
+    :return:  Nothing is returned.  The .csv.gz is stored in s3 bucket from which we need to fetch it.
+    """
+    fp_absolute = os.path.join(fp_base, fn)
+    fp_gz = os.path.join(fp_base, fn + ".csv.gz")
+    sdf\
+      .repartition(1)\
+      .write\
+      .mode("overwrite")\
+      .option("header", True)\
+      .option("delimiter", "|")\
+      .option("compression", "gzip")\
+      .csv(fp_absolute)
+
+    # Find the ".csv.gz" file of interest
+    entity = [x.path for x in dbutils.fs.ls(fp_absolute) if x.path.endswith(".csv.gz")][0]
+
+    # Isolate the .csv.gz entity that we are interested in, and give it a readable name.
+    dbutils.fs.cp(entity, fp_gz)
+
+    # Do a cleanup of the redundant folder:
+    dbutils.fs.rm(fp_absolute, recurse=True)
+
+    # Print the `fp_gz` to copy into shell for download.
+    print(fp_gz)
+    return None
