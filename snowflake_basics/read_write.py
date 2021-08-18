@@ -66,16 +66,16 @@ def write_out_csvgz(sdf, fp_base, fn):
       .option("delimiter", "|")\
       .option("compression", "gzip")\
       .csv(fp_absolute)
-
-    # Find the ".csv.gz" file of interest
-    entity = [x.path for x in dbs.fs.ls(fp_absolute) if x.path.endswith(".csv.gz")][0]
-
-    # Isolate the .csv.gz entity that we are interested in, and give it a readable name.
-    dbs.fs.cp(entity, fp_gz)
-
-    # Do a cleanup of the redundant folder:
-    dbs.fs.rm(fp_absolute, recurse=True)
-
-    # Print the `fp_gz` to copy into shell for download.
-    print(fp_gz)
-    return None
+    #
+    # # Find the ".csv.gz" file of interest
+    # entity = [x.path for x in dbs.fs.ls(fp_absolute) if x.path.endswith(".csv.gz")][0]
+    #
+    # # Isolate the .csv.gz entity that we are interested in, and give it a readable name.
+    # dbs.fs.cp(entity, fp_gz)
+    #
+    # # Do a cleanup of the redundant folder:
+    # dbs.fs.rm(fp_absolute, recurse=True)
+    #
+    # # Print the `fp_gz` to copy into shell for download.
+    # print(fp_gz)
+    # return None
