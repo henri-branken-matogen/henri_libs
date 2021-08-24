@@ -209,7 +209,7 @@ def convert_to_percs(df_input, sum_name="volume", logvol_name="logvol",
 
 
 def convert_to_percs_bland(df_input, sum_name="volume",
-                           logvol_name="logvol", exit_name="Outside"):
+                           logvol_name="logvol", exit_name="outside"):
     """
     Takes in a pandas dataframe containing the raw numbers for the transitions between different buckets as input.
     These figures are then converted to percentages (rates) for better interpretability.
