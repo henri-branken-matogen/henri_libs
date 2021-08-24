@@ -115,7 +115,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     pdf_cross = sdf_cross.toPandas()
 
     # Arrange the 1st column to match the order of `ls_outside` bucket
-    ls_canon_buckets = [x for x in ls_buckets if x.lower() != outside_str]
+    ls_canon_buckets = [x for x in ls_buckets if x.lower() != outside_str.lower()]
     index_order = []
     for x in ls_canon_buckets:
         res = (pdf_cross.loc[:, pdf_cross.columns[0]] == x)
