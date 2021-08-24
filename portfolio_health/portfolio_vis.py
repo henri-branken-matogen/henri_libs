@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 
 
+ss.init_spark_session()
+
+
 def compute_sums(df_input):
     """
     A function that computes totals for the number of entities that have (a) cured, (b) milled,
@@ -75,7 +78,8 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     ])
 
     # Initialise a blank "Transition Matrix" DataFrame.
-    sdf_tr = spark\
+    sdf_tr = ss\
+        .spark\
         .createDataFrame([], myschema)
 
     # ------------------------------------------------------------------------------------------------------------------
