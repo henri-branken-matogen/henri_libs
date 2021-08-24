@@ -5,7 +5,6 @@ import pyspark.sql.functions as F
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
-global spark
 
 
 def compute_sums(df_input):
@@ -73,7 +72,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
         t.StructField(progen_col_name, t.StringType(), True),
         t.StructField(outcome_col_name, t.StringType(), True)
     ])
-
+    global spark
     # Initialise a blank "Transition Matrix" DataFrame.
     sdf_tr = spark\
         .createDataFrame([], myschema)
