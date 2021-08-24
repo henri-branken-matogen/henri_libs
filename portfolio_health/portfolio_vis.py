@@ -2,13 +2,10 @@ import numpy as np
 import pandas as pd
 import pyspark.sql.types as t
 import pyspark.sql.functions as F
-import portfolio_health.spark_session as ss
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
-
-
-ss.init_spark_session()
+global spark
 
 
 def compute_sums(df_input):
@@ -78,8 +75,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     ])
 
     # Initialise a blank "Transition Matrix" DataFrame.
-    sdf_tr = ss\
-        .spark\
+    sdf_tr = spark\
         .createDataFrame([], myschema)
 
     # ------------------------------------------------------------------------------------------------------------------
