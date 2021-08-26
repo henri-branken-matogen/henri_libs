@@ -99,9 +99,13 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
                 .withColumnRenamed(c_o, c_n)
 
         # We cannot infer transition(s) from Null values.  Rows containing these must be dropped.
-        sdf_chunk = sdf_chunk \
-            .dropna() \
-            .filter(F.col(progen_col_name) != outside_str)
+        if outside_str is None:
+            sdf_chunk = sdf_chunk \
+                .dropna()
+        else:
+            sdf_chunk = sdf_chunk \
+                .dropna() \
+                .filter(F.col(progen_col_name) != outside_str)
 
         sdf_tr = sdf_tr \
             .union(sdf_chunk)
