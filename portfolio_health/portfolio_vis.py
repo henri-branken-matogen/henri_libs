@@ -116,7 +116,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
 
     # Arrange the 1st column to match the order of `ls_outside` bucket
     if outside_str is None:
-        ls_canon_buckets = [x for x in ls_buckets if x.lower()]
+        ls_canon_buckets = [x for x in ls_buckets]
     else:
         ls_canon_buckets = [x for x in ls_buckets if x.lower() != outside_str.lower()]
     index_order = []
