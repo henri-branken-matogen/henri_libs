@@ -124,8 +124,6 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     else:
         ls_canon_buckets = [x for x in ls_buckets if x.lower() != outside_str.lower()]
     index_order = []
-    print(ls_buckets)
-    print(pdf_cross)
     for x in ls_canon_buckets:
         res = (pdf_cross.loc[:, pdf_cross.columns[0]] == x)
         index_order.append(pdf_cross[res].index[0])
