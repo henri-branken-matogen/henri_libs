@@ -74,7 +74,8 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
         t.StructField(outcome_col_name, t.StringType(), True)
     ])
     # Initialise a blank "Transition Matrix" DataFrame.
-    sdf_tr = spark\
+    sdf_tr = ss\
+        .spark\
         .createDataFrame([], myschema)
 
     # ------------------------------------------------------------------------------------------------------------------
