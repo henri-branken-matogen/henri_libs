@@ -115,6 +115,8 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     sdf_cross = sdf_tr \
         .crosstab(progen_col_name, outcome_col_name)
 
+    sdf_cross.display()
+
     # Convert crosstab to Pandas DataFrame.
     pdf_cross = sdf_cross.toPandas()
     print(list(pdf_cross.columns))
