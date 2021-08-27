@@ -74,8 +74,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
         t.StructField(outcome_col_name, t.StringType(), True)
     ])
     # Initialise a blank "Transition Matrix" DataFrame.
-    sdf_tr = ss\
-        .spark\
+    sdf_tr = spark\
         .createDataFrame([], myschema)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -112,6 +111,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
 
     # ------------------------------------------------------------------------------------------------------------------
     # Create crosstabulation via PySpark.
+
     sdf_cross = sdf_tr \
         .crosstab(progen_col_name, outcome_col_name)
 
@@ -119,9 +119,8 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
 
     # Convert crosstab to Pandas DataFrame.
     pdf_cross = sdf_cross.toPandas()
-    print(list(pdf_cross.columns))
 
-    # Arrange the 1st column to match the order of `ls_outside` bucket
+    # Arrange the 1st column values to match the order of `ls_outside` bucket
     if outside_str is None:
         ls_canon_buckets = [x for x in ls_buckets]
     else:
@@ -134,11 +133,9 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     pdf_cross = pdf_cross.reindex(index_order)
     # Reset the index to make it monotonically increasing: [0, 1, 2, ..., etc.]
     pdf_cross = pdf_cross.reset_index(drop=True, inplace=False)
-    print(list(pdf_cross.iloc[:, 0]))
-    print(pdf_cross)
 
     # Set the Correct Column Order.
-    new_col_order = [pdf_cross.columns[0]] + ls_buckets
+    new_col_order = [pdf_cross.columns[0]] + list(sdf_cross.columns[1:])
     pdf_cross = pdf_cross[new_col_order]
 
     # Calculate the "volume" and "logvol" for each progenitor bucket.
@@ -180,6 +177,9 @@ def convert_to_percs(df_input, sum_name="volume", logvol_name="logvol",
     # Get the progenitor buckets
     ls_buckets = list(df_input.iloc[:, 0])
 
+    ls_col_buckets = list(df_input.columns[1:])
+    ls_col_buckets = [x for x in ls_col_buckets if x not in (sum_name, logvol_name)]
+
     # Stipulate the "to_<x>_rate" endpoints.
     to_names = ["to_" + str(x) + "_rate" for x in ls_buckets]
 
@@ -196,7 +196,7 @@ def convert_to_percs(df_input, sum_name="volume", logvol_name="logvol",
         iter_row = df_input.loc[idx, :]
         denom = iter_row[sum_name]  # The total Sum of accounts for the progenitor bucket in current iteration.
         logvol = iter_row[logvol_name]
-        bucket_rates = [(iter_row[idx] / denom * 100) for idx in ls_buckets]
+        bucket_rates = [(iter_row[idx] / denom * 100) for idx in ls_col_buckets]
         cure_rate = iter_row[cure_name] / denom * 100
         mill_rate = iter_row[mill_name] / denom * 100
         worsen_rate = iter_row[worsen_name] / denom * 100
@@ -243,8 +243,11 @@ def convert_to_percs_bland(df_input, sum_name="volume",
     # Get all the progenitor buckets from the first Column.
     ls_buckets = list(df_input.iloc[:, 0])
 
+    ls_col_buckets = list(df_input.columns[1:])
+    ls_col_buckets = [x for x in ls_col_buckets if x not in (sum_name, logvol_name)]
+
     # Stipulate the "to_<x>_rate" endpoints from `ls_buckets`.
-    to_names = ["to_" + str(x) + "_rate" for x in ls_buckets]
+    to_names = ["to_" + str(x) + "_rate" for x in ls_col_buckets]
 
     # Stipulate all the column names.
     if exit_name is None:
@@ -259,7 +262,7 @@ def convert_to_percs_bland(df_input, sum_name="volume",
         iter_row = df_input.loc[idx, :]
         denom = iter_row[sum_name]  # The Total Sum of accounts for the progenitor bucket in the current iteration.
         logvol = iter_row[logvol_name]
-        bucket_rates = [(iter_row[elem] / denom * 100) for elem in ls_buckets]
+        bucket_rates = [(iter_row[elem] / denom * 100) for elem in ls_col_buckets]
         # Capture all the elements of the new row into a single list, and assign to Numpy Array.
         if exit_name is None:
             arr[idx, 1:] = bucket_rates + [denom, logvol]
