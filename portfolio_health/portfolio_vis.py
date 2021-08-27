@@ -133,7 +133,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     # Reset the index to make it monotonically increasing: [0, 1, 2, ..., etc.]
     pdf_cross = pdf_cross.reset_index(drop=True, inplace=False)
     print(list(pdf_cross.iloc[:, 0]))
-    print(pdf)
+    print(pdf_cross)
 
     # Set the Correct Column Order.
     new_col_order = [pdf_cross.columns[0]] + ls_buckets
