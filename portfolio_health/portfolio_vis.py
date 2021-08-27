@@ -117,6 +117,7 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
 
     # Convert crosstab to Pandas DataFrame.
     pdf_cross = sdf_cross.toPandas()
+    print(pdf_cross)
 
     # Arrange the 1st column to match the order of `ls_outside` bucket
     if outside_str is None:
