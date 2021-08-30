@@ -134,7 +134,8 @@ def construct_transition_matrix(n_months_lookback, delta_min, delta_max, sdf_ori
     pdf_cross = pdf_cross.reset_index(drop=True, inplace=False)
 
     # Set the Correct Column Order.
-    new_col_order = [pdf_cross.columns[0]] + list(sdf_cross.columns[1:])
+    ls_remainder = [x for x in ls_canon_buckets if x in list(sdf_cross.columns[1:])]
+    new_col_order = [pdf_cross.columns[0]] + ls_remainder
     pdf_cross = pdf_cross[new_col_order]
 
     # Calculate the "volume" and "logvol" for each progenitor bucket.
