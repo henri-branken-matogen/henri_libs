@@ -162,33 +162,33 @@ def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
     return ls
 
 
-def create_raw_df_for_PI(ccyymm):
-    """
-    :param ccyymm: The ccyymm suffix of the dataset of interest.  Is of dtype string.  E.g. "202105".
-    :return:  A DataFrame, `sdf_c`, that is a combination of features from
-              [1] beh_acct_prof_ccyymm and [2] beh_acct_ccyymm.
-    """
-    # TODO:  REMOVE THE SAMPLE STEP WHEN READY.
-    sdf_a = spark \
-        .read \
-        .parquet(f"s3://blunova-matogen/CEC_Stallion/beh_files/parquet/beh_acct_prof_{ccyymm}") \
-        .sample(withReplacement=False, fraction=0.001, seed=777) \
-        .drop(*["ID_Key", "Account_Act_DTE", "Statement_DTE_M0M", "Payment_Profile"])
-
-    sdf_b = spark \
-        .read \
-        .parquet(f"s3://blunova-matogen/CEC_Stallion/beh_files/parquet/beh_acct_{ccyymm}") \
-        .drop(*["Account_Act_DTE", "BEH_Account", "Account_AGE", "Account_DLQ", "Account_GBX", "Account_MOB",
-                "MOB_Missing", "MOB_Immature", "MOB_Established", "BEH_Excellent", "BEH_Good", "BEH_Paidup",
-                "BEH_Poor", "BEH_Adverse", "BEH_Missing", "BEH_Exclusion",
-                "Balance", "Instalment", "Payment"])
-
-    sdf_c = sdf_a.join(sdf_b,
-                       on=((sdf_a.Account_Number == sdf_b.Account) & (sdf_a.ID_Number == sdf_b.IDNumber)),
-                       how="left") \
-        .drop(*["Account_Number", "ID_Number"])
-
-    return sdf_c
+# def create_raw_df_for_PI(ccyymm):
+#     """
+#     :param ccyymm: The ccyymm suffix of the dataset of interest.  Is of dtype string.  E.g. "202105".
+#     :return:  A DataFrame, `sdf_c`, that is a combination of features from
+#               [1] beh_acct_prof_ccyymm and [2] beh_acct_ccyymm.
+#     """
+#     # TODO:  REMOVE THE SAMPLE STEP WHEN READY.
+#     sdf_a = spark \
+#         .read \
+#         .parquet(f"s3://blunova-matogen/CEC_Stallion/beh_files/parquet/beh_acct_prof_{ccyymm}") \
+#         .sample(withReplacement=False, fraction=0.001, seed=777) \
+#         .drop(*["ID_Key", "Account_Act_DTE", "Statement_DTE_M0M", "Payment_Profile"])
+#
+#     sdf_b = spark \
+#         .read \
+#         .parquet(f"s3://blunova-matogen/CEC_Stallion/beh_files/parquet/beh_acct_{ccyymm}") \
+#         .drop(*["Account_Act_DTE", "BEH_Account", "Account_AGE", "Account_DLQ", "Account_GBX", "Account_MOB",
+#                 "MOB_Missing", "MOB_Immature", "MOB_Established", "BEH_Excellent", "BEH_Good", "BEH_Paidup",
+#                 "BEH_Poor", "BEH_Adverse", "BEH_Missing", "BEH_Exclusion",
+#                 "Balance", "Instalment", "Payment"])
+#
+#     sdf_c = sdf_a.join(sdf_b,
+#                        on=((sdf_a.Account_Number == sdf_b.Account) & (sdf_a.ID_Number == sdf_b.IDNumber)),
+#                        how="left") \
+#         .drop(*["Account_Number", "ID_Number"])
+#
+#     return sdf_c
 
 
 def drop_null_columns(pysdf, *ls_cols):
@@ -345,41 +345,41 @@ def Transition_Convert(VAR):
     return VAR_return
 
 
-def wrangle_features(sdf_input, point_in_time, chunk_MOB, chunk_FIN):
-    PIT_idx = point_in_time - 1
-    sdf_return = sdf_input \
-        .withColumn("Account_MOB",
-                    f.substring(f.col("MOB_Profile"),
-                                PIT_idx * chunk_MOB + 1,
-                                chunk_MOB - 1)) \
-        .withColumn("Account_AGE",
-                    f.substring(f.col("Ageing_Profile"), PIT_idx * 1 + 1, 1)) \
-        .withColumn("Account_DLQ",
-                    f.substring(f.col("Delinquency_Profile"), PIT_idx * 1 + 1, 1)) \
-        .withColumn("Account_GBX",
-                    f.substring(f.col("GBIPX_Profile"), PIT_idx * 1 + 1, 1)) \
-        .withColumn("Balance",
-                    f.when(f.substring(f.col("Balance_Profile"),
-                                       PIT_idx * chunk_FIN + 1, chunk_FIN - 1) == ".....",
-                           None)\
-                    .otherwise(f.substring(f.col("Balance_Profile"),
-                                           PIT_idx * chunk_FIN + 1, chunk_FIN - 1))) \
-        .withColumn("Instalment",
-                    f.when(f.substring(f.col("Instalment_Profile"),
-                                       PIT_idx * chunk_FIN + 1, chunk_FIN - 1) == ".....",
-                           None) \
-                    .otherwise(f.substring(f.col("Instalment_Profile"),
-                                           PIT_idx * chunk_FIN + 1,
-                                           chunk_FIN - 1))) \
-        .withColumn("Account_CAT",
-                    f.when(f.col("Account_MOB").isin(["00", "01", "02", "03", "04", "05"]), "NEW") \
-                    .when(f.col("Account_MOB").astype(t.IntegerType()) > 5, "EST") \
-                    .otherwise("APP")) \
-        .withColumnRenamed("OpenQuarter", "Account_QRT") \
-        .filter(f.col("Account_MOB") != "..") \
-        .drop(*["MOB_Profile", "Balance_Profile", "Instalment_Profile"])
-
-    return sdf_return
+# def wrangle_features(sdf_input, point_in_time, chunk_MOB, chunk_FIN):
+#     PIT_idx = point_in_time - 1
+#     sdf_return = sdf_input \
+#         .withColumn("Account_MOB",
+#                     f.substring(f.col("MOB_Profile"),
+#                                 PIT_idx * chunk_MOB + 1,
+#                                 chunk_MOB - 1)) \
+#         .withColumn("Account_AGE",
+#                     f.substring(f.col("Ageing_Profile"), PIT_idx * 1 + 1, 1)) \
+#         .withColumn("Account_DLQ",
+#                     f.substring(f.col("Delinquency_Profile"), PIT_idx * 1 + 1, 1)) \
+#         .withColumn("Account_GBX",
+#                     f.substring(f.col("GBIPX_Profile"), PIT_idx * 1 + 1, 1)) \
+#         .withColumn("Balance",
+#                     f.when(f.substring(f.col("Balance_Profile"),
+#                                        PIT_idx * chunk_FIN + 1, chunk_FIN - 1) == ".....",
+#                            None)\
+#                     .otherwise(f.substring(f.col("Balance_Profile"),
+#                                            PIT_idx * chunk_FIN + 1, chunk_FIN - 1))) \
+#         .withColumn("Instalment",
+#                     f.when(f.substring(f.col("Instalment_Profile"),
+#                                        PIT_idx * chunk_FIN + 1, chunk_FIN - 1) == ".....",
+#                            None) \
+#                     .otherwise(f.substring(f.col("Instalment_Profile"),
+#                                            PIT_idx * chunk_FIN + 1,
+#                                            chunk_FIN - 1))) \
+#         .withColumn("Account_CAT",
+#                     f.when(f.col("Account_MOB").isin(["00", "01", "02", "03", "04", "05"]), "NEW") \
+#                     .when(f.col("Account_MOB").astype(t.IntegerType()) > 5, "EST") \
+#                     .otherwise("APP")) \
+#         .withColumnRenamed("OpenQuarter", "Account_QRT") \
+#         .filter(f.col("Account_MOB") != "..") \
+#         .drop(*["MOB_Profile", "Balance_Profile", "Instalment_Profile"])
+#
+#     return sdf_return
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
