@@ -187,6 +187,10 @@ def Customer_Type(type_sas, type_sla):
     """
     Customer_TYP = ""
     # First, use the IDTTPE from the ID validation routine to allocate the probable Customer Type.
+    if type_sas is None:
+        type_sas = ""
+    if type_sla is None:
+        type_sla = ""
     type_sas = type_sas.upper()
     type_sla = type_sla.upper()
     if type_sas in ["N", "I"]:
@@ -198,7 +202,7 @@ def Customer_Type(type_sas, type_sla):
     if type_sla in ['1', 'SOUTHAFRICANID', '2', 'PASSPORT', '5', 'TEMPRESIDENCE']:
         Customer_TYP = "Consumer"
     if type_sla in ['3', 'COMPANYID', 'BUSINESSREGNUM']:
-        Customer_TYP = "Consumer"
+        Customer_TYP = "Enterprise"
     return Customer_TYP
 
 
