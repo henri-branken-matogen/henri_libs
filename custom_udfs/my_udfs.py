@@ -178,6 +178,33 @@ def cnt_pipes(txt):
 udf_cnt_pipes = udf(cnt_pipes, returnType=IntegerType())
 
 
+def Customer_Type(type_sas, type_sla):
+    """
+    Determine whether an AccountNumber-IDNumber combination belongs to "Consumer" or "Enterprise".
+    :param type_sas:  DType string.  A single character from which we can infer in which class the record belongs to.
+    :param type_sla:  DType string.  Information supplied by the SLAF, in the field "ID_TYPE".
+    :return:  Return the Customer_TYP varialbe.  Of DType string.  Can be either one of ["", "Consumer", "Enterprise"].
+    """
+    Customer_TYP = ""
+    # First, use the IDTTPE from the ID validation routine to allocate the probable Customer Type.
+    type_sas = type_sas.upper()
+    type_sla = type_sla.upper()
+    if type_sas in ["N", "I"]:
+        Customer_TYP = "Consumer"
+    if type_sas == "B":
+        Customer_TYP = "Enterprise"
+
+    # Secondly, we use what has been supplied by CellC / CEC, and override:
+    if type_sla in ['1', 'SOUTHAFRICANID', '2', 'PASSPORT', '5', 'TEMPRESIDENCE']:
+        Customer_TYP = "Consumer"
+    if type_sla in ['3', 'COMPANYID', 'BUSINESSREGNUM']:
+        Customer_TYP = "Consumer"
+    return Customer_TYP
+
+
+udf_Customer_Type = udf(Customer_Type, returnType=StringType())
+
+
 def date_comparison(dte_m0m, dte_m1m):
     """
     Function that evaluates two date values (which come from 2 columns) on whether they are Null or not, and
