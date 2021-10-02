@@ -3,6 +3,41 @@ from dateutil.relativedelta import relativedelta
 from datetime import date
 
 
+def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, join_type="inner"):
+    """
+    :param sdf_a:  The one dataframe containing the one field to be compared.  Of type PySpark DataFrame.
+    :param sdf_b:  The other dataframe containing the other field to be compared with.  Of type PySpark DataFrame.
+    :param on_column_name:  The intersection of sdf_a and sdf_b.  I.e., on what column the two should be joined on.
+                            Of DType String.
+    :param col_a_name:  The one column, contained in sdf_a, that we need to compare.  Of DType string.
+    :param col_b_name:  The other column, contained in sdf_b, that we need to compare.  Of DType string.
+    :param join_type:  How sdf_a and sdf_a should be joined on the `on_column_name`.  Of DType string.  Default value is 'inner'.
+    :return:  None.  Is displays results for the user to interrogate.
+    """
+    sdf_comp = sdf_a\
+        .join(sdf_b,
+              on=(sdf_a.on_column_name == sdf_b.on_column_name),
+              how=join_type)
+    sdf_comp_1 = sdf_comp\
+        .withColumn("comparison",
+                    F.when(((F.col(col_a_name).isNull()) & (F.col(col_b_name).isNull())), F.lit("equality"))\
+                     .when(((F.col(col_a_name).isNull()) & (F.col(col_b_name).isNotNull())), F.lit("ineq left value is NULL,"))\
+                     .when(((F.col(col_a_name).isNotNull()) & (F.col(col_b_name).isNull())), F.lit("ineq right value is NULL"))\
+                     .when(F.col(col_a_name) == F.col(col_b_name), F.lit("equality"))\
+                     .when(F.col(col_a_name) != F.col(col_b_name), F.lit("inequality"))\
+                     .otherwise(F.lit("ineq for other reason")))
+
+    # Display all the inequal records.
+    sdf_ineq = sdf_comp_1\
+        .select(*[on_column_name, col_a_name, col_b_name, "comparison"])\
+        .filter(F.col("comparison") != "equality")
+    sdf_ineq.display()
+
+    # Get a distribution on the "comparison" column.
+    count_distribution(sdf_comp_1, "comparison")
+    return None
+
+
 def count_distribution(sdf_base, col_check, fancy=False):
     """
     Shows what the unique elements are for a certain column.
@@ -93,6 +128,9 @@ def equal_comp(sdf_base, col_a_name, col_b_name, on_col_name, id_col_names):
     sdf_sample.display()
     count_distribution(sdf_comp_1, "comparison")
     return None
+
+
+
 
 
 def extract_date_tag(val, override=False, **dte_data):
