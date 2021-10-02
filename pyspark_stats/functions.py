@@ -39,7 +39,7 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
 
     # Display all the inequal records.
     sdf_ineq = sdf_comp_1\
-        .select(*[on_column_name, a_ref, b_ref, "comparison"])\
+        .select(*[a_join, b_join, a_ref, b_ref, "comparison"])\
         .filter(F.col("comparison") != "equality")
     sdf_ineq.display()
 
