@@ -698,6 +698,48 @@ udf_Account_Transition = f.udf(Account_Transition,
                                returnType=schema_Account_Transition)
 
 
+def Doubtful_Debt(Account_State_val, PIT):
+    DoubtfulDebt1M = None
+    DoubtfulDebt3M = None
+    DoubtfulDebt6M = None
+    DoubtfulDebt9M = None
+    DoubtfulDebt12M = None
+    if Account_State_val == "D. Doubtful Debt (Involuntary Churn)":
+        if PIT > 12:
+            DoubtfulDebt1M = 1
+            DoubtfulDebt3M = 1
+            DoubtfulDebt6M = 1
+            DoubtfulDebt9M = 1
+            DoubtfulDebt12M = 1
+        if PIT > 9:
+            DoubtfulDebt1M = 1
+            DoubtfulDebt3M = 1
+            DoubtfulDebt6M = 1
+            DoubtfulDebt9M = 1
+        if PIT > 6:
+            DoubtfulDebt1M = 1
+            DoubtfulDebt3M = 1
+            DoubtfulDebt6M = 1
+        if PIT > 3:
+            DoubtfulDebt1M = 1
+            DoubtfulDebt3M = 1
+        if PIT > 1:
+            DoubtfulDebt1M = 1
+    return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
+
+
+schema_Doubtful_Debt = t.StructType([
+    t.StructField("DoubtfulDebt1M", t.IntegerType(), True),
+    t.StructField("DoubtfulDebt3M", t.IntegerType(), True),
+    t.StructField("DoubtfulDebt6M", t.IntegerType(), True),
+    t.StructField("DoubtfulDebt9M", t.IntegerType(), True),
+    t.StructField("DoubtfulDebt12M", t.IntegerType(), True)
+])
+
+udf_Doubtful_Debt = f.udf(Doubtful_Debt,
+                          returnType=schema_Doubtful_Debt)
+
+
 def Observation_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
     """
     A function that invokes `Behaviour_GBIPX`, which returns the
