@@ -19,13 +19,12 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
     b_ref = col_b_name + "_b"
     b_join = on_column_name + "_b"
     sdf_a = sdf_a\
-        .withColumnRenamed(col_a_name, a_ref)
-    sdf_a = sdf_a\
+        .withColumnRenamed(col_a_name, a_ref)\
+        .withColumnRenamed(on_column_name, a_join)\
         .select(*[a_join, a_ref])
     sdf_b = sdf_b\
         .withColumnRenamed(col_b_name, b_ref)\
-        .select(*[b_join, b_ref])
-    sdf_b = sdf_b\
+        .withColumnRenamed(on_column_name, b_join)\
         .select(*[b_join, b_ref])
     sdf_comp = sdf_a\
         .join(sdf_b,
