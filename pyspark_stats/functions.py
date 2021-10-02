@@ -45,10 +45,11 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
         .filter(F.col("comparison") != "equality")
     sdf_ineq.display()
 
-    vals = sdf_ineq\
-        .select(a_join)\
+    ls_vals = sdf_ineq\
+        .select(*[a_join])\
+        .rdd\
+        .flatMap(lambda x: x)\
         .collect()
-    ls_vals = [row.a_join for row in vals]
 
     # Get a distribution on the "comparison" column.
     count_distribution(sdf_comp_1, "comparison")
