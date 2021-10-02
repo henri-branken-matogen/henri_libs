@@ -12,7 +12,7 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
     :param col_a_name:  The one column, contained in sdf_a, that we need to compare.  Of DType string.
     :param col_b_name:  The other column, contained in sdf_b, that we need to compare.  Of DType string.
     :param join_type:  How sdf_a and sdf_a should be joined on the `on_column_name`.  Of DType string.  Default value is 'inner'.
-    :return:  None.  Is displays results for the user to interrogate.
+    :return:  ls_vals.  Of DType Python list.  A list of values on which the two dataframes don't agree upon.
     """
     a_ref = col_a_name + "_a"
     a_join = on_column_name + "_a"
@@ -45,9 +45,14 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
         .filter(F.col("comparison") != "equality")
     sdf_ineq.display()
 
+    vals = sdf_ineq\
+        .select(a_join)\
+        .collect()
+    ls_vals = [row.a_join for row in vals]
+
     # Get a distribution on the "comparison" column.
     count_distribution(sdf_comp_1, "comparison")
-    return None
+    return ls_vals
 
 
 def count_distribution(sdf_base, col_check, fancy=False):
