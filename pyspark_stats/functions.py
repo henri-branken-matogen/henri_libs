@@ -14,22 +14,32 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
     :param join_type:  How sdf_a and sdf_a should be joined on the `on_column_name`.  Of DType string.  Default value is 'inner'.
     :return:  None.  Is displays results for the user to interrogate.
     """
+    a_ref = col_a_name + "_a"
+    a_join = on_column_name + "_a"
+    b_ref = col_b_name + "_b"
+    b_join = on_column_name + "_b"
+    sdf_a = sdf_a\
+        .withColumnRenamed(col_a_name, a_ref)\
+        .select(*[a_join, a_ref])
+    sdf_b = sdf_b\
+        .withColumnRenamed(col_b_name, b_ref)\
+        .select(*[b_join, b_ref])
     sdf_comp = sdf_a\
         .join(sdf_b,
-              on=(sdf_a[on_column_name] == sdf_b[on_column_name]),
+              on=(sdf_a[a_join] == sdf_b[b_join]),
               how=join_type)
     sdf_comp_1 = sdf_comp\
         .withColumn("comparison",
-                    F.when(((F.col(col_a_name).isNull()) & (F.col(col_b_name).isNull())), F.lit("equality"))\
-                     .when(((F.col(col_a_name).isNull()) & (F.col(col_b_name).isNotNull())), F.lit("ineq left value is NULL,"))\
-                     .when(((F.col(col_a_name).isNotNull()) & (F.col(col_b_name).isNull())), F.lit("ineq right value is NULL"))\
-                     .when(F.col(col_a_name) == F.col(col_b_name), F.lit("equality"))\
-                     .when(F.col(col_a_name) != F.col(col_b_name), F.lit("inequality"))\
+                    F.when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNull())), F.lit("equality"))\
+                     .when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNotNull())), F.lit("ineq left value is NULL,"))\
+                     .when(((F.col(a_ref).isNotNull()) & (F.col(b_ref).isNull())), F.lit("ineq right value is NULL"))\
+                     .when(F.col(a_ref) == F.col(b_ref), F.lit("equality"))\
+                     .when(F.col(a_ref) != F.col(b_ref), F.lit("inequality"))\
                      .otherwise(F.lit("ineq for other reason")))
 
     # Display all the inequal records.
     sdf_ineq = sdf_comp_1\
-        .select(*[on_column_name, col_a_name, col_b_name, "comparison"])\
+        .select(*[on_column_name, a_ref, b_ref, "comparison"])\
         .filter(F.col("comparison") != "equality")
     sdf_ineq.display()
 
