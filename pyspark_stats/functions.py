@@ -16,7 +16,7 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
     """
     sdf_comp = sdf_a\
         .join(sdf_b,
-              on=(sdf_a.on_column_name == sdf_b.on_column_name),
+              on=(sdf_a[on_column_name] == sdf_b[on_column_name]),
               how=join_type)
     sdf_comp_1 = sdf_comp\
         .withColumn("comparison",
