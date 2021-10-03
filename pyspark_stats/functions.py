@@ -52,6 +52,7 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
         .collect()
 
     # Get a distribution on the "comparison" column.
+    print(f"{a_ref} versus {b_ref}:")
     count_distribution(sdf_comp_1, "comparison")
     return ls_vals, sdf_ineq
 
