@@ -345,45 +345,6 @@ def Transition_Convert(VAR):
     return VAR_return
 
 
-# def wrangle_features(sdf_input, point_in_time, chunk_MOB, chunk_FIN):
-#     PIT_idx = point_in_time - 1
-#     sdf_return = sdf_input \
-#         .withColumn("Account_MOB",
-#                     f.substring(f.col("MOB_Profile"),
-#                                 PIT_idx * chunk_MOB + 1,
-#                                 chunk_MOB - 1)) \
-#         .withColumn("Account_AGE",
-#                     f.substring(f.col("Ageing_Profile"), PIT_idx * 1 + 1, 1)) \
-#         .withColumn("Account_DLQ",
-#                     f.substring(f.col("Delinquency_Profile"), PIT_idx * 1 + 1, 1)) \
-#         .withColumn("Account_GBX",
-#                     f.substring(f.col("GBIPX_Profile"), PIT_idx * 1 + 1, 1)) \
-#         .withColumn("Balance",
-#                     f.when(f.substring(f.col("Balance_Profile"),
-#                                        PIT_idx * chunk_FIN + 1, chunk_FIN - 1) == ".....",
-#                            None)\
-#                     .otherwise(f.substring(f.col("Balance_Profile"),
-#                                            PIT_idx * chunk_FIN + 1, chunk_FIN - 1))) \
-#         .withColumn("Instalment",
-#                     f.when(f.substring(f.col("Instalment_Profile"),
-#                                        PIT_idx * chunk_FIN + 1, chunk_FIN - 1) == ".....",
-#                            None) \
-#                     .otherwise(f.substring(f.col("Instalment_Profile"),
-#                                            PIT_idx * chunk_FIN + 1,
-#                                            chunk_FIN - 1))) \
-#         .withColumn("Account_CAT",
-#                     f.when(f.col("Account_MOB").isin(["00", "01", "02", "03", "04", "05"]), "NEW") \
-#                     .when(f.col("Account_MOB").astype(t.IntegerType()) > 5, "EST") \
-#                     .otherwise("APP")) \
-#         .withColumnRenamed("OpenQuarter", "Account_QRT") \
-#         .filter(f.col("Account_MOB") != "..") \
-#         .drop(*["MOB_Profile", "Balance_Profile", "Instalment_Profile"])
-#
-#     return sdf_return
-
-# -------------------------------------------------------------------------------------------------------------------- #
-
-
 def Account_Behaviour(OBS1, OBS6, OBS12, OBS18, OBS24):
     """
     As per BD:  Generate the Account Behaviour Profile.
@@ -515,9 +476,9 @@ def Account_State(Account_CAT, Account_DLQ, OBS1_DC1, OBS3_CRD, OBS3_DC0, OBS3_P
         Account_State_val = "C. PUP Paid-up 12+ months (Voluntary Churn)"
 
     if (OBS3_PUP == 3) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
-        Account_State_val = "3. P01 Paid-up 1-2 months"
+        Account_State_val = "3. P01 Paid-up 3-11 months"
 
-    if Account_DLQ == "P" and (OBS3_PUP is not None) and batch_evaluation(None, "and", OBS3_PUP, OBS24_ADV, OBS24_DC4):
+    if Account_DLQ == "P" and (OBS3_PUP is not None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
         Account_State_val = "3. P01 Paid-up 1-2 months"
 
     """
