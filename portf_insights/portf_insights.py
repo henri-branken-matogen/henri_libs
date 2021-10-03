@@ -749,6 +749,8 @@ def Observation_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
     if PUP is None:
         PUP = 0
     CNT = sum([GDS, BAD, PUP])  # OBS&NBR._CNT  # int
+    if CNT == 0:
+        CNT = None
     if GDS == 0:
         GDS = None
     if BAD == 0:
@@ -908,6 +910,8 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         if PUP is None:
             PUP = 0
         CNT = GDS + BAD + PUP  # PER&NBR._CNT  # int
+        if CNT == 0:
+            CNT = None
         if GDS == 0:
             GDS = None
         if BAD == 0:
@@ -979,6 +983,8 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         if paidup_NBR is None:
             paidup_NBR = 0
         GBP = sum([goods_NBR, bads_NBR, paidup_NBR])  # PER&NBR._GBP  # int
+        if GBP == 0:
+            GBP = None
         if goods_NBR == 0:
             goods_NBR = None
         if bads_NBR == 0:
