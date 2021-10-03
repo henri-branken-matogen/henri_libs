@@ -144,11 +144,11 @@ def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
         variable = "G-Good"
     if CNT_B == PER:
         variable = "B-Bad"
-    if 0 < CNT_B < PER:
+    if CNT_B != 0:
         variable = "B-Partial"
-    if 0 < CNT_G < PER:
+    if CNT_G != 0:
         variable = "G-Partial"
-    if 0 < CNT_P < PER:
+    if CNT_P != 0:
         variable = "P-Partial"
 
     """
@@ -160,35 +160,6 @@ def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
     # indices:      0      1      2      3      4      5      6      7      8      9      10     11
     ls = variable, [CNT_G, CNT_B, CNT_I, CNT_P, CNT_X, CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C]
     return ls
-
-
-# def create_raw_df_for_PI(ccyymm):
-#     """
-#     :param ccyymm: The ccyymm suffix of the dataset of interest.  Is of dtype string.  E.g. "202105".
-#     :return:  A DataFrame, `sdf_c`, that is a combination of features from
-#               [1] beh_acct_prof_ccyymm and [2] beh_acct_ccyymm.
-#     """
-#     # TODO:  REMOVE THE SAMPLE STEP WHEN READY.
-#     sdf_a = spark \
-#         .read \
-#         .parquet(f"s3://blunova-matogen/CEC_Stallion/beh_files/parquet/beh_acct_prof_{ccyymm}") \
-#         .sample(withReplacement=False, fraction=0.001, seed=777) \
-#         .drop(*["ID_Key", "Account_Act_DTE", "Statement_DTE_M0M", "Payment_Profile"])
-#
-#     sdf_b = spark \
-#         .read \
-#         .parquet(f"s3://blunova-matogen/CEC_Stallion/beh_files/parquet/beh_acct_{ccyymm}") \
-#         .drop(*["Account_Act_DTE", "BEH_Account", "Account_AGE", "Account_DLQ", "Account_GBX", "Account_MOB",
-#                 "MOB_Missing", "MOB_Immature", "MOB_Established", "BEH_Excellent", "BEH_Good", "BEH_Paidup",
-#                 "BEH_Poor", "BEH_Adverse", "BEH_Missing", "BEH_Exclusion",
-#                 "Balance", "Instalment", "Payment"])
-#
-#     sdf_c = sdf_a.join(sdf_b,
-#                        on=((sdf_a.Account_Number == sdf_b.Account) & (sdf_a.ID_Number == sdf_b.IDNumber)),
-#                        how="left") \
-#         .drop(*["Account_Number", "ID_Number"])
-#
-#     return sdf_c
 
 
 def drop_null_columns(pysdf, *ls_cols):
