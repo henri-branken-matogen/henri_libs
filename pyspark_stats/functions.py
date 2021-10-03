@@ -53,7 +53,7 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
 
     # Get a distribution on the "comparison" column.
     count_distribution(sdf_comp_1, "comparison")
-    return ls_vals
+    return ls_vals, sdf_ineq
 
 
 def count_distribution(sdf_base, col_check, fancy=False):
