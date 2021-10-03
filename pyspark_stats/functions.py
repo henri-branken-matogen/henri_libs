@@ -33,7 +33,7 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
     sdf_comp_1 = sdf_comp\
         .withColumn("comparison",
                     F.when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNull())), F.lit("equality"))\
-                     .when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNotNull())), F.lit("ineq left value is NULL,"))\
+                     .when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNotNull())), F.lit("ineq left value is NULL"))\
                      .when(((F.col(a_ref).isNotNull()) & (F.col(b_ref).isNull())), F.lit("ineq right value is NULL"))\
                      .when(F.col(a_ref) == F.col(b_ref), F.lit("equality"))\
                      .when(F.col(a_ref) != F.col(b_ref), F.lit("inequality"))\
