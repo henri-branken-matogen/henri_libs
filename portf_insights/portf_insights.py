@@ -157,6 +157,33 @@ def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
     if variable == "":
         variable = "I-Indeterminate"
 
+    # If the counter at this stage is still 0, then revert it back to NULL to align with the SAS Code.
+    if CNT_G == 0:
+        CNT_G = None    # 1
+    if CNT_B == 0:
+        CNT_B = None    # 2
+    if CNT_I == 0:
+        CNT_I = None    # 3
+    if CNT_P == 0:
+        CNT_P = None    # 4
+    if CNT_X == 0:
+        CNT_X = None    # 5
+    if CNT_0 == 0:
+        CNT_0 = None    # 6
+    if CNT_1 == 0:
+        CNT_1 = None    # 7
+    if CNT_2 == 0:
+        CNT_2 = None    # 8
+    if CNT_3 == 0:
+        CNT_3 = None    # 9
+    if CNT_4 == 0:
+        CNT_4 = None    # 10
+    if CNT_A == 0:
+        CNT_A = None    # 11
+    if CNT_C == 0:
+        CNT_C = None    # 12
+
+
     # indices:      0      1      2      3      4      5      6      7      8      9      10     11
     ls = variable, [CNT_G, CNT_B, CNT_I, CNT_P, CNT_X, CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C]
     return ls
@@ -715,7 +742,19 @@ def Observation_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
     Initialise a list that will store variables pertaining to `OBS_NBR`.
     This is a workaround for not being able to create `._attr` attributes as done in SAS.
     """
+    if GDS is None:
+        GDS = 0
+    if BAD is None:
+        BAD = 0
+    if PUP is None:
+        PUP = 0
     CNT = sum([GDS, BAD, PUP])  # OBS&NBR._CNT  # int
+    if GDS == 0:
+        GDS = None
+    if BAD == 0:
+        BAD = None
+    if PUP == 0:
+        PUP = None
 
     # indices 0    1    2    3    4    5    6    7    8    9    10
     ls_int = [DC0, DC1, DC2, DC3, DC4, ADV, CRD, GDS, BAD, PUP, CNT]
@@ -790,11 +829,11 @@ def Payment_Defaulters(PIT, DLQ_profile):
     ThirdCycle90Days = None   # int  # Third billing cycle 90 days  (TID).
     PIT_py = PIT - 1  # See the documentation above.
 
-    if (PIT > 1) and (DLQ_profile[PIT_py - 2] == "1"):
+    if (PIT > 1) and (DLQ_profile[PIT_py - 1] == "1"):
         NextCycle30Days = 1
-    if (PIT > 2) and (DLQ_profile[PIT_py - 3: PIT_py - 1] == "21"):
+    if (PIT > 2) and (DLQ_profile[PIT_py - 2: PIT_py] == "21"):
         SecondCycle60Days = 1
-    if (PIT > 3) and (DLQ_profile[PIT_py - 4: PIT_py - 1] == "321"):
+    if (PIT > 3) and (DLQ_profile[PIT_py - 3: PIT_py] == "321"):
         ThirdCycle90Days = 1
 
     ls_pd = [NextCycle30Days, SecondCycle60Days, ThirdCycle90Days]
@@ -846,7 +885,7 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         BadRateNBRM = None  # 'Bad Rate' over &NBR of Months.  # Integer I suppose.
 
         CNT_4 = ls_counters[9]
-        DoubtfulDebtNBRM = 0  # 'Doubtful Debt' over &NBR of Months.  # Integer.
+        DoubtfulDebtNBRM = None  # 'Doubtful Debt' over &NBR of Months.  # Integer.
         if CNT_4 >= 1:
             DoubtfulDebtNBRM = 1
 
@@ -903,9 +942,9 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         F.  Set the Goods, Bads & Paid-up counters.
             These are used when calculating the "Account Performance" for the "Risk Mandates".
         """
-        goods_NBR = 0  # Goods&NBR    # int
-        bads_NBR = 0  # Bads&NBR      # int
-        paidup_NBR = 0  # PaidUp&NBR  # int
+        goods_NBR = None  # Goods&NBR    # int
+        bads_NBR = None  # Bads&NBR      # int
+        paidup_NBR = None  # PaidUp&NBR  # int
 
         val_char = PERF_NBR[0]
         if val_char == "G":
@@ -920,7 +959,19 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         """
         Get the summation of the three counters above:
         """
+        if goods_NBR is None:
+            goods_NBR = 0
+        if bads_NBR is None:
+            bads_NBR = 0
+        if paidup_NBR is None:
+            paidup_NBR = 0
         GBP = sum([goods_NBR, bads_NBR, paidup_NBR])  # PER&NBR._GBP  # int
+        if goods_NBR == 0:
+            goods_NBR = None
+        if bads_NBR == 0:
+            bads_NBR = None
+        if paidup_NBR == 0:
+            paidup_NBR = None
 
         """
         Expand `ls_PERF_NBR` with GBP
