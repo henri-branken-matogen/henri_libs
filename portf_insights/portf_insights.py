@@ -886,8 +886,9 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
 
         CNT_4 = ls_counters[9]
         DoubtfulDebtNBRM = None  # 'Doubtful Debt' over &NBR of Months.  # Integer.
-        if CNT_4 >= 1:
-            DoubtfulDebtNBRM = 1
+        if CNT_4 is not None:
+            if CNT_4 >= 1:
+                DoubtfulDebtNBRM = 1
 
         PaidUpNBRM = None  # The 'PaidUp Rate' over &NBR of Months.  # Supposedly Integer.
 
