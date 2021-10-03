@@ -230,7 +230,7 @@ def Transition_Convert(VAR):
     (i)
     Initialisation of the return variable (which is of dtype string):
     """
-    VAR_return = ""
+    VAR_return = None
 
     """
     (ii)
