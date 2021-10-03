@@ -901,7 +901,19 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         BAD = ls_counters[1]   # PER&NBR._BAD  # int
         PUP = ls_counters[3]   # PER&NBR._PUP  # int
         CRD = ls_counters[11]  # PER&NBR._CRD  # int
+        if GDS is None:
+            GDS = 0
+        if BAD is None:
+            BAD = 0
+        if PUP is None:
+            PUP = 0
         CNT = GDS + BAD + PUP  # PER&NBR._CNT  # int
+        if GDS == 0:
+            GDS = None
+        if BAD == 0:
+            BAD = None
+        if PUP == 0:
+            PUP = None
         # In a section below, we compute the `GRP` variable.
 
         """
