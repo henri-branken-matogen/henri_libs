@@ -6,343 +6,6 @@ chunk_MOB = 3
 chunk_FIN = 6
 
 
-def batch_evaluation(eval_against, conjunction, *observations):
-    """
-    A functions that evaluates a bunch of variables (stored in `observations`) against a single value
-    (i.e. `eval_against`).
-    The `conjunction` variable specifies whether the conditions should be chained together with an "and" operator,
-    or an "or" operator.
-    In the case of "and", True is returned if all `observations` are equal to `eval_against`.  Otherwise False.
-    In the case of "or", True is returned if any one of the `observations` are equal to `eval_against`.
-        If none of the `observations` are equal to `eval_against`, then False is returned.
-    Therefore, in the end, a boolean value is finally returned.
-
-    For Example:
-    batch_evaluation(None, "and", a, b, c)
-        True if a == b == c == None.  Otherwise False.
-
-    batch_evaluation("Y", "or", e, f)
-        True if e == "Y" or f == "Y" (also True if e == f == "Y").  Otherwise False.
-
-    :param eval_against: The value against which all the elements in `*observations` are evaluated against.
-    :param conjunction:  Of Dtype string.  Can only be either one of "and" or "or".
-                         This is the logical operator sandwiched between the individual conditions.
-    :param observations: A variable, or list of variables, which are evaluated against `eval_against`.
-    :return:  A Boolean value, True or False.
-    """
-    ls_obs = [elem for elem in observations]
-    if eval_against is None:
-        ls_res = [elem is None for elem in ls_obs]
-
-    else:
-        ls_res = [elem == eval_against for elem in ls_obs]
-
-    # "and" is coupled with the all(...) function.
-    if conjunction.lower() == "and":
-        eval_res = all(ls_res)
-
-    # "or" is coupled with the any(...) function.
-    elif conjunction.lower() == "or":
-        eval_res = any(ls_res)
-
-    # If the `else` clause is invoked, then the `conjunction` parameter was not specified correctly.
-    else:
-        raise Exception("The `conjunction` parameter can only be either one of 'and' or 'or'.\n"
-                        "Please correct and retry...")
-
-    return eval_res
-
-
-def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
-    """
-    This function generates:
-        CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C  [based of the `DLQ_profile`]
-        CNT_G, CNT_B, CNT_I, CNT_P, CNT_X                [based of the `GBIPX_profile`]
-        variable                                         [based of the `CNT_<x>` variables]
-    :param NDX:  The starting point in the DELINQUENCY/GBIPX strings.
-                      Remember that: NDX_py = NDX_sas - 1.   > how to get the Python equivalent.
-                      Alternatively: NDX_sas = NDX_py + 1.   > how to get the SAS equivalent.
-
-                      NDX without any subscript is assumed to represent NDX_sas, NOT NDX_py.
-
-                      NDX is 1-index based.
-
-                      The Parameter Passed should be NDX and NOT INDEX.
-    :param PER:  The number of points to inspect.
-                 In other words, the number of months spanning a specific period.
-    :param DLQ_profile:  N-Month Delinquency String Profile.  Of DType String.
-    :param GBIPX_profile:  N-Month GBIPX String Profile.  Of Dtype String.
-    :return:  variable, [CNT_G, CNT_B, CNT_I, CNT_P, CNT_X, CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C]
-    """
-    NDX_py = NDX - 1
-    """
-    A:  The set up of temporary Counters and their Initialisation:
-    """
-    CNT_G = 0
-    CNT_B = 0
-    CNT_I = 0
-    CNT_P = 0
-    CNT_X = 0
-    CNT_0 = 0
-    CNT_1 = 0
-    CNT_2 = 0
-    CNT_3 = 0
-    CNT_4 = 0
-    CNT_A = 0
-    CNT_C = 0
-
-    """
-    B:  Traverse the DLQ_profile...
-    """
-    for i in range(NDX_py, NDX_py + PER):
-        char = DLQ_profile[i]  # The character under investigation in the current for-loop iteration.
-        if char == "0":  # Up To Date.
-            CNT_0 = CNT_0 + 1
-        if char == "1":  # 30 Days.
-            CNT_1 = CNT_1 + 1
-        if char == "2":  # 60 Days.
-            CNT_2 = CNT_2 + 1
-        if char == "3":  # 90 Days.
-            CNT_3 = CNT_3 + 1
-        if char == "4":  # 120 Days.
-            CNT_4 = CNT_4 + 1
-        if char == "A":  # Adverse Behaviour.
-            CNT_A = CNT_A + 1
-        if char == "C":  # In Credit.
-            CNT_C = CNT_C + 1
-
-        """
-        Count the GBIPX attributes over the period.
-        """
-        char = GBIPX_profile[i].upper()  # .upper() is a Belts-and-Braces approach.
-        if char == "G":  # Good behaviour.
-            CNT_G = CNT_G + 1
-        if char == "B":  # Bad behaviour.
-            CNT_B = CNT_B + 1
-        if char == ".":  # Indeterminate.
-            CNT_I = CNT_I + 1
-        if char == "P":  # Paid-Up.
-            CNT_P = CNT_P + 1
-        if char == "X":  # Exclusion.
-            CNT_X = CNT_X + 1
-
-    """
-    C.  Summarise the GBIPX behaviour over the period of `PER`.
-        Determine the `GBIPX` streaks.
-    """
-    # `variable` is derived from the CNT_<GBIPX> variables.
-    # `variable` summarises the Account GBIPX behaviour
-    variable = ""  # In SAS, this is simply called &VAR.
-
-    if CNT_X != 0:
-        variable = "X-Exclusion"
-    if CNT_P == PER:
-        variable = "P-Paid-up"
-    if CNT_I == PER:
-        variable = "I-Missing"
-    if CNT_G == PER:
-        variable = "G-Good"
-    if CNT_B == PER:
-        variable = "B-Bad"
-    if CNT_B != 0:
-        variable = "B-Partial"
-    if CNT_G != 0:
-        variable = "G-Partial"
-    if CNT_P != 0:
-        variable = "P-Partial"
-
-    """
-    If `variable` at this point is still empty, then it must be assigned the following "I-Indeterminate" Catch-All.
-    """
-    if variable == "":
-        variable = "I-Indeterminate"
-
-    # If the counter at this stage is still 0, then revert it back to NULL to align with the SAS Code.
-    if CNT_G == 0:
-        CNT_G = None    # 1
-    if CNT_B == 0:
-        CNT_B = None    # 2
-    if CNT_I == 0:
-        CNT_I = None    # 3
-    if CNT_P == 0:
-        CNT_P = None    # 4
-    if CNT_X == 0:
-        CNT_X = None    # 5
-    if CNT_0 == 0:
-        CNT_0 = None    # 6
-    if CNT_1 == 0:
-        CNT_1 = None    # 7
-    if CNT_2 == 0:
-        CNT_2 = None    # 8
-    if CNT_3 == 0:
-        CNT_3 = None    # 9
-    if CNT_4 == 0:
-        CNT_4 = None    # 10
-    if CNT_A == 0:
-        CNT_A = None    # 11
-    if CNT_C == 0:
-        CNT_C = None    # 12
-
-
-    # indices:      0      1      2      3      4      5      6      7      8      9      10     11
-    ls = variable, [CNT_G, CNT_B, CNT_I, CNT_P, CNT_X, CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C]
-    return ls
-
-
-def drop_null_columns(pysdf, *ls_cols):
-    """
-    This function drops columns that only contains null values.
-    :param pysdf:  A PySpark DataFrame.
-    :ls_cols: The columns under investigation.
-    """
-    # print(f"pysdf.count() = {pysdf.count()}.")
-    null_counts = pysdf \
-        .select([f.count(f.when(f.col(c).isNull(), c)).alias(c) for c in ls_cols]) \
-        .collect()[0] \
-        .asDict()
-    # print(f"Dictionary `null_counts` = {null_counts}.")
-    pysdf_count = pysdf.count()
-    to_drop = [k for k, v in null_counts.items() if v == pysdf_count]
-    # print(f"List `to_drop` = {to_drop}.")
-    pysdf = pysdf.drop(*to_drop)
-
-    return pysdf
-
-
-def set_spark_session(spark_session):
-    global spark
-    spark = spark_session
-
-
-def Transition_Convert(VAR):
-    """
-    Evaluates the input `VAR` against many conditions.
-    `VAR` is then updated based on the match it has made.
-    IN ESSENCE, Transition_Convert.py expands the 2-character aging and dlq combinations into meaningful strings.
-    :param VAR:  Based on the logic present in the `Account_Transition.py` script, it appears that `VAR` may be
-            (i) `Transition_NDX_AGE`, or
-            (ii) `Transition_NDX_DLQ`.
-    This `VAR` is of dtype string.  In this scenario, it should be a 2-character combination.
-    :return:  Return an updated `VAR` stored in the variable `VAR_return`.
-    """
-
-    """
-    (i)
-    Initialisation of the return variable (which is of dtype string):
-    """
-    VAR_return = None
-
-    """
-    (ii)
-    UTD Accounts:
-    """
-    if VAR == "00":
-        VAR_return = "0(=) UTD both periods"
-    if VAR in ("01", "02", "03", "04", "0A"):
-        VAR_return = "0(-) UTD: Rolled forward or adverse event next period"
-    if VAR in ("0C", "0P"):
-        VAR_return = "0(+) UTD: Credit balance or paid-up next period"
-
-    """
-    30-Day Accounts:
-    (iii)
-    """
-    if VAR in ("10", "1C", "1P"):
-        VAR_return = "1(+) 30 Days: Cured or credit balance or paid-up next period"
-    if VAR == "11":
-        VAR_return = "1(=) 30 Days both periods"
-    if VAR in ("12", "13", "14", "1A"):
-        VAR_return = "1(-) 30 Days: Rolled forward or adverse event next period"
-
-    """
-    60-Day Accounts:
-    (iv)
-    """
-    if VAR in ("20", "2C"):
-        VAR_return = "2(+) 60 Days: Cured or credit balance next period"
-    if VAR in ("21", "2P"):
-        VAR_return = "2(+) 60 Days: Rolled backward or paid-up next period"
-    if VAR == "22":
-        VAR_return = "2(=) 60 Days both periods"
-    if VAR in ("23", "24", "2A"):
-        VAR_return = "2(-) 60 Days: Rolled forward or adverse event next period"
-
-    """
-    (v)
-    90-Day Accounts:
-    """
-    if VAR in ("30", "3C"):
-        VAR_return = "3(+) 90 Days: Cured or credit balance next period"
-    if VAR in ("31", "32", "3P"):
-        VAR_return = "3(+) 90 Days: Rolled backward or paid-up next period"
-    if VAR == "33":
-        VAR_return = "3(=) 90 Days both periods"
-    if VAR in ("34", "3A"):
-        VAR_return = "3(-) 90 Days: Rolled forward or adverse event next period"
-
-    """
-    (vi)
-    120-Day Accounts
-    """
-    if VAR in ("40", "41", "42", "43", "4C", "4P"):
-        VAR_return = "4(+) 120 Days: Rolled backward or credit balance or paid-up next period"
-    if VAR in ("44", "4A"):
-        VAR_return = "4(=) 120 Days both periods or 120 Days and adverse next period"
-
-    """
-    (vii)
-    Adverse-event Accounts:
-    """
-    if VAR == "AA":
-        VAR_return = "5(=) Adverse both periods"
-    if VAR in ("A0", "AC"):
-        VAR_return = "5(+) Adverse: UTD or credit balance next period"
-    if VAR in ("A1", "AP"):
-        VAR_return = "5(+) Adverse: 30 days or paid-up next period"
-    if VAR in ("A2", "A3", "A4"):
-        VAR_return = "5(-) Adverse: 60+ days next period"
-
-    """
-    (viii)
-    Credit-Balance Accounts
-    """
-    if VAR == "CC":
-        VAR_return = "6(=) Credit Balance both periods"
-    if VAR == "C0":
-        VAR_return = "6(+) Credit Balance: UTD next period"
-    if VAR in ("C1", "C2", "C3", "C4", "CA", "CP"):
-        VAR_return = "6(-) Credit Balance: 30+ days or paid-up or adverse event next period"
-
-    """
-    (ix)
-    Paid-up Accounts:
-    """
-    if VAR == "PP":
-        VAR_return = "7(=) Paid-up both periods"
-    if VAR in ("P0", "PC"):
-        VAR_return = "7(+) Paid-up: UTD or credit balance next period"
-    if VAR == "P1":
-        VAR_return = "7(-) Paid-up: 30 days next period"
-    if VAR in ("P2", "P3", "P4", "PA"):
-        VAR_return = "7(-) Paid-up: 60+ days or adverse event next period"
-
-    """
-    (x)
-    Insufficient performance information in either of the periods.
-    """
-    if VAR in ("--", ".."):
-        VAR_return = "8(.) Insufficient performance information"
-
-    """
-    (xi)
-    Exclusion accounts including deceased, doubtful debt, etc...
-    """
-    if VAR in ("DD", "XX"):
-        VAR_return = "9(.) Exclusion account in either period"
-
-    return VAR_return
-
-
 def Account_Behaviour(OBS1, OBS6, OBS12, OBS18, OBS24):
     """
     As per BD:  Generate the Account Behaviour Profile.
@@ -396,7 +59,10 @@ schema_Account_Behaviour = t.StructType([
 udf_Account_Behaviour = f.udf(Account_Behaviour, returnType=schema_Account_Behaviour)
 
 
-def Account_State(Account_CAT, Account_DLQ, OBS1_DC1, OBS3_CRD, OBS3_DC0, OBS3_PUP, OBS12_DC0, OBS12_DC2, OBS12_PUP,
+def Account_State(Account_CAT, Account_DLQ,
+                  OBS1_DC1,
+                  OBS3_CRD, OBS3_DC0, OBS3_PUP,
+                  OBS12_DC0, OBS12_DC2, OBS12_PUP,
                   OBS24, OBS24_DC1, OBS24_DC2, OBS24_DC3, OBS24_DC4, OBS24_ADV, OBS24_PUP):
     """
     As per BD:  Generate the Account Transition States (which should eventually replace the `Account Behaviour`).
@@ -657,6 +323,209 @@ udf_Account_Transition = f.udf(Account_Transition,
                                returnType=schema_Account_Transition)
 
 
+def batch_evaluation(eval_against, conjunction, *observations):
+    """
+    A functions that evaluates a bunch of variables (stored in `observations`) against a single value
+    (i.e. `eval_against`).
+    The `conjunction` variable specifies whether the conditions should be chained together with an "and" operator,
+    or an "or" operator.
+    In the case of "and", True is returned if all `observations` are equal to `eval_against`.  Otherwise False.
+    In the case of "or", True is returned if any one of the `observations` are equal to `eval_against`.
+        If none of the `observations` are equal to `eval_against`, then False is returned.
+    Therefore, in the end, a boolean value is finally returned.
+
+    For Example:
+    batch_evaluation(None, "and", a, b, c)
+        True if a == b == c == None.  Otherwise False.
+
+    batch_evaluation("Y", "or", e, f)
+        True if e == "Y" or f == "Y" (also True if e == f == "Y").  Otherwise False.
+
+    :param eval_against: The value against which all the elements in `*observations` are evaluated against.
+    :param conjunction:  Of Dtype string.  Can only be either one of "and" or "or".
+                         This is the logical operator sandwiched between the individual conditions.
+    :param observations: A variable, or list of variables, which are evaluated against `eval_against`.
+    :return:  A Boolean value, True or False.
+    """
+    ls_obs = [elem for elem in observations]
+    if eval_against is None:
+        ls_res = [elem is None for elem in ls_obs]
+
+    else:
+        ls_res = [elem == eval_against for elem in ls_obs]
+
+    # "and" is coupled with the all(...) function.
+    if conjunction.lower() == "and":
+        eval_res = all(ls_res)
+
+    # "or" is coupled with the any(...) function.
+    elif conjunction.lower() == "or":
+        eval_res = any(ls_res)
+
+    # If the `else` clause is invoked, then the `conjunction` parameter was not specified correctly.
+    else:
+        raise Exception("The `conjunction` parameter can only be either one of 'and' or 'or'.\n"
+                        "Please correct and retry...")
+
+    return eval_res
+
+
+def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
+    """
+    This function generates:
+        CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C  [based of the `DLQ_profile`]
+        CNT_G, CNT_B, CNT_I, CNT_P, CNT_X                [based of the `GBIPX_profile`]
+        variable                                         [based of the `CNT_<x>` variables]
+    :param NDX:  The starting point in the DELINQUENCY/GBIPX strings.
+                      Remember that: NDX_py = NDX_sas - 1.   > how to get the Python equivalent.
+                      Alternatively: NDX_sas = NDX_py + 1.   > how to get the SAS equivalent.
+
+                      NDX without any subscript is assumed to represent NDX_sas, NOT NDX_py.
+
+                      NDX is 1-index based.
+
+                      The Parameter Passed should be NDX and NOT INDEX.
+    :param PER:  The number of points to inspect.
+                 In other words, the number of months spanning a specific period.
+    :param DLQ_profile:  N-Month Delinquency String Profile.  Of DType String.
+    :param GBIPX_profile:  N-Month GBIPX String Profile.  Of Dtype String.
+    :return:  variable, [CNT_G, CNT_B, CNT_I, CNT_P, CNT_X, CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C]
+    """
+    NDX_py = NDX - 1
+    """
+    A:  The set up of temporary Counters and their Initialisation:
+    """
+    CNT_G = 0
+    CNT_B = 0
+    CNT_I = 0
+    CNT_P = 0
+    CNT_X = 0
+
+    CNT_0 = 0
+    CNT_1 = 0
+    CNT_2 = 0
+    CNT_3 = 0
+    CNT_4 = 0
+    CNT_A = 0
+    CNT_C = 0
+
+    """
+    B:  Traverse the DLQ_profile...
+    """
+    for i in range(NDX_py, NDX_py + PER):
+        char = DLQ_profile[i].upper()  # The character under investigation in the current for-loop iteration.
+        if char == "0":  # Up To Date.
+            CNT_0 = CNT_0 + 1
+        if char == "1":  # 30 Days.
+            CNT_1 = CNT_1 + 1
+        if char == "2":  # 60 Days.
+            CNT_2 = CNT_2 + 1
+        if char == "3":  # 90 Days.
+            CNT_3 = CNT_3 + 1
+        if char == "4":  # 120 Days.
+            CNT_4 = CNT_4 + 1
+        if char == "A":  # Adverse Behaviour.
+            CNT_A = CNT_A + 1
+        if char == "C":  # In Credit.
+            CNT_C = CNT_C + 1
+
+        """
+        Count the GBIPX attributes over the period.
+        """
+        char_b = GBIPX_profile[i].upper()  # .upper() is a Belts-and-Braces approach.
+        if char_b == "G":  # Good behaviour.
+            CNT_G = CNT_G + 1
+        if char_b == "B":  # Bad behaviour.
+            CNT_B = CNT_B + 1
+        if char_b == ".":  # Indeterminate.
+            CNT_I = CNT_I + 1
+        if char_b == "P":  # Paid-Up.
+            CNT_P = CNT_P + 1
+        if char_b == "X":  # Exclusion.
+            CNT_X = CNT_X + 1
+
+    """
+    C.  Summarise the GBIPX behaviour over the period of `PER`.
+        Determine the `GBIPX` streaks.
+    """
+    # `variable` is derived from the CNT_<GBIPX> variables.
+    # `variable` summarises the Account GBIPX behaviour
+    variable = ""  # In SAS, this is simply called &VAR.
+
+    if CNT_X > 0:
+        variable = "X-Exclusion"
+    if CNT_P == PER:
+        variable = "P-Paid-up"
+    if CNT_I == PER:
+        variable = "I-Missing"
+    if CNT_G == PER:
+        variable = "G-Good"
+    if CNT_B == PER:
+        variable = "B-Bad"
+    if CNT_B > 0:
+        variable = "B-Partial"
+    if CNT_G > 0:
+        variable = "G-Partial"
+    if CNT_P > 0:
+        variable = "P-Partial"
+    """
+    If `variable` at this point is still empty, then it must be assigned the following "I-Indeterminate" Catch-All.
+    """
+    if variable == "":
+        variable = "I-Indeterminate"
+
+    # If the counter at this stage is still 0, then revert it back to NULL to align with the SAS Code.
+    if CNT_G == 0:
+        CNT_G = None    # 1
+    if CNT_B == 0:
+        CNT_B = None    # 2
+    if CNT_I == 0:
+        CNT_I = None    # 3
+    if CNT_P == 0:
+        CNT_P = None    # 4
+    if CNT_X == 0:
+        CNT_X = None    # 5
+    if CNT_0 == 0:
+        CNT_0 = None    # 6
+    if CNT_1 == 0:
+        CNT_1 = None    # 7
+    if CNT_2 == 0:
+        CNT_2 = None    # 8
+    if CNT_3 == 0:
+        CNT_3 = None    # 9
+    if CNT_4 == 0:
+        CNT_4 = None    # 10
+    if CNT_A == 0:
+        CNT_A = None    # 11
+    if CNT_C == 0:
+        CNT_C = None    # 12
+
+
+    # indices:      0      1      2      3      4      5      6      7      8      9      10     11
+    ls = variable, [CNT_G, CNT_B, CNT_I, CNT_P, CNT_X, CNT_0, CNT_1, CNT_2, CNT_3, CNT_4, CNT_A, CNT_C]
+    return ls
+
+
+def drop_null_columns(pysdf, *ls_cols):
+    """
+    This function drops columns that only contains null values.
+    :param pysdf:  A PySpark DataFrame.
+    :ls_cols: The columns under investigation.
+    """
+    # print(f"pysdf.count() = {pysdf.count()}.")
+    null_counts = pysdf \
+        .select([f.count(f.when(f.col(c).isNull(), c)).alias(c) for c in ls_cols]) \
+        .collect()[0] \
+        .asDict()
+    # print(f"Dictionary `null_counts` = {null_counts}.")
+    pysdf_count = pysdf.count()
+    to_drop = [k for k, v in null_counts.items() if v == pysdf_count]
+    # print(f"List `to_drop` = {to_drop}.")
+    pysdf = pysdf.drop(*to_drop)
+
+    return pysdf
+
+
 def Doubtful_Debt(Account_State_val, PIT):
     DoubtfulDebt1M = None
     DoubtfulDebt3M = None
@@ -767,7 +636,7 @@ def Observation_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         We may want to exclude observations with missing records when performing analysis.
     """
     # Extract the value we are evaluating in the following conditional statements.
-    val = ls_int[-1]  # CNT
+    val = ls_int[-1]  # `CNT` variable
 
     """
     Initialise the variable into which the output will be stored (RE: number of points missing).
@@ -999,8 +868,8 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
 
         # indices   0            1                 2           3    4    5    6    7    8          9         10
         # ls_int = [BadRateNBRM, DoubtfulDebtNBRM, PaidUpNBRM, GDS, BAD, PUP, CRD, CNT, goods_NBR, bads_NBR, paidup_NBR,
-        # GBP]
-        # 11
+        #           GBP]
+        #           11
 
         return ls_str, ls_int
 
@@ -1012,3 +881,143 @@ schema_Performance_GBIPX = t.StructType([
 
 udf_Performance_GBIPX = f.udf(Performance_GBIPX,
                               returnType=schema_Performance_GBIPX)
+
+
+def set_spark_session(spark_session):
+    global spark
+    spark = spark_session
+
+
+def Transition_Convert(VAR):
+    """
+    Evaluates the input `VAR` against many conditions.
+    `VAR` is then updated based on the match it has made.
+    IN ESSENCE, Transition_Convert.py expands the 2-character aging and dlq combinations into meaningful strings.
+    :param VAR:  Based on the logic present in the `Account_Transition.py` script, it appears that `VAR` may be
+            (i) `Transition_NDX_AGE`, or
+            (ii) `Transition_NDX_DLQ`.
+    This `VAR` is of dtype string.  In this scenario, it should be a 2-character combination.
+    :return:  Return an updated `VAR` stored in the variable `VAR_return`.
+    """
+
+    """
+    (i)
+    Initialisation of the return variable (which is of dtype string):
+    """
+    VAR_return = None
+
+    """
+    (ii)
+    UTD Accounts:
+    """
+    if VAR == "00":
+        VAR_return = "0(=) UTD both periods"
+    if VAR in ("01", "02", "03", "04", "0A"):
+        VAR_return = "0(-) UTD: Rolled forward or adverse event next period"
+    if VAR in ("0C", "0P"):
+        VAR_return = "0(+) UTD: Credit balance or paid-up next period"
+
+    """
+    30-Day Accounts:
+    (iii)
+    """
+    if VAR in ("10", "1C", "1P"):
+        VAR_return = "1(+) 30 Days: Cured or credit balance or paid-up next period"
+    if VAR == "11":
+        VAR_return = "1(=) 30 Days both periods"
+    if VAR in ("12", "13", "14", "1A"):
+        VAR_return = "1(-) 30 Days: Rolled forward or adverse event next period"
+
+    """
+    60-Day Accounts:
+    (iv)
+    """
+    if VAR in ("20", "2C"):
+        VAR_return = "2(+) 60 Days: Cured or credit balance next period"
+    if VAR in ("21", "2P"):
+        VAR_return = "2(+) 60 Days: Rolled backward or paid-up next period"
+    if VAR == "22":
+        VAR_return = "2(=) 60 Days both periods"
+    if VAR in ("23", "24", "2A"):
+        VAR_return = "2(-) 60 Days: Rolled forward or adverse event next period"
+
+    """
+    (v)
+    90-Day Accounts:
+    """
+    if VAR in ("30", "3C"):
+        VAR_return = "3(+) 90 Days: Cured or credit balance next period"
+    if VAR in ("31", "32", "3P"):
+        VAR_return = "3(+) 90 Days: Rolled backward or paid-up next period"
+    if VAR == "33":
+        VAR_return = "3(=) 90 Days both periods"
+    if VAR in ("34", "3A"):
+        VAR_return = "3(-) 90 Days: Rolled forward or adverse event next period"
+
+    """
+    (vi)
+    120-Day Accounts
+    """
+    if VAR in ("40", "41", "42", "43", "4C", "4P"):
+        VAR_return = "4(+) 120 Days: Rolled backward or credit balance or paid-up next period"
+    if VAR in ("44", "4A"):
+        VAR_return = "4(=) 120 Days both periods or 120 Days and adverse next period"
+
+    """
+    (vii)
+    Adverse-event Accounts:
+    """
+    if VAR == "AA":
+        VAR_return = "5(=) Adverse both periods"
+    if VAR in ("A0", "AC"):
+        VAR_return = "5(+) Adverse: UTD or credit balance next period"
+    if VAR in ("A1", "AP"):
+        VAR_return = "5(+) Adverse: 30 days or paid-up next period"
+    if VAR in ("A2", "A3", "A4"):
+        VAR_return = "5(-) Adverse: 60+ days next period"
+
+    """
+    (viii)
+    Credit-Balance Accounts
+    """
+    if VAR == "CC":
+        VAR_return = "6(=) Credit Balance both periods"
+    if VAR == "C0":
+        VAR_return = "6(+) Credit Balance: UTD next period"
+    if VAR in ("C1", "C2", "C3", "C4", "CA", "CP"):
+        VAR_return = "6(-) Credit Balance: 30+ days or paid-up or adverse event next period"
+
+    """
+    (ix)
+    Paid-up Accounts:
+    """
+    if VAR == "PP":
+        VAR_return = "7(=) Paid-up both periods"
+    if VAR in ("P0", "PC"):
+        VAR_return = "7(+) Paid-up: UTD or credit balance next period"
+    if VAR == "P1":
+        VAR_return = "7(-) Paid-up: 30 days next period"
+    if VAR in ("P2", "P3", "P4", "PA"):
+        VAR_return = "7(-) Paid-up: 60+ days or adverse event next period"
+
+    """
+    (x)
+    Insufficient performance information in either of the periods.
+    """
+    if VAR in ("--", ".."):
+        VAR_return = "8(.) Insufficient performance information"
+
+    """
+    (xi)
+    Exclusion accounts including deceased, doubtful debt, etc...
+    """
+    if VAR in ("DD", "XX"):
+        VAR_return = "9(.) Exclusion account in either period"
+
+    return VAR_return
+
+
+
+
+
+

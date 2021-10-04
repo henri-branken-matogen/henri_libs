@@ -212,7 +212,7 @@ udf_Customer_Type = udf(Customer_Type, returnType=StringType())
 def date_comparison(dte_m0m, dte_m1m):
     """
     Function that evaluates two date values (which come from 2 columns) on whether they are Null or not, and
-    returns information     based on that evaluation.  Note that it does not compare the 2 date values with each other.
+    returns information based on that evaluation.  Note that it does not compare the 2 date values with each other.
     :param dte_m0m:  The name of the one column whose date values we need to examine on whether they are NULL or not.
     :param dte_m1m:  The name of the second columns whose date values we need to examine on whether they are NULL
     or not.
@@ -846,17 +846,17 @@ def finalise_aad(dte_m0m, dte_m1m):
     dte_m0m and dte_m1m are NULL, the function will return a NULL value.
     """
     if (dte_m0m is None) and (dte_m1m is not None):
-        return dte_m1m
+        return dte_m1m  # Use the Profile "Account_Activation_DTE".
     elif (dte_m0m is not None) and (dte_m1m is None):
-        return dte_m0m
+        return dte_m0m  # Use the latest "Account_Activation_DTE".
     elif (dte_m0m is None) and (dte_m1m is None):
-        return None
+        return None  # Leave as is.  "Account_Activation_DTE" is NULL.
     elif dte_m0m == dte_m1m:
-        return dte_m0m
+        return dte_m0m  # Use either "Account_Activation_DTE".  Outcome remains the same.
     elif dte_m0m < dte_m1m:
-        return dte_m0m
+        return dte_m0m  # Override "Account_Activation_DTE" with Younger version (dte_m0m).
     elif dte_m0m > dte_m1m:
-        return dte_m1m
+        return dte_m1m  # Override "Account_Activation_DTE" with the Older version (dte_m0m).
     else:
         return None
 
@@ -866,7 +866,7 @@ udf_finalise_aad = udf(finalise_aad, returnType=DateType())
 
 def generate_mob_prof(mob_start):
     """
-    Given the Months-On-Book value, in integer format, for Month-01, the function generates a full string profile for
+    Given the Months-On-Book value, in integer format of Month-01, the function generates a full string profile for
     the entire observation period of 60 Months.
     :param mob_start: The Month-01 Months-On-Book value.
     :return: A 60-month string profile representing the Months-On-Book profile over a period of 60 months.
@@ -1197,6 +1197,7 @@ def starting_mob(acctact_dte, statement_dte):
     """
     Determines the Month-01 value for Months-On-Book.  It does so by determining the number of elapsed months from the
     account activation date till the statement date.
+    I.e. delta does the following:  'statement_dte' - 'acctact_dte'
     :param acctact_dte: The Account Activation Date, in date format.
     :param statement_dte: The Statement-Month End Date, in date format.
     :return: The Month-01 Months-On-Book value, in integer format.
