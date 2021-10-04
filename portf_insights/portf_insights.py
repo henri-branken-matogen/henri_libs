@@ -29,24 +29,20 @@ def Account_Behaviour(OBS1, OBS6, OBS12, OBS18, OBS24):
 
     if batch_evaluation("X-Exclusion", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "X. Exclusions"
-
-    if batch_evaluation("I-Missing", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
+    elif batch_evaluation("I-Missing", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "D. Missing Record"
-
-    if batch_evaluation("B-Bad", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
+    elif batch_evaluation("B-Bad", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "F. Adverse Account"
-
-    if batch_evaluation("B-Partial", "or", OBS6, OBS12, OBS18, OBS24):
+    elif batch_evaluation("B-Partial", "or", OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "E. Poor Account"
-
-    if batch_evaluation("G-Good", "or", OBS6, OBS12, OBS18, OBS24):
+    elif batch_evaluation("G-Good", "or", OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "A. Excellent Account"
-
-    if batch_evaluation("G-Partial", "or", OBS6, OBS12, OBS18, OBS24):
+    elif batch_evaluation("G-Partial", "or", OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "B. Good Account"
-
-    if batch_evaluation("P-Paid-up", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
+    elif batch_evaluation("P-Paid-up", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "C. Paid-up Account"
+    else:
+        pass
 
     return Account_Behaviour_val, Customer_Behaviour_val
 
@@ -109,91 +105,36 @@ def Account_State(Account_CAT, Account_DLQ,
     Account_State_val = ""  # The Account State (SME)
     Customer_State_val = "to be announced"  # The Customer State (SME)
 
-    """
-    (i)
-    Deceased, etc...
-    """
     if (Account_DLQ == "D") or (OBS24 == "X-Exclusion") or (OBS24 == "I-Missing"):
         Account_State_val = "X. EXC Exclusions"
-
-    """
-    (ii)
-    Still to be created from the Contracts Files.
-    """
-    if Account_CAT.upper() == "APP":
+    elif Account_CAT.upper() == "APP":
         Account_State_val = "A. NTU Not Taken-Up Applications"
-
-    """
-    (iii)
-    New Accounts opened in the past 6 months.
-    """
-    if Account_CAT.upper() == "NEW":
+    elif Account_CAT.upper() == "NEW":
         Account_State_val = "1. IMM Immature Accounts"
-
-    if OBS3_CRD == 3:
+    elif OBS3_CRD == 3:
         Account_State_val = "B. CRD Credit balance 3+ months (Voluntary Churn)"
-
-    if (Account_DLQ == "C") and (OBS3_CRD is not None):
+    elif (Account_DLQ == "C") and (OBS3_CRD is not None):
         Account_State_val = "2. C01 Credit Balance 1-2 months"
-
-    if (OBS12_PUP == 12) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
+    elif (OBS12_PUP == 12) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
         Account_State_val = "C. PUP Paid-up 12+ months (Voluntary Churn)"
-
-    if (OBS3_PUP == 3) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
+    elif (OBS3_PUP == 3) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
         Account_State_val = "3. P01 Paid-up 3-11 months"
-
-    if Account_DLQ == "P" and (OBS3_PUP is not None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
+    elif Account_DLQ == "P" and (OBS3_PUP is not None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
         Account_State_val = "3. P01 Paid-up 1-2 months"
-
-    """
-    (iv)
-    UTD with 12-month clear payment streak, no prior arrears / paid-up.
-    """
-    if (OBS12_DC0 == 12) and batch_evaluation(None, "and", OBS24_DC1, OBS24_DC2, OBS24_ADV, OBS24_DC3, OBS24_DC4,
-                                              OBS24_PUP):
+    elif (OBS12_DC0 == 12) and batch_evaluation(None, "and", OBS24_DC1, OBS24_DC2, OBS24_ADV, OBS24_DC3, OBS24_DC4, OBS24_PUP):
         Account_State_val = "4. CLR Clear"
-
-    """
-    (v)
-    [1] In the past 3 months, the account must have been consecutively UTD (DC0).
-    [2] In the past 12 months, the account must NOT have reached 60 Days (DC2).
-    [3] In the past 24 months, the account must not have reached 90 Days (DC3), 120 Days (DC4), and not had any adverse.
-    We effectively have 3 observation windows.
-    The net effect is that the account must show a running streak of payments (first check), but could have had a minor
-    delinquency in the 12 months (second check), but must not have had a serious delinquency during the 24 months
-    contract period (third check).  This all assumes a 24 month contract which is the most common contract.
-    """
-    if (OBS3_DC0 == 3) and (OBS12_DC2 is None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC3, OBS24_DC4):
+    elif (OBS3_DC0 == 3) and (OBS12_DC2 is None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC3, OBS24_DC4):
         Account_State_val = "5. RES Responsible"
-
-    """
-    (vi)
-    UTD, but struggles to pay consistently.
-    """
-    if Account_DLQ == "0":
+    elif Account_DLQ == "0":
         Account_State_val = "6. ERR Erratic"
-
-    """
-    (vii)
-    30 Days in Arrears.
-    """
-    if OBS1_DC1 == 1:
+    elif OBS1_DC1 == 1:
         Account_State_val = "7. EXT Extended"
-
-    """
-    (viii)
-    60 or 90 Days in Arrears.
-    """
-    if Account_DLQ in ["2", "3"]:
+    elif Account_DLQ in ["2", "3"]:
         Account_State_val = "8. Distressed"
-
-    """
-    (ix)
-    120 days in Arrears / Adverse Event / Paid-up.
-    """
-    if Account_DLQ in ["A", "4", "P"]:
+    elif Account_DLQ in ["A", "4", "P"]:
         Account_State_val = "D. DBT Doubtful Debt (Involuntary Churn)"
-
+    else:
+        pass
     return Account_State_val, Customer_State_val
 
 
@@ -273,18 +214,20 @@ def Account_Transition(NDX, PIT, Account_AGE, Account_DLQ, Aging_profile, DLQ_pr
             # Already a Credit Balance Account.
             Transition_NDX_AGE = "CC"
             Transition_NDX_DLQ = "CC"
-        if char_eval == "C":
+        elif char_eval == "C":
             # Already a Paid-Up Account.
             Transition_NDX_AGE = "PP"
             Transition_NDX_DLQ = "PP"
-        if char_eval == "D":
+        elif char_eval == "D":
             # Already a Doubtful Debt Account.
             Transition_NDX_AGE = "44"
             Transition_NDX_DLQ = "44"
-        if char_eval == "X":
+        elif char_eval == "X":
             # Already an Exclusion Account.
             Transition_NDX_AGE = "XX"
             Transition_NDX_DLQ = "XX"
+        else:
+            pass
 
         """
         (iii)
@@ -416,33 +359,36 @@ def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
         char = DLQ_profile[i].upper()  # The character under investigation in the current for-loop iteration.
         if char == "0":  # Up To Date.
             CNT_0 = CNT_0 + 1
-        if char == "1":  # 30 Days.
+        elif char == "1":  # 30 Days.
             CNT_1 = CNT_1 + 1
-        if char == "2":  # 60 Days.
+        elif char == "2":  # 60 Days.
             CNT_2 = CNT_2 + 1
-        if char == "3":  # 90 Days.
+        elif char == "3":  # 90 Days.
             CNT_3 = CNT_3 + 1
-        if char == "4":  # 120 Days.
+        elif char == "4":  # 120 Days.
             CNT_4 = CNT_4 + 1
-        if char == "A":  # Adverse Behaviour.
+        elif char == "A":  # Adverse Behaviour.
             CNT_A = CNT_A + 1
-        if char == "C":  # In Credit.
+        elif char == "C":  # In Credit.
             CNT_C = CNT_C + 1
-
+        else:
+            pass
         """
         Count the GBIPX attributes over the period.
         """
         char_b = GBIPX_profile[i].upper()  # .upper() is a Belts-and-Braces approach.
         if char_b == "G":  # Good behaviour.
             CNT_G = CNT_G + 1
-        if char_b == "B":  # Bad behaviour.
+        elif char_b == "B":  # Bad behaviour.
             CNT_B = CNT_B + 1
-        if char_b == ".":  # Indeterminate.
+        elif char_b == ".":  # Indeterminate.
             CNT_I = CNT_I + 1
-        if char_b == "P":  # Paid-Up.
+        elif char_b == "P":  # Paid-Up.
             CNT_P = CNT_P + 1
-        if char_b == "X":  # Exclusion.
+        elif char_b == "X":  # Exclusion.
             CNT_X = CNT_X + 1
+        else:
+            pass
 
     """
     C.  Summarise the GBIPX behaviour over the period of `PER`.
@@ -454,24 +400,21 @@ def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
 
     if CNT_X > 0:
         variable = "X-Exclusion"
-    if CNT_P == PER:
+    elif CNT_P == PER:
         variable = "P-Paid-up"
-    if CNT_I == PER:
+    elif CNT_I == PER:
         variable = "I-Missing"
-    if CNT_G == PER:
+    elif CNT_G == PER:
         variable = "G-Good"
-    if CNT_B == PER:
+    elif CNT_B == PER:
         variable = "B-Bad"
-    if CNT_B > 0:
+    elif CNT_B > 0:
         variable = "B-Partial"
-    if CNT_G > 0:
+    elif CNT_G > 0:
         variable = "G-Partial"
-    if CNT_P > 0:
+    elif CNT_P > 0:
         variable = "P-Partial"
-    """
-    If `variable` at this point is still empty, then it must be assigned the following "I-Indeterminate" Catch-All.
-    """
-    if variable == "":
+    else:
         variable = "I-Indeterminate"
 
     # If the counter at this stage is still 0, then revert it back to NULL to align with the SAS Code.
@@ -906,113 +849,66 @@ def Transition_Convert(VAR):
     """
     VAR_return = None
 
-    """
-    (ii)
-    UTD Accounts:
-    """
     if VAR == "00":
         VAR_return = "0(=) UTD both periods"
-    if VAR in ("01", "02", "03", "04", "0A"):
+    elif VAR in ("01", "02", "03", "04", "0A"):
         VAR_return = "0(-) UTD: Rolled forward or adverse event next period"
-    if VAR in ("0C", "0P"):
+    elif VAR in ("0C", "0P"):
         VAR_return = "0(+) UTD: Credit balance or paid-up next period"
-
-    """
-    30-Day Accounts:
-    (iii)
-    """
-    if VAR in ("10", "1C", "1P"):
+    elif VAR in ("10", "1C", "1P"):
         VAR_return = "1(+) 30 Days: Cured or credit balance or paid-up next period"
-    if VAR == "11":
+    elif VAR == "11":
         VAR_return = "1(=) 30 Days both periods"
-    if VAR in ("12", "13", "14", "1A"):
+    elif VAR in ("12", "13", "14", "1A"):
         VAR_return = "1(-) 30 Days: Rolled forward or adverse event next period"
-
-    """
-    60-Day Accounts:
-    (iv)
-    """
-    if VAR in ("20", "2C"):
+    elif VAR in ("20", "2C"):
         VAR_return = "2(+) 60 Days: Cured or credit balance next period"
-    if VAR in ("21", "2P"):
+    elif VAR in ("21", "2P"):
         VAR_return = "2(+) 60 Days: Rolled backward or paid-up next period"
-    if VAR == "22":
+    elif VAR == "22":
         VAR_return = "2(=) 60 Days both periods"
-    if VAR in ("23", "24", "2A"):
+    elif VAR in ("23", "24", "2A"):
         VAR_return = "2(-) 60 Days: Rolled forward or adverse event next period"
-
-    """
-    (v)
-    90-Day Accounts:
-    """
-    if VAR in ("30", "3C"):
+    elif VAR in ("30", "3C"):
         VAR_return = "3(+) 90 Days: Cured or credit balance next period"
-    if VAR in ("31", "32", "3P"):
+    elif VAR in ("31", "32", "3P"):
         VAR_return = "3(+) 90 Days: Rolled backward or paid-up next period"
-    if VAR == "33":
+    elif VAR == "33":
         VAR_return = "3(=) 90 Days both periods"
-    if VAR in ("34", "3A"):
+    elif VAR in ("34", "3A"):
         VAR_return = "3(-) 90 Days: Rolled forward or adverse event next period"
-
-    """
-    (vi)
-    120-Day Accounts
-    """
-    if VAR in ("40", "41", "42", "43", "4C", "4P"):
+    elif VAR in ("40", "41", "42", "43", "4C", "4P"):
         VAR_return = "4(+) 120 Days: Rolled backward or credit balance or paid-up next period"
-    if VAR in ("44", "4A"):
+    elif VAR in ("44", "4A"):
         VAR_return = "4(=) 120 Days both periods or 120 Days and adverse next period"
-
-    """
-    (vii)
-    Adverse-event Accounts:
-    """
-    if VAR == "AA":
+    elif VAR == "AA":
         VAR_return = "5(=) Adverse both periods"
-    if VAR in ("A0", "AC"):
+    elif VAR in ("A0", "AC"):
         VAR_return = "5(+) Adverse: UTD or credit balance next period"
-    if VAR in ("A1", "AP"):
+    elif VAR in ("A1", "AP"):
         VAR_return = "5(+) Adverse: 30 days or paid-up next period"
-    if VAR in ("A2", "A3", "A4"):
+    elif VAR in ("A2", "A3", "A4"):
         VAR_return = "5(-) Adverse: 60+ days next period"
-
-    """
-    (viii)
-    Credit-Balance Accounts
-    """
-    if VAR == "CC":
+    elif VAR == "CC":
         VAR_return = "6(=) Credit Balance both periods"
-    if VAR == "C0":
+    elif VAR == "C0":
         VAR_return = "6(+) Credit Balance: UTD next period"
-    if VAR in ("C1", "C2", "C3", "C4", "CA", "CP"):
+    elif VAR in ("C1", "C2", "C3", "C4", "CA", "CP"):
         VAR_return = "6(-) Credit Balance: 30+ days or paid-up or adverse event next period"
-
-    """
-    (ix)
-    Paid-up Accounts:
-    """
-    if VAR == "PP":
+    elif VAR == "PP":
         VAR_return = "7(=) Paid-up both periods"
-    if VAR in ("P0", "PC"):
+    elif VAR in ("P0", "PC"):
         VAR_return = "7(+) Paid-up: UTD or credit balance next period"
-    if VAR == "P1":
+    elif VAR == "P1":
         VAR_return = "7(-) Paid-up: 30 days next period"
-    if VAR in ("P2", "P3", "P4", "PA"):
+    elif VAR in ("P2", "P3", "P4", "PA"):
         VAR_return = "7(-) Paid-up: 60+ days or adverse event next period"
-
-    """
-    (x)
-    Insufficient performance information in either of the periods.
-    """
-    if VAR in ("--", ".."):
+    elif VAR in ("--", ".."):
         VAR_return = "8(.) Insufficient performance information"
-
-    """
-    (xi)
-    Exclusion accounts including deceased, doubtful debt, etc...
-    """
-    if VAR in ("DD", "XX"):
+    elif VAR in ("DD", "XX"):
         VAR_return = "9(.) Exclusion account in either period"
+    else:
+        pass
 
     return VAR_return
 
