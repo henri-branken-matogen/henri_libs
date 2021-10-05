@@ -688,8 +688,10 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         A.  Call the Python Script that calculates the GBIPX Behaviour
         """
         delta = PIT - NBR  # A positive integer.  delta >= 1.
-        delta_py = delta - 1  # delta_py >= 0.
-        PERF_NBR, ls_counters = Behaviour_GBIPX(NDX=delta_py, PER=NBR,
+        # delta_py = delta - 1  # delta_py >= 0.
+        # Do not use NDX=delta_py below, because then you will do a 'double subtraction' of "<x> - 1".
+        # The correct usage in the line below is NDX=delta.
+        PERF_NBR, ls_counters = Behaviour_GBIPX(NDX=delta, PER=NBR,
                                                 DLQ_profile=DLQ_profile, GBIPX_profile=GBIPX_profile)
         ls_str = [PERF_NBR]
 
@@ -743,7 +745,7 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
             as we may want to exclude observations with missing records when performing analysis.
         """
         # Extract the `value` that we are evaluating in the subsequent conditional statements:
-        val = ls_int[7]  # List route.
+        val = ls_int[7]  # List route to grab `CNT`.
         # Initialise the `GRP` variable into which the output will be stored:
         GRP = ""  # PER&NBR._GRP  # String
         if (val == 0) or (val is None):
@@ -775,7 +777,7 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         bads_NBR = None  # Bads&NBR      # int
         paidup_NBR = None  # PaidUp&NBR  # int
 
-        val_char = PERF_NBR[0]
+        val_char = PERF_NBR[0].upper()  # Extract the first character of `PERF_NBR[0]`.
         if val_char == "G":
             goods_NBR = 1
         elif val_char == "B":
