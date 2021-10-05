@@ -475,7 +475,7 @@ def Doubtful_Debt(Account_State_val, PIT):
     DoubtfulDebt6M = None
     DoubtfulDebt9M = None
     DoubtfulDebt12M = None
-    if Account_State_val == "D. Doubtful Debt (Involuntary Churn)":
+    if Account_State_val == "D. DBT Doubtful Debt (Involuntary Churn)":
         if PIT > 12:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
