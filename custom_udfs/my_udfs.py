@@ -605,7 +605,38 @@ def derive_quarter(stamp_val):
     return yyyy + suffix
 
 
+def derive_quarter_from_dt(dt_val):
+    yyyy = str(dt_val.year)
+    mm = str(dt_val.month).zfill(2)
+    if mm in ("01", "02", "03"):
+        suffix = "Q1"
+    elif mm in ("04", "05", "06"):
+        suffix = "Q2"
+    elif mm in ("07", "08", "09"):
+        suffix = "Q3"
+    else:
+        suffix = "Q4"
+    return yyyy + suffix
+
+
 udf_derive_quarter = udf(derive_quarter, returnType=StringType())
+
+
+def derive_quarter_from_dt_type(dt_val):
+    yyyy = str(dt_val.year)
+    mm = str(dt_val.month).zfill(2)
+    if mm in ("01", "02", "03"):
+        suffix = "Q1"
+    elif mm in ("04", "05", "06"):
+        suffix = "Q2"
+    elif mm in ("07", "08", "09"):
+        suffix = "Q3"
+    else:
+        suffix = "Q4"
+    return yyyy + suffix
+
+udf_derive_quarter_from_dt_type = udf(derive_quarter_from_dt_type,
+                                      returnType=StringType())
 
 
 def element_extraction(profile, n_chars_p_chunk, pipe_present=True, point_in_time=1):
