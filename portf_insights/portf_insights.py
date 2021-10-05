@@ -182,34 +182,36 @@ def Account_Transition(NDX, PIT, Account_AGE, Account_DLQ, Aging_profile, DLQ_pr
 
     delta = PIT - NDX
     delta_py = delta - 1
-    if delta > 0:
+    if delta_py >= 0:
         # Fetch the next period account aging / delinquency / states, and append to the current month to create combos.
-        Transition_NDX_AGE = str(Account_AGE + Aging_profile[delta_py]).replace(" ", "")
-        Transition_NDX_DLQ = str(Account_DLQ + DLQ_profile[delta_py]).replace(" ", "")
+        Transition_NDX_AGE = (str(Account_AGE) + str(Aging_profile[delta_py])).replace(" ", "")
+        Transition_NDX_DLQ = (str(Account_DLQ) + str(DLQ_profile[delta_py])).replace(" ", "")
 
-        # If there is a missing aging field, then exclude by converting the field into "--".
-        if Account_AGE in ("-", None) or Aging_profile[delta_py] in ("-", None):
+        # If there is a missing AGING field, then exclude by converting the field into "--".
+        if (Account_AGE in ("-", None)) or (Aging_profile[delta_py] in ("-", None)):
             Transition_NDX_AGE = "--"
-        if Account_AGE in (".", None) or Aging_profile[delta_py] in (".", None):
+        if (Account_AGE in (".", None)) or (Aging_profile[delta_py] in (".", None)):
             Transition_NDX_AGE = ".."
 
-        # If there is a missing Delinquency Field, then Exclude by converting the field into "..".
-        if Account_DLQ in (".", None) or DLQ_profile[delta_py] in (".", None):
+        # If there is a missing DELINQUENCY Field, then Exclude by converting the field into "..".
+        if (Account_DLQ in (".", None)) or (DLQ_profile[delta_py] in (".", None)):
             Transition_NDX_DLQ = ".."
 
         # If `Account_DLQ`="X" (Exlusion), in either month, then we exclude by converting the field into "XX":
-        if Account_DLQ == "X" or DLQ_profile[delta_py] == "X":
+        if (Account_DLQ == "X") or (DLQ_profile[delta_py] == "X"):
             Transition_NDX_AGE = "XX"
+            Transition_NDX_DLQ = "XX"
 
         # If deceased, in either month, then exclude by converting the field into "DD":
-        if Account_DLQ == "D" or DLQ_profile[delta_py] == "D":
+        if (Account_DLQ == "D") or (DLQ_profile[delta_py] == "D"):
             Transition_NDX_AGE = "DD"
+            Transition_NDX_DLQ = "DD"
 
         """
         (ii)
         Scan the Account State, and override any prior combinations:
         """
-        char_eval = Account_State_val[0].upper()
+        char_eval = str(Account_State_val[0]).upper()
         if char_eval == "B":
             # Already a Credit Balance Account.
             Transition_NDX_AGE = "CC"
@@ -845,10 +847,6 @@ def Transition_Convert(VAR):
     :return:  Return an updated `VAR` stored in the variable `VAR_return`.
     """
 
-    """
-    (i)
-    Initialisation of the return variable (which is of dtype string):
-    """
     VAR_return = None
 
     if VAR == "00":
@@ -880,7 +878,7 @@ def Transition_Convert(VAR):
     elif VAR in ("34", "3A"):
         VAR_return = "3(-) 90 Days: Rolled forward or adverse event next period"
     elif VAR in ("40", "41", "42", "43", "4C", "4P"):
-        VAR_return = "4(+) 120 Days: Rolled backward or credit balance or paid-up next period"
+        VAR_return = "4(+) 120 Days: Rolled backward or or credit balance or paid-up next period"
     elif VAR in ("44", "4A"):
         VAR_return = "4(=) 120 Days both periods or 120 Days and adverse next period"
     elif VAR == "AA":
