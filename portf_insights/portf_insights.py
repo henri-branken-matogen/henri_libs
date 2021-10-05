@@ -118,7 +118,7 @@ def Account_State(Account_CAT, Account_DLQ,
     elif (OBS12_PUP == 12) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
         Account_State_val = "C. PUP Paid-up 12+ months (Voluntary Churn)"
     elif (OBS3_PUP == 3) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
-        Account_State_val = "3. P01 Paid-up 3-11 months"
+        Account_State_val = "3. P03 Paid-up 3-11 months"
     elif Account_DLQ == "P" and (OBS3_PUP is not None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
         Account_State_val = "3. P01 Paid-up 1-2 months"
     elif (OBS12_DC0 == 12) and batch_evaluation(None, "and", OBS24_DC1, OBS24_DC2, OBS24_ADV, OBS24_DC3, OBS24_DC4, OBS24_PUP):
@@ -130,7 +130,7 @@ def Account_State(Account_CAT, Account_DLQ,
     elif OBS1_DC1 == 1:
         Account_State_val = "7. EXT Extended"
     elif Account_DLQ in ["2", "3"]:
-        Account_State_val = "8. Distressed"
+        Account_State_val = "8. DIS Distressed"
     elif Account_DLQ in ["A", "4", "P"]:
         Account_State_val = "D. DBT Doubtful Debt (Involuntary Churn)"
     else:
