@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import date
 
 
-def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, join_type="inner"):
+def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, join_type="inner", disp=True):
     """
     :param sdf_a:  The one dataframe containing the one field to be compared.  Of type PySpark DataFrame.
     :param sdf_b:  The other dataframe containing the other field to be compared with.  Of type PySpark DataFrame.
@@ -43,7 +43,13 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
     sdf_ineq = sdf_comp_1\
         .select(*[a_join, b_join, a_ref, b_ref, "comparison"])\
         .filter(F.col("comparison") != "equality")
-    sdf_ineq.display()
+
+    if disp:
+        sdf_ineq.display()
+    elif disp is not True:
+        pass
+    else:
+        pass
 
     ls_vals = sdf_ineq\
         .select(*[a_join])\
