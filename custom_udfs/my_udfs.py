@@ -567,11 +567,15 @@ def derive_first_mob(arr):
     non-null value.  If such a value exists, then derive the Month-01 Months-On-Book value, and return that value.
     If such a value does not exist, then the Month-01 Months-On-Book value cannot be determined,
     and a Null is returned as a result.
+    :param arr:  The 60-month MOB String Profile.
+    :return:  The left-most (point_in_time = 1) MOB value.
     """
-    arr_1 = arr[:-1]
-    ls_0 = arr_1.split("|")
-    ls_1 = [int(chunk) if "." not in chunk else None for chunk in ls_0]
-    ls_2 = ls_1[::-1]
+    arr_1 = arr[:-1]  # remove the very last pipe character.
+    ls_0 = arr_1.split("|")  # Get a Python List representation of `arr_1`.
+    ls_1 = [int(chunk) if "." not in chunk else None for chunk in ls_0]  # Convert `ls_0` to integers.
+    ls_2 = ls_1[::-1]  # Reverse the list array.
+
+    # -999 is a default value that is returned when the iterable has reached to its end.
     idx = next((i for i, val in enumerate(ls_2) if val), -999)
     if idx >= 0:
         mob_mth_1 = ls_2[idx] + 60 - idx - 1
@@ -605,20 +609,6 @@ def derive_quarter(stamp_val):
     return yyyy + suffix
 
 
-def derive_quarter_from_dt(dt_val):
-    yyyy = str(dt_val.year)
-    mm = str(dt_val.month).zfill(2)
-    if mm in ("01", "02", "03"):
-        suffix = "Q1"
-    elif mm in ("04", "05", "06"):
-        suffix = "Q2"
-    elif mm in ("07", "08", "09"):
-        suffix = "Q3"
-    else:
-        suffix = "Q4"
-    return yyyy + suffix
-
-
 udf_derive_quarter = udf(derive_quarter, returnType=StringType())
 
 
@@ -634,6 +624,7 @@ def derive_quarter_from_dt_type(dt_val):
     else:
         suffix = "Q4"
     return yyyy + suffix
+
 
 udf_derive_quarter_from_dt_type = udf(derive_quarter_from_dt_type,
                                       returnType=StringType())
@@ -1000,7 +991,7 @@ def make_proxy_date(monthid_stamp):
     """
     Make a Proxy Date from an Integer that is in the format of ccyymm.  E.g.: 202108.
     :param monthid_stamp: A year-month stamp in integer format.
-    :return: Return a proxy date that is in date format.  The day of the date is defaulted to "1".
+    :return: Return a proxy date that is in date format.  The day number of the date is defaulted to "1".
     """
     mid_str = str(monthid_stamp)
     yyyy = int(mid_str[:4])
@@ -1028,7 +1019,7 @@ def mob_category(profile, point_in_time=1):
 
     point_in_time -= 1
     mob_element = profile[
-                  point_in_time: point_in_time + 3 - 1]  # we are not interested in the trailing "|" character.
+                  point_in_time: point_in_time + 2]  # we are not interested in the trailing "|" character.
     if mob_element == "..":
         mob_missing = 1
     elif mob_element in ("00", "01", "02", "03", "04", "05"):
@@ -1056,11 +1047,10 @@ def mback_from_dte(dte_val, ref_dte):
     :param ref_dte: The reference date.  Date Type.
     :return: The difference between dte_val and ref_dte in terms of months.
     """
-    year_ref_dte = ref_dte.year
-    month_ref_dte = ref_dte.month
-    del_1 = (year_ref_dte - dte_val.year) * 12
-    del_2 = month_ref_dte - dte_val.month
-    return del_1 + del_2
+    ref_dte_2 = date(ref_dte.year, ref_dte.month, 1)
+    dte_val_2 = date(dte_val.year, dte_val.month, 1)
+    delta = relativedelta(ref_dte_2, dte_val_2)
+    return int((delta.years * 12) + delta.months)
 
 
 udf_mback_from_dte = udf(mback_from_dte, returnType=IntegerType())
@@ -1204,7 +1194,102 @@ def number_to_padded_text(num_value, n_chars):
 udf_number_to_padded_text = udf(number_to_padded_text, returnType=StringType())
 
 
+def num_to_5_chars(num_val):
+    """
+    :param num_val:  The numeric value that we wish to convert to a text representation.
+    :return:  Returns a string of exactly 5 characters long to represent `num_val`.
+              Zero padding takes place if necessary to reach 5 characters.
+    """
+    num_val = int(num_val)
+    txt_val = ""
+    if num_val is None:
+        txt_val = "....."
+    elif num_val < -9999:
+        txt_val = "-9999"
+    elif num_val < -999:
+        txt_val = "-" + str(-1 * num_val)
+    elif num_val < -99:
+        txt_val = "-0" + str(-1 * num_val)
+    elif num_val < -9:
+        txt_val = "-00" + str(-1 * num_val)
+    elif num_val < 0:
+        txt_val = "-000" + str(-1 * num_val)
+    elif num_val <= 9:
+        txt_val = "0000" + str(num_val)
+    elif num_val <= 99:
+        txt_val = "000" + str(num_val)
+    elif num_val <= 999:
+        txt_val = "00" + str(num_val)
+    elif num_val <= 9999:
+        txt_val = "0" + str(num_val)
+    elif num_val <= 99999:
+        txt_val = str(num_val)
+    elif num_val > 99999:
+        txt_val = "99999"
+    else:
+        pass
+    return txt_val
+
+
+udf_num_to_5_chars = udf(num_to_5_chars, returnType=StringType())
+
+
+def num_to_2_chars(num_val):
+    """
+    :param num_val:  The numeric value that we wish to convert to a text representation.
+    :return:  Returns a string of exactly 2 characters long to represent `num_val`.
+              Zero padding takes place if necessary to reach 2 characters.
+    """
+    num_val = int(num_val)
+    if num_val <= -10:
+        return "-9"
+    elif -9 <= num_val <= -1:
+        return str(num_val)
+    elif num_val == 0:
+        return "00"
+    elif num_val in list(range(1, 100)):
+        return str(num_val).zfill(2)
+    elif num_val > 99:
+        return "99"
+    elif num_val is None:  # A Flag value indicating MOB could not be deduced.
+        return ".."
+    else:
+        pass
+
+
+udf_num_to_2_chars = udf(num_to_2_chars, returnType=StringType())
+
+
+def num_to_1_char(num_val):
+    """
+    :param num_val:  The numeric value that we wish to convert to a text representation.
+    :return:  Returns a string of exactly 1 character long to represent `num_val`.
+    """
+    num_val = int(num_val)
+    if num_val <= 0:
+        return "0"
+    elif num_val in list(range(1, 10)):
+        return str(num_val)
+    elif num_val >= 10:
+        return "9"
+    elif num_val is None:  # A Flag value indicating MOB could not be deduced.
+        return "."
+    else:
+        pass
+
+
+udf_num_to_1_char = udf(num_to_1_char, returnType=StringType())
+
+
 def one_month_back(profile, type_name):
+    """
+    Manipulate the 60Month string profile to reach a new one that begins at the previous month.
+    :param profile:  Of Dtype string.
+                     Is a 60-month string profile with which we want to go back in time with one month
+    :param type_name:  Of Dtype string.
+                       Used for determining the number of characters per 'chunk' in the string profile
+    :return:  Returns a string profile that has been shifted back by 1 month to the past.
+    """
     n_chars_chunk = PROF_TYPE_PROF_LENGTH_MAP[type_name][1]
     profile_1 = profile[n_chars_chunk:]
     profile_2 = normalise_profile(profile=profile_1, type_name=type_name)
@@ -1215,6 +1300,12 @@ udf_one_month_back = udf(one_month_back, returnType=StringType())
 
 
 def simul(val_a, val_b):
+    """
+    A function that determines whether both input values are equal to 1.
+    :param val_a:  A numeric value.
+    :param val_b:  Another numeric value.
+    :return:  1 if val_a == val_b == 1.  Returns None otherwise.
+    """
     if (val_a == 1) and (val_b == 1):
         return 1
     else:
@@ -1228,15 +1319,17 @@ def starting_mob(acctact_dte, statement_dte):
     """
     Determines the Month-01 value for Months-On-Book.  It does so by determining the number of elapsed months from the
     account activation date till the statement date.
-    I.e. delta does the following:  'statement_dte' - 'acctact_dte'
+    I.e. delta does the following:  `statement_dte` - `acctact_dte`
     :param acctact_dte: The Account Activation Date, in date format.
     :param statement_dte: The Statement-Month End Date, in date format.
     :return: The Month-01 Months-On-Book value, in integer format.
     """
     if acctact_dte is None:
         return -1
-    delta = relativedelta(statement_dte, acctact_dte)
-    return int(delta.years * 12 + delta.months)
+    acctact_dte_2 = date(acctact_dte.year, acctact_dte.month, 1)
+    statement_dte_2 = date(statement_dte.year, statement_dte.month, 1)
+    delta = relativedelta(statement_dte_2, acctact_dte_2)
+    return int((delta.years * 12) + delta.months)
 
 
 udf_starting_mob = udf(starting_mob, returnType=IntegerType())
