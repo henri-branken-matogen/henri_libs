@@ -1260,27 +1260,6 @@ def num_to_2_chars(num_val):
 udf_num_to_2_chars = udf(num_to_2_chars, returnType=StringType())
 
 
-def num_to_1_char(num_val):
-    """
-    :param num_val:  The numeric value that we wish to convert to a text representation.
-    :return:  Returns a string of exactly 1 character long to represent `num_val`.
-    """
-    num_val = int(num_val)
-    if num_val <= 0:
-        return "0"
-    elif num_val in list(range(1, 10)):
-        return str(num_val)
-    elif num_val >= 10:
-        return "9"
-    elif num_val is None:  # A Flag value indicating MOB could not be deduced.
-        return "."
-    else:
-        pass
-
-
-udf_num_to_1_char = udf(num_to_1_char, returnType=StringType())
-
-
 def one_month_back(profile, type_name):
     """
     Manipulate the 60Month string profile to reach a new one that begins at the previous month.
