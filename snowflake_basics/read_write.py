@@ -7,6 +7,29 @@ PASSWORD_KEY = "my_pass"
 SF_URL_KEY = "SF_URL_KEY"
 
 
+def append_snowflake(user, password, sdf, tablename, sf_url,
+                     database="DEV", schema="MATOGEN", warehouse="MATOGEN_WH"):
+    """
+    The `mode` option has been specifically set to "append".
+    """
+    options = {
+        'sfUrl': sf_url,
+        'sfUser': user,
+        'sfPassword': password,
+        'sfDatabase': database,
+        'sfSchema': schema,
+        'sfWarehouse': warehouse
+    }
+    sdf\
+        .write\
+        .format("snowflake")\
+        .options(**options)\
+        .option('dbtable', tablename)\
+        .mode("append")\
+        .save()
+    return None
+
+
 def read_snowflake(user, password, query, sf_url, database="DEV",
                    schema="MATOGEN", warehouse="MATOGEN_WH"):
     options = {
@@ -28,8 +51,10 @@ def read_snowflake(user, password, query, sf_url, database="DEV",
 
 
 def write_snowflake(user, password, sdf, tablename, sf_url,
-                    database="DEV", schema="MATOGEN", warehouse="MATOGEN_WH",
-                    mode="overwrite"):
+                    database="DEV", schema="MATOGEN", warehouse="MATOGEN_WH"):
+    """
+    The `mode` option has been specifically set to "overwrite".
+    """
     options = {
         'sfUrl': sf_url,
         'sfUser': user,
@@ -43,8 +68,9 @@ def write_snowflake(user, password, sdf, tablename, sf_url,
         .format("snowflake")\
         .options(**options)\
         .option('dbtable', tablename)\
-        .mode(mode)\
+        .mode("overwrite")\
         .save()
+    return None
 
 
 def write_out_csvgz(sdf, fp_base, fn):
@@ -58,25 +84,12 @@ def write_out_csvgz(sdf, fp_base, fn):
     fp_absolute = os.path.join(fp_base, fn)
     fp_gz = os.path.join(fp_base, fn + ".csv.gz")
     sdf\
-      .repartition(1)\
-      .write\
-      .mode("overwrite")\
-      .option("header", True)\
-      .option("delimiter", "|")\
-      .option("compression", "gzip")\
-      .csv(fp_absolute)
+        .repartition(1)\
+        .write\
+        .mode("overwrite")\
+        .option("header", True)\
+        .option("delimiter", "|")\
+        .option("compression", "gzip")\
+        .csv(fp_absolute)
 
     print(fp_absolute, fp_gz)
-    #
-    # # Find the ".csv.gz" file of interest
-    # entity = [x.path for x in dbs.fs.ls(fp_absolute) if x.path.endswith(".csv.gz")][0]
-    #
-    # # Isolate the .csv.gz entity that we are interested in, and give it a readable name.
-    # dbs.fs.cp(entity, fp_gz)
-    #
-    # # Do a cleanup of the redundant folder:
-    # dbs.fs.rm(fp_absolute, recurse=True)
-    #
-    # # Print the `fp_gz` to copy into shell for download.
-    # print(fp_gz)
-    # return None
