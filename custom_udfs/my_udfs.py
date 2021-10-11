@@ -1200,7 +1200,10 @@ def num_to_5_chars(num_val):
     :return:  Returns a string of exactly 5 characters long to represent `num_val`.
               Zero padding takes place if necessary to reach 5 characters.
     """
-    num_val = int(num_val)
+    try:
+        num_val = int(num_val)
+    except Exception as e:
+        pass
     txt_val = ""
     if num_val is None:
         txt_val = "....."
@@ -1240,8 +1243,13 @@ def num_to_2_chars(num_val):
     :return:  Returns a string of exactly 2 characters long to represent `num_val`.
               Zero padding takes place if necessary to reach 2 characters.
     """
-    num_val = int(num_val)
-    if num_val <= -10:
+    try:
+        num_val = int(num_val)
+    except Exception as e:
+        pass
+    if num_val is None:  # A Flag value indicating MOB could not be deduced.
+        return ".."
+    elif num_val <= -10:
         return "-9"
     elif -9 <= num_val <= -1:
         return str(num_val)
@@ -1251,8 +1259,6 @@ def num_to_2_chars(num_val):
         return str(num_val).zfill(2)
     elif num_val > 99:
         return "99"
-    elif num_val is None:  # A Flag value indicating MOB could not be deduced.
-        return ".."
     else:
         pass
 

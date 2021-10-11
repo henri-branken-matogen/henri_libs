@@ -911,9 +911,3 @@ def Transition_Convert(VAR):
         pass
 
     return VAR_return
-
-
-
-
-
-
