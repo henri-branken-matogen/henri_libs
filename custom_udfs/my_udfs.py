@@ -1203,11 +1203,12 @@ def num_to_5_chars(num_val):
     try:
         num_val = int(num_val)
     except Exception as e:
-        pass
+        if num_val is None:
+            return "....."
+        else:
+            return "....."
     txt_val = ""
-    if num_val is None:
-        txt_val = "....."
-    elif num_val < -9999:
+    if num_val < -9999:
         txt_val = "-9999"
     elif num_val < -999:
         txt_val = "-" + str(-1 * num_val)
@@ -1246,10 +1247,11 @@ def num_to_2_chars(num_val):
     try:
         num_val = int(num_val)
     except Exception as e:
-        pass
-    if num_val is None:  # A Flag value indicating MOB could not be deduced.
-        return ".."
-    elif num_val <= -10:
+        if num_val is None:
+            return ".."
+        else:
+            return ".."
+    if num_val <= -10:
         return "-9"
     elif -9 <= num_val <= -1:
         return str(num_val)
@@ -1257,7 +1259,7 @@ def num_to_2_chars(num_val):
         return "00"
     elif num_val in list(range(1, 100)):
         return str(num_val).zfill(2)
-    elif num_val > 99:
+    elif num_val >= 100:
         return "99"
     else:
         pass

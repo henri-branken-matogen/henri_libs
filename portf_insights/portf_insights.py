@@ -878,7 +878,7 @@ def Transition_Convert(VAR):
     elif VAR in ("34", "3A"):
         VAR_return = "3(-) 90 Days: Rolled forward or adverse event next period"
     elif VAR in ("40", "41", "42", "43", "4C", "4P"):
-        VAR_return = "4(+) 120 Days: Rolled backward or or credit balance or paid-up next period"
+        VAR_return = "4(+) 120 Days: Rolled backward or credit balance or paid-up next period"
     elif VAR in ("44", "4A"):
         VAR_return = "4(=) 120 Days both periods or 120 Days and adverse next period"
     elif VAR == "AA":
