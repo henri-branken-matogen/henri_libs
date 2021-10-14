@@ -102,14 +102,16 @@ def Account_State(Account_CAT, Account_DLQ,
     In SAS, the variable names are simply named as:  `Account_State`, `Customer_State`.
             In Python, this would conflict the function name and/or script name.
     """
-    Account_State_val = ""  # The Account State (SME)
-    Customer_State_val = "to be announced"  # The Customer State (SME)
+    Account_State_val = ""  # The Account State (SME).  Initialise it to an empty string.
 
     if (Account_DLQ == "D") or (OBS24 == "X-Exclusion") or (OBS24 == "I-Missing"):
+        # Deceased, etc...
         Account_State_val = "X. EXC Exclusions"
     elif Account_CAT.upper() == "APP":
+        # Still to be created from the contracts files.
         Account_State_val = "A. NTU Not Taken-Up Applications"
     elif Account_CAT.upper() == "NEW":
+        # New accounts opened in the past 6 months.
         Account_State_val = "1. IMM Immature Accounts"
     elif OBS3_CRD == 3:
         Account_State_val = "B. CRD Credit balance 3+ months (Voluntary Churn)"
@@ -122,29 +124,30 @@ def Account_State(Account_CAT, Account_DLQ,
     elif Account_DLQ == "P" and (OBS3_PUP is not None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC4):
         Account_State_val = "3. P01 Paid-up 1-2 months"
     elif (OBS12_DC0 == 12) and batch_evaluation(None, "and", OBS24_DC1, OBS24_DC2, OBS24_ADV, OBS24_DC3, OBS24_DC4, OBS24_PUP):
+        # UTD with 12 month clear payment streak, no prior arrears / arrears / paid-up.
         Account_State_val = "4. CLR Clear"
     elif (OBS3_DC0 == 3) and (OBS12_DC2 is None) and batch_evaluation(None, "and", OBS24_ADV, OBS24_DC3, OBS24_DC4):
+        # UTD with 3 month clear payment streak, max 30 days arrears last 12 months,
+        # never reached 60+ days arrears / adverse.
         Account_State_val = "5. RES Responsible"
     elif Account_DLQ == "0":
+        # UTD, but struggles to pay consistently.
         Account_State_val = "6. ERR Erratic"
     elif OBS1_DC1 == 1:
+        # 30 days in arrears.
         Account_State_val = "7. EXT Extended"
     elif Account_DLQ in ["2", "3"]:
+        # 60 or 90 days in arrears.
         Account_State_val = "8. DIS Distressed"
     elif Account_DLQ in ["A", "4", "P"]:
+        # 120 days in arrears, adverse event, or paid-up.
         Account_State_val = "D. DBT Doubtful Debt (Involuntary Churn)"
     else:
         pass
-    return Account_State_val, Customer_State_val
+    return Account_State_val
 
 
-schema_Account_State = t.StructType([
-    t.StructField("acct_state", t.StringType(), True),
-    t.StructField("cust_state", t.StringType(), True)
-])
-
-udf_Account_State = f.udf(Account_State,
-                          returnType=schema_Account_State)
+udf_Account_State = f.udf(Account_State, returnType=t.StringType())
 
 
 def Account_Transition(NDX, PIT, Account_AGE, Account_DLQ, Aging_profile, DLQ_profile, Account_State_val):
