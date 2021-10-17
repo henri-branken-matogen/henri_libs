@@ -382,7 +382,7 @@ def Behaviour_GBIPX(NDX, PER, DLQ_profile, GBIPX_profile):
         Count the GBIPX attributes over the period.
         """
         char_b = GBIPX_profile[i].upper()  # .upper() is a Belts-and-Braces approach.
-        if char_b == "G":  # Good behaviour.
+        if char_b == "G":    # Good behaviour.
             CNT_G = CNT_G + 1
         elif char_b == "B":  # Bad behaviour.
             CNT_B = CNT_B + 1
@@ -687,7 +687,7 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
         print("There are not sufficient PERFORMANCE points to inspect.\n"
               "In other words:  (PIT <= NBR), instead of (PIT > NBR).\n"
               "This routine is being aborted.")
-        return None
+        return [None, None], [None, None, None, None, None, None, None, None, None, None, None, None]
     else:  # i.e. PIT > NBR
         """
         A.  Call the Python Script that calculates the GBIPX Behaviour
