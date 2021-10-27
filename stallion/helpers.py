@@ -1,5 +1,212 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
+import pyspark.sql.functions as f
+
+
+def corrupt_C_or_P_to_2(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "C") & (f.col(col_young) == "2"), "From C to 2")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "C") & (f.col(col_young) == "2"), "aged 2 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "C") & (f.col(col_young) == "2"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))\
+        .withColumn("problem", f.when((f.col(col_old) == "P") & (f.col(col_young) == "2"), "From P to 2")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "P") & (f.col(col_young) == "2"), "aged 2 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "P") & (f.col(col_young) == "2"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_C_or_P_to_3(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "C") & (f.col(col_young) == "3"), "From C to 3")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "C") & (f.col(col_young) == "3"), "aged 3 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "C") & (f.col(col_young) == "3"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))\
+        .withColumn("problem", f.when((f.col(col_old) == "P") & (f.col(col_young) == "3"), "From P to 3")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "P") & (f.col(col_young) == "3"), "aged 3 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "P") & (f.col(col_young) == "3"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_C_or_P_to_4(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "C") & (f.col(col_young) == "4"), "From C to 4")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "C") & (f.col(col_young) == "4"), "aged 4 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "C") & (f.col(col_young) == "4"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))\
+        .withColumn("problem", f.when((f.col(col_old) == "P") & (f.col(col_young) == "4"), "From P to 4")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "P") & (f.col(col_young) == "4"), "aged 4 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "P") & (f.col(col_young) == "4"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_zero_to_two(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "0") & (f.col(col_young) == "2"), "From 0 to 2")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "0") & (f.col(col_young) == "2"), "aged 2 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "0") & (f.col(col_young) == "2"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_zero_to_three(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "0") & (f.col(col_young) == "3"), "From 0 to 3")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "0") & (f.col(col_young) == "3"), "aged 3 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "0") & (f.col(col_young) == "3"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_zero_to_four(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "0") & (f.col(col_young) == "4"), "From 0 to 4")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "0") & (f.col(col_young) == "4"), "aged 4 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "0") & (f.col(col_young) == "4"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_one_to_three(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "1") & (f.col(col_young) == "3"), "From 1 to 3")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "1") & (f.col(col_young) == "3"), "aged 2 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "1") & (f.col(col_young) == "3"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_one_to_four(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "1") & (f.col(col_young) == "4"), "From 1 to 4")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "1") & (f.col(col_young) == "4"), "aged 3 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "1") & (f.col(col_young) == "4"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
+
+
+def corrupt_two_to_four(sdf_base, col_old, col_young, cycle_name_val):
+    """
+    :param sdf_base:  Our input dataframe.
+    :param col_old:  The MTH stamp that is 1 month more historic with respect to col_young.
+    :param col_young:  The MTH stamp that is 1 month younger with respect to col_old.
+                       So, an example (col_old, col_young) combination would be (JUN21, JUL21).
+    :param cycle_name_val:  An text description telling us in which monthly transition the problem occurred.
+                            An example would be "AUG21 to SEP21".
+    :return:  Returns `sdf_return`, which is basically `sdf_base` with updated values for the columns
+              ["problem", "interpretation", "cycle_id"].
+    """
+    sdf_return = sdf_base\
+        .withColumn("problem", f.when((f.col(col_old) == "2") & (f.col(col_young) == "4"), "From 2 to 4")
+                                .otherwise(f.col("problem")))\
+        .withColumn("interpretation", f.when((f.col(col_old) == "2") & (f.col(col_young) == "4"), "aged 2 cycles")
+                                       .otherwise(f.col("interpretation")))\
+        .withColumn("cycle_id", f.when((f.col(col_old) == "2") & (f.col(col_young) == "4"), cycle_name_val)
+                                 .otherwise(f.col("cycle_id")))
+    return sdf_return
 
 
 def compare(value, cutoffs, label):
