@@ -146,11 +146,11 @@ def Valid_ID(ID):
             IDEven = IDEven + int(IDEvenX[i])
 
         IDCheck = IDOdd + IDEven
-        IDCheck = IDCheck[0: 2]
+        IDCheck = str(IDCheck)[0: 2]
         if len(str(IDCheck)) > 1:
             IDCheck = int(str(IDCheck)[1])
-        if IDCheck > 0:
-            Check_Digit = 10 - IDCheck
+        if int(IDCheck) > 0:
+            Check_Digit = 10 - int(IDCheck)
         else:
             Check_Digit = 0
         if Check_Digit == IDFix[12]:
