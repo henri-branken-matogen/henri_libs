@@ -8,7 +8,7 @@ setup(
     author='Henri Branken',
     packages=find_packages(include=['custom_udfs', 'pyspark_stats', 'snowflake_basics', 'cvm_activity',
                                     'stallion', 'portfolio_health', 'portf_insights', 'customer_scores',
-                                    'contract_macros']),
+                                    'contract_macros', 'Valid_ID']),
     license='MatogenAI',
     install_requires=['DateTime==4.3', 'numpy==1.20.3', 'py4j==0.10.9', 'pyspark==3.1.1',
                       'python-dateutil==2.8.1', 'pytz==2021.1', 'seaborn==0.11.1', 'six==1.14.0',
