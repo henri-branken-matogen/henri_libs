@@ -138,22 +138,19 @@ def Valid_ID(ID):
 
     if IDType == "I":
         IDOdd = int(IDFix[0]) + int(IDFix[2]) + int(IDFix[4]) + int(IDFix[6]) + int(IDFix[8]) + int(IDFix[10])
-        IDEvenX = str(int(str(IDFix[1]) + str(IDFix[3]) + str(IDFix[5]) +
-                          str(IDFix[7]) + str(IDFix[9]) + str(IDFix[11])) * 2)
-        IDEvenX = IDEvenX[0: 7]
-        IDEven = 0
-        for i in range(len(IDEvenX)):
-            IDEven = IDEven + int(IDEvenX[i])
+        even_nums = int(str(IDFix[1]) + str(IDFix[3]) + str(IDFix[5]) + str(IDFix[7])
+                        + str(IDFix[9]) + str(IDFix[11])) * 2
+        sum_even_nums = 0
+        for x in str(even_nums):
+            sum_even_nums += int(x)
+        total = sum_even_nums + IDOdd
 
-        IDCheck = IDOdd + IDEven
-        IDCheck = str(IDCheck)[0: 2]
-        if len(str(IDCheck)) > 1:
-            IDCheck = int(str(IDCheck)[1])
-        if int(IDCheck) > 0:
-            Check_Digit = 10 - int(IDCheck)
-        else:
-            Check_Digit = 0
-        if Check_Digit == IDFix[12]:
+        control_char = int(str(total)[len(str(total)) - 1])
+
+        if control_char != 0:
+            control_char = 10 - control_char
+
+        if control_char == int(IDFix[12]):
             if IDFix[6] in [str(x) for x in range(0, 5)]:
                 IDGender = "F"
             else:
@@ -161,6 +158,7 @@ def Valid_ID(ID):
         else:
             IDType = "X"
             IDFailure = "10 Failed Modulus 11"
+
     if IDType == "I":
         IDDOB = date(int(Year + IDFix[0:2]), int(IDFix[2:4]), int(IDFix[4:6]))
         IDDOBX = Year + IDFix[0:6]
