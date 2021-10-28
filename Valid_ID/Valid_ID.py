@@ -60,7 +60,8 @@ def Valid_ID(ID):
             IDFix = "00" + str(IDFix)
             IDFix = IDFix[0:5] + "00" + IDFix[5:]
             IDType = "b"
-        elif (IDFix[0:2].upper() == "IT") and (IDFix[2] in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
+        elif (len(IDFix) >= 3) and (IDFix[0:2].upper() == "IT") and\
+             (IDFix[2] in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
             IDType = "T"
         else:
             IDType = "X"
