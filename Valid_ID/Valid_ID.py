@@ -8,9 +8,13 @@ from dateutil.relativedelta import relativedelta
 
 
 def Valid_ID(ID):
+    def compress(orig_string, width):
+        val = orig_string.replace(" ", "").strip()
+        val_1 = val.ljust(width)
+        return val_1
     ID = str(ID)
     IDKey = ""
-    IDFix = ID.replace(" ", "")
+    IDFix = compress(ID.replace(" ", ""), 15)
     IDFailure = ""
     IDDOB = None
     IDDOBX = None
@@ -29,46 +33,38 @@ def Valid_ID(ID):
     if len(IDFix.replace(" ", "")) > 5:
         if (len(IDFix) == 13) and (re.sub(r'[0-9]', "", IDFix) == ""):
             IDType = "I"
+        elif ((len(IDFix) == 14) and (IDFix[4] == "/") and (IDFix[11] == "/") and
+              (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
+            IDType = "B"
+        elif ((len(IDFix) == 13) and (IDFix[4] == "/") and (IDFix[10] == "/") and
+              (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
+            IDType = "b"
+        elif ((len(IDFix) == 12) and (IDFix[4] == "/") and (IDFix[9] == "/") and
+              (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
+              IDType = "b"
+        elif ((len(IDFix) == 12) and (re.sub(r'[0-9]', "", IDFix) == "") and
+              (int(IDFix[:4]) > 1800)):
+            IDFix = "/".join([IDFix[0:4], IDFix[4:10], IDFix[10:]])
+            IDType = "b"
+        elif ((len(IDFix) == 12) and (IDFix[2] == "/") and (IDFix[9] == "/") and
+              (re.sub(r'[/0-9]', "", IDFix) == "")):
+            IDFix = "00" + str(IDFix)
+            IDType = "b"
+        elif ((len(IDFix) == 11) and (IDFix[2] == "/") and (IDFix[8] == "/") and
+              (re.sub(r'[/0-9]', "", IDFix) == "")):
+            IDFix = "00" + str(IDFix)
+            IDFix = IDFix[0:5] + "0" + IDFix[5:]
+            IDType = "b"
+        elif ((len(IDFix) == 10) and (IDFix[2] == "/") and (IDFix[7] == "/") and
+              (re.sub(r'[/0-9]', "", IDFix) == "")):
+            IDFix = "00" + str(IDFix)
+            IDFix = IDFix[0:5] + "00" + IDFix[5:]
+            IDType = "b"
+        elif (IDFix[0:2].upper() == "IT") and (IDFix[2] in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
+            IDType = "T"
         else:
-            if ((IDFix[4] == "/") and (IDFix[11] == "/") and (len(IDFix) == 14) and
-                    (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
-                IDType = "B"
-            else:
-                if ((IDFix[4] == "/") and (IDFix[10] == "/") and (len(IDFix) == 13) and
-                        (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
-                    IDType = "b"
-                else:
-                    if ((IDFix[4] == "/") and (IDFix[9] == "/") and (len(IDFix) == 12) and
-                            (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
-                        IDType = "b"
-                    else:
-                        if len(IDFix) == 12 and re.sub(r'[0-9]', "", IDFix) == "" and int(IDFix[:4]) > 1800:
-                            IDFix = "/".join([IDFix[0:4], IDFix[4:10], IDFix[10:]])
-                            IDType = "b"
-                        else:
-                            if ((IDFix[2] == "/") and (IDFix[9] == "/") and (len(IDFix) == 12) and
-                                    (re.sub(r'[/0-9]', "", IDFix) == "")):
-                                IDFix = "00" + str(IDFix)
-                                IDType = "b"
-                            else:
-                                if ((IDFix[2] == "/") and (IDFix[8] == "/") and (len(IDFix) == 11) and
-                                        (re.sub(r'[/0-9]', "", IDFix) == "")):
-                                    IDFix = "00" + str(IDFix)
-                                    IDFix = IDFix[0:5] + "0" + IDFix[5:]
-                                    IDType = "b"
-                                else:
-                                    if ((IDFix[2] == "/") and (IDFix[7] == "/") and (len(IDFix) == 10) and
-                                            (re.sub(r'[/0-9]', "", IDFix) == "")):
-                                        IDFix = "00" + str(IDFix)
-                                        IDFix = IDFix[0:5] + "00" + IDFix[5:]
-                                        IDType = "b"
-                                    else:
-                                        if ((IDFix[0:2].upper() == "IT") and
-                                                (IDFix[2] in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])):
-                                            IDType = "T"
-                                        else:
-                                            IDType = "X"
-                                            IDFailure = "00 Unsure ID Type"
+            IDType = "X"
+            IDFailure = "00 Unsure ID Type"
     else:
         IDType = "X"
         IDFailure = "00 Short ID (<=5)"
