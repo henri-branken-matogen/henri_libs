@@ -1,5 +1,3 @@
-import re
-import copy
 import pyspark.sql.types as t
 import pyspark.sql.functions as f
 
@@ -12,6 +10,8 @@ def Valid_ID(ID):
         val = orig_string.replace(" ", "").strip()
         val_1 = val.ljust(width)
         return val_1
+    def eliminate(orig_string, to_be_eliminated):
+        return orig_string.translate({ord(c): None for c in to_be_eliminated})
     ID = str(ID)
     IDKey = ""
     IDFix = compress(ID.replace(" ", ""), 15)
@@ -31,32 +31,32 @@ def Valid_ID(ID):
 
     # ID TYPE FIRST PASS : Assign initially expected ID Type
     if len(IDFix.replace(" ", "")) > 5:
-        if (len(IDFix) == 13) and (re.sub(r'[0-9]', "", IDFix) == ""):
+        if (len(IDFix) == 13) and (eliminate(IDFix, "0123456789 ") == ""):
             IDType = "I"
         elif ((len(IDFix) == 14) and (IDFix[4] == "/") and (IDFix[11] == "/") and
-              (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
+              (eliminate(IDFix, "/0123456789 ") == "") and (int(IDFix[:4]) > 1800)):
             IDType = "B"
         elif ((len(IDFix) == 13) and (IDFix[4] == "/") and (IDFix[10] == "/") and
-              (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
+              (eliminate(IDFix, "/0123456789 ") == "") and (int(IDFix[:4]) > 1800)):
             IDType = "b"
         elif ((len(IDFix) == 12) and (IDFix[4] == "/") and (IDFix[9] == "/") and
-              (re.sub(r'[/0-9]', "", IDFix) == "") and (int(IDFix[:4]) > 1800)):
+              (eliminate(IDFix, "/0123456789 ") == "") and (int(IDFix[:4]) > 1800)):
               IDType = "b"
-        elif ((len(IDFix) == 12) and (re.sub(r'[0-9]', "", IDFix) == "") and
+        elif ((len(IDFix) == 12) and (eliminate(IDFix, "0123456789 ") == "") and
               (int(IDFix[:4]) > 1800)):
             IDFix = "/".join([IDFix[0:4], IDFix[4:10], IDFix[10:]])
             IDType = "b"
         elif ((len(IDFix) == 12) and (IDFix[2] == "/") and (IDFix[9] == "/") and
-              (re.sub(r'[/0-9]', "", IDFix) == "")):
+              (eliminate(IDFix, "/0123456789 ") == "")):
             IDFix = "00" + str(IDFix)
             IDType = "b"
         elif ((len(IDFix) == 11) and (IDFix[2] == "/") and (IDFix[8] == "/") and
-              (re.sub(r'[/0-9]', "", IDFix) == "")):
+              (eliminate(IDFix, "/0123456789 ") == "")):
             IDFix = "00" + str(IDFix)
             IDFix = IDFix[0:5] + "0" + IDFix[5:]
             IDType = "b"
         elif ((len(IDFix) == 10) and (IDFix[2] == "/") and (IDFix[7] == "/") and
-              (re.sub(r'[/0-9]', "", IDFix) == "")):
+              (eliminate(IDFix, "/0123456789 ") == "")):
             IDFix = "00" + str(IDFix)
             IDFix = IDFix[0:5] + "00" + IDFix[5:]
             IDType = "b"
@@ -177,7 +177,7 @@ def Valid_ID(ID):
 
     if IDType in ["B", "b"]:
         IDGender = "B"
-        IDKey = copy.copy(IDFix)
+        IDKey = IDFix[:]
         val3 = IDFix[12: 2]
         if val3 == "06":
             IDExpand = "Public"
@@ -207,7 +207,7 @@ def Valid_ID(ID):
 
     if IDType == "T":
         IDGender = "T"
-        IDKey = copy.copy(IDFix)
+        IDKey = IDFix[:]
 
     if IDFix[0: 10] == "0" * 10:
         IDKey = ""
