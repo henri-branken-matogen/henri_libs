@@ -135,15 +135,18 @@ def Valid_ID(ID):
             Mth = "XXX"
             IDType = "X"
             IDFailure = "09 Unknown Month"
+
     if IDType == "I":
         IDOdd = int(IDFix[0]) + int(IDFix[2]) + int(IDFix[4]) + int(IDFix[6]) + int(IDFix[8]) + int(IDFix[10])
         IDEvenX = str(int(str(IDFix[1]) + str(IDFix[3]) + str(IDFix[5]) +
                           str(IDFix[7]) + str(IDFix[9]) + str(IDFix[11])) * 2)
+        IDEvenX = IDEvenX[0: 7]
         IDEven = 0
         for i in range(len(IDEvenX)):
-            IDEven += int(IDEvenX[i])
+            IDEven = IDEven + int(IDEvenX[i])
 
         IDCheck = IDOdd + IDEven
+        IDCheck = IDCheck[0: 2]
         if len(str(IDCheck)) > 1:
             IDCheck = int(str(IDCheck)[1])
         if IDCheck > 0:
