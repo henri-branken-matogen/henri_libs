@@ -17,6 +17,9 @@ def Valid_ID(ID):
     def repl_strip(orig_string):
         return orig_string.replace(" ", "").strip()
     ID = str(ID).lstrip()
+    if ID.endswith(".0"):
+        ID = ID[:-2]
+    ID = ID.lstrip()
     IDKey = ""
     IDFix = compress(ID.replace(" ", ""), 15)
     IDFailure = ""
