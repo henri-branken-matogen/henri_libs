@@ -10,9 +10,13 @@ def Valid_ID(ID):
         val = orig_string.replace(" ", "").strip()
         val_1 = val.ljust(width)
         return val_1
+
     def eliminate(orig_string, to_be_eliminated):
         return orig_string.translate({ord(c): None for c in to_be_eliminated})
-    ID = str(ID)
+
+    def repl_strip(orig_string):
+        return orig_string.replace(" ", "").strip()
+    ID = str(ID).lstrip()
     IDKey = ""
     IDFix = compress(ID.replace(" ", ""), 15)
     IDFailure = ""
@@ -24,43 +28,44 @@ def Valid_ID(ID):
     Mth = ""
     IDGender = ""
 
+    IDFix = compress(IDFix, 15)
     if IDFix[0:2] == "CK":
         IDFix = IDFix[2:]
     if (IDFix[0] in [".", "/"]) and (len(IDFix) > 2):
         IDFix = IDFix[1:]
 
     # ID TYPE FIRST PASS : Assign initially expected ID Type
-    if len(IDFix.replace(" ", "")) > 5:
-        if (len(IDFix) == 13) and (eliminate(IDFix, "0123456789 ") == ""):
+    if len(repl_strip(IDFix)) >= 5:
+        if (len(IDFix.strip()) == 13) and (eliminate(IDFix, "0123456789 ") == ""):
             IDType = "I"
-        elif ((len(IDFix) == 14) and (IDFix[4] == "/") and (IDFix[11] == "/") and
-              (eliminate(IDFix, "/0123456789 ") == "") and (int(IDFix[:4]) > 1800)):
+        elif ((len(IDFix.strip()) == 14) and (IDFix[4] == "/") and (IDFix[11] == "/") and
+              (eliminate(IDFix, "/0123456789 ") == "") and (IDFix[:4] > "1800")):
             IDType = "B"
-        elif ((len(IDFix) == 13) and (IDFix[4] == "/") and (IDFix[10] == "/") and
-              (eliminate(IDFix, "/0123456789 ") == "") and (int(IDFix[:4]) > 1800)):
+        elif ((len(IDFix.strip()) == 13) and (IDFix[4] == "/") and (IDFix[10] == "/") and
+              (eliminate(IDFix, "/0123456789 ") == "") and (IDFix[:4] > "1800")):
             IDType = "b"
-        elif ((len(IDFix) == 12) and (IDFix[4] == "/") and (IDFix[9] == "/") and
-              (eliminate(IDFix, "/0123456789 ") == "") and (int(IDFix[:4]) > 1800)):
+        elif ((len(IDFix.strip()) == 12) and (IDFix[4] == "/") and (IDFix[9] == "/") and
+              (eliminate(IDFix, "/0123456789 ") == "") and (IDFix[:4] > "1800")):
               IDType = "b"
-        elif ((len(IDFix) == 12) and (eliminate(IDFix, "0123456789 ") == "") and
+        elif ((len(IDFix.strip()) == 12) and (eliminate(IDFix, "0123456789 ") == "") and
               (int(IDFix[:4]) > 1800)):
-            IDFix = "/".join([IDFix[0:4], IDFix[4:10], IDFix[10:]])
+            IDFix = compress("/".join([IDFix[0:4], IDFix[4:10], IDFix[10:]]), 15)
             IDType = "b"
-        elif ((len(IDFix) == 12) and (IDFix[2] == "/") and (IDFix[9] == "/") and
+        elif ((len(IDFix.strip()) == 12) and (IDFix[2] == "/") and (IDFix[9] == "/") and
               (eliminate(IDFix, "/0123456789 ") == "")):
-            IDFix = "00" + str(IDFix)
+            IDFix = compress("00" + str(IDFix), 15)
             IDType = "b"
-        elif ((len(IDFix) == 11) and (IDFix[2] == "/") and (IDFix[8] == "/") and
+        elif ((len(IDFix.strip()) == 11) and (IDFix[2] == "/") and (IDFix[8] == "/") and
               (eliminate(IDFix, "/0123456789 ") == "")):
-            IDFix = "00" + str(IDFix)
-            IDFix = IDFix[0:5] + "0" + IDFix[5:]
+            IDFix = ("00" + str(IDFix)).rstrip()
+            IDFix = compress(IDFix[0:5] + "0" + IDFix[5:], 15)
             IDType = "b"
-        elif ((len(IDFix) == 10) and (IDFix[2] == "/") and (IDFix[7] == "/") and
+        elif ((len(IDFix.strip()) == 10) and (IDFix[2] == "/") and (IDFix[7] == "/") and
               (eliminate(IDFix, "/0123456789 ") == "")):
-            IDFix = "00" + str(IDFix)
-            IDFix = IDFix[0:5] + "00" + IDFix[5:]
+            IDFix = ("00" + str(IDFix)).rstrip()
+            IDFix = compress(IDFix[0:5] + "00" + IDFix[5:], 15)
             IDType = "b"
-        elif (len(IDFix) >= 3) and (IDFix[0:2].upper() == "IT") and\
+        elif (len(IDFix.strip()) >= 3) and (IDFix[0:2].upper() == "IT") and\
              (IDFix[2] in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
             IDType = "T"
         else:
@@ -231,6 +236,8 @@ def Valid_ID(ID):
         IDReport = "-"
     else:
         IDReport = "X"
+
+    IDFix = repl_strip(IDFix)
 
     # pos 1      2       3          4      5       6         7      8         9      10
     # idx 0      1       2          3      4       5         6      7         8      9
