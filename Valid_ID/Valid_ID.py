@@ -264,5 +264,3 @@ schema_id = t.StructType([
 
 udf_Valid_ID = f.udf(Valid_ID,
                      returnType=schema_id)
-
-print(Valid_ID("9107085012080"))
