@@ -20,15 +20,13 @@ def Valid_ID(ID):
     if ID.endswith(".0"):
         ID = ID[:-2]
     ID = ID.lstrip()
-    IDKey = ""
+    IDKey = None
     IDFix = compress(ID.replace(" ", ""), 15)
     IDFailure = ""
     IDDOB = None
     IDDOBX = None
     IDExpand = ""
     IDAge = None
-    Year = ""
-    Mth = ""
     IDGender = ""
 
     IDFix = compress(IDFix, 15)
@@ -43,6 +41,7 @@ def Valid_ID(ID):
             IDType = "I"
         elif ((len(IDFix.strip()) == 14) and (IDFix[4] == "/") and (IDFix[11] == "/") and
               (eliminate(IDFix, "/0123456789 ") == "") and (IDFix[:4] > "1800")):
+            print("No")
             IDType = "B"
         elif ((len(IDFix.strip()) == 13) and (IDFix[4] == "/") and (IDFix[10] == "/") and
               (eliminate(IDFix, "/0123456789 ") == "") and (IDFix[:4] > "1800")):
@@ -79,6 +78,7 @@ def Valid_ID(ID):
         IDFailure = "00 Short ID (<=5)"
         if len(IDFix) == 0:
             IDFailure = "00 Blank ID"
+# ----------------------------------------------------------------------------------------------------------------------------------
 
     if IDType == "I":
         if IDFix[0:2] in [str(x).zfill(2) for x in range(0, 6)]:
@@ -141,52 +141,53 @@ def Valid_ID(ID):
             IDType = "X"
             IDFailure = "09 Unknown Month"
 
-    if IDType == "I":
-        IDOdd = int(IDFix[0]) + int(IDFix[2]) + int(IDFix[4]) + int(IDFix[6]) + int(IDFix[8]) + int(IDFix[10])
-        even_nums = int(str(IDFix[1]) + str(IDFix[3]) + str(IDFix[5]) + str(IDFix[7])
-                        + str(IDFix[9]) + str(IDFix[11])) * 2
-        sum_even_nums = 0
-        for x in str(even_nums):
-            sum_even_nums += int(x)
-        total = sum_even_nums + IDOdd
+        if IDType == "I":
+            IDOdd = int(IDFix[0]) + int(IDFix[2]) + int(IDFix[4]) + int(IDFix[6]) + int(IDFix[8]) + int(IDFix[10])
+            even_nums = int(str(IDFix[1]) + str(IDFix[3]) + str(IDFix[5]) + str(IDFix[7])
+                            + str(IDFix[9]) + str(IDFix[11])) * 2
+            sum_even_nums = 0
+            for x in str(even_nums):
+                sum_even_nums += int(x)
+            total = sum_even_nums + IDOdd
 
-        control_char = int(str(total)[len(str(total)) - 1])
+            control_char = int(str(total)[len(str(total)) - 1])
 
-        if control_char != 0:
-            control_char = 10 - control_char
+            if control_char != 0:
+                control_char = 10 - control_char
 
-        if control_char == int(IDFix[12]):
-            if IDFix[6] in [str(x) for x in range(0, 5)]:
-                IDGender = "F"
+            if control_char == int(IDFix[12]):
+                if IDFix[6] in [str(x) for x in range(0, 5)]:
+                    IDGender = "F"
+                else:
+                    IDGender = "M"
             else:
-                IDGender = "M"
+                IDType = "X"
+                IDFailure = "10 Failed Modulus 11"
+
+        if IDType == "I":
+            IDDOB = date(int(Year + IDFix[0:2]), int(IDFix[2:4]), int(IDFix[4:6]))
+            IDDOBX = Year + IDFix[0:6]
+            IDExpand = " ".join([IDFix[4:6], Mth, Year + IDFix[0:2]])
+            IDAge = relativedelta(date.today(), IDDOB).years
+
+        val2 = IDFix[10:12]
+        if val2 in ["08", "09"]:
+            IDType = "N"
+        elif val2 in [str(x).zfill(2) for x in range(0, 8)]:
+            IDType = "n"
+        elif val2 in ["18", "19"]:
+            IDType = "I"
         else:
-            IDType = "X"
-            IDFailure = "10 Failed Modulus 11"
+            IDType = "i"
 
-    if IDType == "I":
-        IDDOB = date(int(Year + IDFix[0:2]), int(IDFix[2:4]), int(IDFix[4:6]))
-        IDDOBX = Year + IDFix[0:6]
-        IDExpand = " ".join([IDFix[4:6], Mth, Year + IDFix[0:2]])
-        IDAge = relativedelta(date.today(), IDDOB).years
-
-    val2 = IDFix[10:12]
-    if val2 in ["08", "09"]:
-        IDType = "N"
-    elif val2 in [str(x).zfill(2) for x in range(0, 8)]:
-        IDType = "n"
-    elif val2 in ["18", "19"]:
-        IDType = "I"
-    else:
-        IDType = "i"
-
-    if IDType in ["N", "n", "I", "i"]:
         IDKey = IDFix[0:10]
+
+# ---------------------------------------------------------------------------------------------------------
 
     if IDType in ["B", "b"]:
         IDGender = "B"
         IDKey = IDFix[:]
-        val3 = IDFix[12: 2]
+        val3 = IDFix[12: 14]
         if val3 == "06":
             IDExpand = "Public"
         elif val3 == "07":
@@ -263,3 +264,5 @@ schema_id = t.StructType([
 
 udf_Valid_ID = f.udf(Valid_ID,
                      returnType=schema_id)
+
+print(Valid_ID("9107085012080"))
