@@ -596,7 +596,7 @@ def derive_quarter(stamp_val):
     :return: A string containing (1) the year of `stamp_val` in string format, and (2) the Quarter in which
     the mm part of `stamp_val` gets classified into.
     """
-    if stamp_val in [None, ""]:
+    if stamp_val in [None, "None", ""]:
         return None
     yyyy = str(stamp_val)[0:4]
     mm = str(stamp_val)[4:].zfill(2)
