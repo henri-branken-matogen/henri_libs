@@ -870,9 +870,9 @@ def finalise_aad(dte_m0m, dte_m1m):
     dte_m0m and dte_m1m are NULL, the function will return a NULL value.
     """
     if (dte_m0m is None) and (dte_m1m is not None):
-        return dte_m1m  # Use the Profile "Account_Activation_DTE".
+        return None  # ????? Use the Previous "Account_Activation_DTE".
     elif (dte_m0m is not None) and (dte_m1m is None):
-        return dte_m0m  # Use the latest "Account_Activation_DTE".
+        return dte_m0m  # Use the latest "Account_Activation_DTE" from the SLAF.
     elif (dte_m0m is None) and (dte_m1m is None):
         return None  # Leave as is.  "Account_Activation_DTE" is NULL.
     elif dte_m0m == dte_m1m:
@@ -1313,15 +1313,14 @@ def starting_mob(acctact_dte, statement_dte):
     :param statement_dte: The Statement-Month End Date, in date format.
     :return: The Month-01 Months-On-Book value, in integer format.
     """
-    if acctact_dte is None:
+    if (acctact_dte is None) or (statement_dte is None):
         return -1
-    acctact_dte_2 = date(acctact_dte.year, acctact_dte.month, 1)
-    statement_dte_2 = date(statement_dte.year, statement_dte.month, 1)
-    delta = relativedelta(statement_dte_2, acctact_dte_2)
+    delta = relativedelta(statement_dte, acctact_dte)
     return int((delta.years * 12) + delta.months)
 
 
-udf_starting_mob = udf(starting_mob, returnType=IntegerType())
+udf_starting_mob = udf(starting_mob,
+                       returnType=IntegerType())
 
 
 def str_length(txt):
