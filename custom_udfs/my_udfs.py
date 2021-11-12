@@ -870,7 +870,7 @@ def finalise_aad(dte_m0m, dte_m1m):
     dte_m0m and dte_m1m are NULL, the function will return a NULL value.
     """
     if (dte_m0m is None) and (dte_m1m is not None):
-        return None  # ????? Use the Previous "Account_Activation_DTE".
+        return None  # The Account Activation Date is NULL.  We don't fiddle with the data.
     elif (dte_m0m is not None) and (dte_m1m is None):
         return dte_m0m  # Use the latest "Account_Activation_DTE" from the SLAF.
     elif (dte_m0m is None) and (dte_m1m is None):
@@ -1308,7 +1308,7 @@ def starting_mob(acctact_dte, statement_dte):
     """
     Determines the Month-01 value for Months-On-Book.  It does so by determining the number of elapsed months from the
     account activation date till the statement date.
-    I.e. delta does the following:  `statement_dte` - `acctact_dte`
+    I.e. delta does the following:  `statement_dte` - `acctact_dte`, and get the month difference.
     :param acctact_dte: The Account Activation Date, in date format.
     :param statement_dte: The Statement-Month End Date, in date format.
     :return: The Month-01 Months-On-Book value, in integer format.
