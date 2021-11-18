@@ -63,51 +63,51 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
     return ls_vals, sdf_ineq
 
 
-def compare_mult_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, join_type="inner", disp=True):
-    """
-    :param sdf_a:  The one dataframe containing the one field to be compared.  Of type PySpark DataFrame.
-    :param sdf_b:  The other dataframe containing the other field to be compared with.  Of type PySpark DataFrame.
-    :param on_column_name:  The intersection of sdf_a and sdf_b.  I.e., on what column the two should be joined on.
-                            Of DType String.
-    :param col_a_name:  The one column, contained in sdf_a, that we need to compare.  Of DType string.
-    :param col_b_name:  The other column, contained in sdf_b, that we need to compare.  Of DType string.
-    :param join_type:  How sdf_a and sdf_a should be joined on the `on_column_name`.  Of DType string.  Default value is 'inner'.
-    :return:  ls_vals.  Of DType Python list.  A list of values on which the two dataframes don't agree upon.
-    """
-    a_ref = col_a_name + "_a"
-    b_ref = col_b_name + "_b"
-
-    sdf_a = sdf_a\
-        .withColumnRenamed(col_a_name, a_ref)\
-        .select(*on_column_name, a_ref)
-    sdf_b = sdf_b\
-        .withColumnRenamed(col_b_name, b_ref)\
-        .select(*on_column_name, b_ref)
-
-    n = len(on_column_name)
-    ls_on = [sdf_a[on_col_name[i]] == sdf_b[on_col_name][i]] for i in range(n)]
-
-    sdf_comp = sdf_a\
-        .join(sdf_b,
-              on=ls_on,
-              how="inner")
-    sdf_comp_1 = sdf_comp\
-        .withColumn("comparison",
-                    F.when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNull())), F.lit("equality"))\
-                     .when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNotNull())), F.lit("ineq left value is NULL"))\
-                     .when(((F.col(a_ref).isNotNull()) & (F.col(b_ref).isNull())), F.lit("ineq right value is NULL"))\
-                     .when(F.col(a_ref) == F.col(b_ref), F.lit("equality"))\
-                     .when(F.col(a_ref) != F.col(b_ref), F.lit("inequality"))\
-                     .otherwise(F.lit("ineq for other reason")))
-    # Display all the inequal records.
-    sdf_ineq = sdf_comp_1\
-        .select(a_ref, b_ref, "comparison")\
-        .filter(F.col("comparison") != "equality")
-
-    sdf_ineq.display()
-
-    count_distribution(sdf_comp_1, "comparison")
-    return None
+# def compare_mult_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, join_type="inner", disp=True):
+#     """
+#     :param sdf_a:  The one dataframe containing the one field to be compared.  Of type PySpark DataFrame.
+#     :param sdf_b:  The other dataframe containing the other field to be compared with.  Of type PySpark DataFrame.
+#     :param on_column_name:  The intersection of sdf_a and sdf_b.  I.e., on what column the two should be joined on.
+#                             Of DType String.
+#     :param col_a_name:  The one column, contained in sdf_a, that we need to compare.  Of DType string.
+#     :param col_b_name:  The other column, contained in sdf_b, that we need to compare.  Of DType string.
+#     :param join_type:  How sdf_a and sdf_a should be joined on the `on_column_name`.  Of DType string.  Default value is 'inner'.
+#     :return:  ls_vals.  Of DType Python list.  A list of values on which the two dataframes don't agree upon.
+#     """
+#     a_ref = col_a_name + "_a"
+#     b_ref = col_b_name + "_b"
+#
+#     sdf_a = sdf_a\
+#         .withColumnRenamed(col_a_name, a_ref)\
+#         .select(*on_column_name, a_ref)
+#     sdf_b = sdf_b\
+#         .withColumnRenamed(col_b_name, b_ref)\
+#         .select(*on_column_name, b_ref)
+#
+#     n = len(on_column_name)
+#     ls_on = [sdf_a[on_col_name[i]] == sdf_b[on_col_name][i]] for i in range(n)]
+#
+#     sdf_comp = sdf_a\
+#         .join(sdf_b,
+#               on=ls_on,
+#               how="inner")
+#     sdf_comp_1 = sdf_comp\
+#         .withColumn("comparison",
+#                     F.when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNull())), F.lit("equality"))\
+#                      .when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNotNull())), F.lit("ineq left value is NULL"))\
+#                      .when(((F.col(a_ref).isNotNull()) & (F.col(b_ref).isNull())), F.lit("ineq right value is NULL"))\
+#                      .when(F.col(a_ref) == F.col(b_ref), F.lit("equality"))\
+#                      .when(F.col(a_ref) != F.col(b_ref), F.lit("inequality"))\
+#                      .otherwise(F.lit("ineq for other reason")))
+#     # Display all the inequal records.
+#     sdf_ineq = sdf_comp_1\
+#         .select(a_ref, b_ref, "comparison")\
+#         .filter(F.col("comparison") != "equality")
+#
+#     sdf_ineq.display()
+#
+#     count_distribution(sdf_comp_1, "comparison")
+#     return None
 
 
 def count_distribution(sdf_base, col_check, fancy=False):
