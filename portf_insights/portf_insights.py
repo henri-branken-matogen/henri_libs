@@ -474,33 +474,45 @@ def drop_null_columns(pysdf, *ls_cols):
     return pysdf
 
 
-def Doubtful_Debt(Account_State_val, PIT):
+def Doubtful_Debt(Account_State_val, PIT_val):
     DoubtfulDebt1M = None
     DoubtfulDebt3M = None
     DoubtfulDebt6M = None
     DoubtfulDebt9M = None
     DoubtfulDebt12M = None
-    if Account_State_val == "D. DBT Doubtful Debt (Involuntary Churn)":
-        if PIT > 12:
+    if str(Account_State_val).upper().replace(" ", "") == "D.DBTDOUBTFULDEBT(INVOLUNTARYCHURN)":
+        if PIT_val >= 13:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
             DoubtfulDebt6M = 1
             DoubtfulDebt9M = 1
             DoubtfulDebt12M = 1
-        if PIT > 9:
+        elif PIT_val >= 10:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
             DoubtfulDebt6M = 1
             DoubtfulDebt9M = 1
-        if PIT > 6:
+        elif PIT_val >= 7:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
             DoubtfulDebt6M = 1
-        if PIT > 3:
+        elif PIT_val >= 4:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
-        if PIT > 1:
+        elif PIT_val >= 2:
             DoubtfulDebt1M = 1
+        else:
+            DoubtfulDebt1M = None
+            DoubtfulDebt3M = None
+            DoubtfulDebt6M = None
+            DoubtfulDebt9M = None
+            DoubtfulDebt12M = None
+    else:
+        DoubtfulDebt1M = None
+        DoubtfulDebt3M = None
+        DoubtfulDebt6M = None
+        DoubtfulDebt9M = None
+        DoubtfulDebt12M = None
     return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
 
 

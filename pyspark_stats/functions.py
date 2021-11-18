@@ -74,21 +74,23 @@ def compare_mult_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, j
     :param join_type:  How sdf_a and sdf_a should be joined on the `on_column_name`.  Of DType string.  Default value is 'inner'.
     :return:  ls_vals.  Of DType Python list.  A list of values on which the two dataframes don't agree upon.
     """
-    ls_on = []
-    for cname in on_column_name:
-        ls_on.append(sdf_a[cname] == sdf_b[cname])
     a_ref = col_a_name + "_a"
     b_ref = col_b_name + "_b"
+
     sdf_a = sdf_a\
         .withColumnRenamed(col_a_name, a_ref)\
-        .select(*ls_on, a_ref)
+        .select(*on_column_name, a_ref)
     sdf_b = sdf_b\
         .withColumnRenamed(col_b_name, b_ref)\
-        .select(*ls_on, b_ref)
+        .select(*on_column_name, b_ref)
+
+    n = len(on_column_name)
+    ls_on = [sdf_a[on_col_name[i]] == sdf_b[on_col_name][i]] for i in range(n)]
+
     sdf_comp = sdf_a\
         .join(sdf_b,
               on=ls_on,
-              how=join_type)
+              how="inner")
     sdf_comp_1 = sdf_comp\
         .withColumn("comparison",
                     F.when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNull())), F.lit("equality"))\
@@ -97,29 +99,15 @@ def compare_mult_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, j
                      .when(F.col(a_ref) == F.col(b_ref), F.lit("equality"))\
                      .when(F.col(a_ref) != F.col(b_ref), F.lit("inequality"))\
                      .otherwise(F.lit("ineq for other reason")))
-
     # Display all the inequal records.
     sdf_ineq = sdf_comp_1\
-        .select(*ls_on, a_ref, b_ref, "comparison")\
+        .select(a_ref, b_ref, "comparison")\
         .filter(F.col("comparison") != "equality")
 
-    if disp:
-        sdf_ineq.display()
-    elif disp is not True:
-        pass
-    else:
-        pass
+    sdf_ineq.display()
 
-    ls_vals = sdf_ineq\
-        .select(*ls_on)\
-        .rdd\
-        .flatMap(lambda x: x)\
-        .collect()
-
-    # Get a distribution on the "comparison" column.
-    print(f"{a_ref} versus {b_ref}:")
     count_distribution(sdf_comp_1, "comparison")
-    return ls_vals, sdf_ineq
+    return None
 
 
 def count_distribution(sdf_base, col_check, fancy=False):
