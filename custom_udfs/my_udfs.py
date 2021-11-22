@@ -615,6 +615,8 @@ udf_derive_quarter = udf(derive_quarter, returnType=StringType())
 
 
 def derive_quarter_from_dt_type(dt_val):
+    if dt_val is None:
+        return ""
     yyyy = str(dt_val.year)
     mm = str(dt_val.month).zfill(2)
     if mm in ("01", "02", "03"):
@@ -623,8 +625,10 @@ def derive_quarter_from_dt_type(dt_val):
         suffix = "Q2"
     elif mm in ("07", "08", "09"):
         suffix = "Q3"
-    else:
+    elif mm in ("10", "11", "12"):
         suffix = "Q4"
+    else:
+        raise ValueError("`mm` is not a valid string.")
     return yyyy + suffix
 
 
