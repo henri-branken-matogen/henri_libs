@@ -606,8 +606,10 @@ def derive_quarter(stamp_val):
         suffix = "Q2"
     elif mm in ("07", "08", "09"):
         suffix = "Q3"
-    else:
+    elif mm in ("10", "11", "12"):
         suffix = "Q4"
+    else:
+        return None
     return yyyy + suffix
 
 
