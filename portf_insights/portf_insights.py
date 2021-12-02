@@ -541,95 +541,102 @@ def Observation_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
               ls_int = [DC0, DC1, DC2, DC3, DC4, ADV, CRD, GDS, BAD, PUP, CNT]
     """
 
-    """
-    A.  Invoke `Behaviour_GBIPX.py` that calculates the GBIPX Behaviour.
-    It appears that `CNT_I` [2] and `CNT_X` [4] are not needed downstream, and are therefore excluded.
-    """
-    # OBS_&NBR
-    OBS_NBR, ls_counters = Behaviour_GBIPX(NDX=PIT, PER=NBR, DLQ_profile=DLQ_profile, GBIPX_profile=GBIPX_profile)
-    ls_str = [OBS_NBR]
+    # When the following condition is True, then it means that:
+    # There are insufficient 'points' in the string profile to collect 'observations' from.
+    # In other words, we have breached BEYOND the 60th element in the string profile.
+    if (PIT + NBR) >= 62:
+        return [None, None], [None, None, None, None, None, None, None, None, None, None, None]
 
-    """
-    Store the GBIPX attribute counts over the observation period, based on `NBR`.
-    """
-    GDS = ls_counters[0]  # OBS&NBR._GDS  # int
-    BAD = ls_counters[1]  # OBS&NBR._BAD  # int
-    PUP = ls_counters[3]  # OBS&NBR._PUP  # int
-
-    """
-    Store the DELINQUENCY attribute counts over the Observation Period, based on `NBR`.
-    """
-    DC0 = ls_counters[5]   # OBS&NBR._DC0  # int
-    DC1 = ls_counters[6]   # OBS&NBR._DC1  # int
-    DC2 = ls_counters[7]   # OBS&NBR._DC2  # int
-    DC3 = ls_counters[8]   # OBS&NBR._DC3  # int
-    DC4 = ls_counters[9]   # OBS&NBR._DC4  # int
-    ADV = ls_counters[10]  # OBS&NBR._ADV  # int
-    CRD = ls_counters[11]  # OBS&NBR._CRD  # int
-
-    """
-    Initialise a list that will store variables pertaining to `OBS_NBR`.
-    This is a workaround for not being able to create `._attr` attributes as done in SAS.
-    """
-    if GDS is None:
-        GDS = 0
-    if BAD is None:
-        BAD = 0
-    if PUP is None:
-        PUP = 0
-    CNT = sum([GDS, BAD, PUP])  # OBS&NBR._CNT  # int
-    if CNT == 0:
-        CNT = None
-    if GDS == 0:
-        GDS = None
-    if BAD == 0:
-        BAD = None
-    if PUP == 0:
-        PUP = None
-
-    # indices 0    1    2    3    4    5    6    7    8    9    10
-    ls_int = [DC0, DC1, DC2, DC3, DC4, ADV, CRD, GDS, BAD, PUP, CNT]
-    #         int  int  int  int  int  int  int  int  int  int  int
-
-    """
-    D.  Keep track as to how many GBP observation points are missing.
-        We may want to exclude observations with missing records when performing analysis.
-    """
-    # Extract the value we are evaluating in the following conditional statements.
-    val = ls_int[-1]  # `CNT` variable
-
-    """
-    Initialise the variable into which the output will be stored (RE: number of points missing).
-    `GRP` is the GBP Count (Group).
-    """
-    GRP = ""  # OBS&NBR._GRP
-    if (val == 0) or (val is None):
-        GRP = "E. All OBS points missing"
-    elif val < (NBR - 2):
-        GRP = "D. 3+ missing OBS points"
-    elif val == (NBR - 2):
-        GRP = "C. 2 missing OBS points"
-    elif val == (NBR - 1):
-        GRP = "B. 1 missing OBS point"
-    elif val == NBR:
-        GRP = "A. No missing OBS point"
     else:
-        pass
+        """
+        A.  Invoke `Behaviour_GBIPX.py` that calculates the GBIPX Behaviour.
+        It appears that `CNT_I` [2] and `CNT_X` [4] are not needed downstream, and are therefore excluded.
+        """
+        # OBS_&NBR
+        OBS_NBR, ls_counters = Behaviour_GBIPX(NDX=PIT, PER=NBR, DLQ_profile=DLQ_profile, GBIPX_profile=GBIPX_profile)
+        ls_str = [OBS_NBR]
 
-    """
-    Expand the `ls_OBS_NBR` with the `GRP` variable created in the 'D.' Section.
-    """
-    ls_str.append(GRP)
+        """
+        Store the GBIPX attribute counts over the observation period, based on `NBR`.
+        """
+        GDS = ls_counters[0]  # OBS&NBR._GDS  # int
+        BAD = ls_counters[1]  # OBS&NBR._BAD  # int
+        PUP = ls_counters[3]  # OBS&NBR._PUP  # int
 
-    # indices   0        1
-    # ls_str = [OBS_NBR, GRP]
-    #           str      str
+        """
+        Store the DELINQUENCY attribute counts over the Observation Period, based on `NBR`.
+        """
+        DC0 = ls_counters[5]   # OBS&NBR._DC0  # int
+        DC1 = ls_counters[6]   # OBS&NBR._DC1  # int
+        DC2 = ls_counters[7]   # OBS&NBR._DC2  # int
+        DC3 = ls_counters[8]   # OBS&NBR._DC3  # int
+        DC4 = ls_counters[9]   # OBS&NBR._DC4  # int
+        ADV = ls_counters[10]  # OBS&NBR._ADV  # int
+        CRD = ls_counters[11]  # OBS&NBR._CRD  # int
 
-    # indices   0    1    2    3    4    5    6    7    8    9    10
-    # ls_int = [DC0, DC1, DC2, DC3, DC4, ADV, CRD, GDS, BAD, PUP, CNT]
-    #           int  int  int  int  int  int  int  int  int  int  int
+        """
+        Initialise a list that will store variables pertaining to `OBS_NBR`.
+        This is a workaround for not being able to create `._attr` attributes as done in SAS.
+        """
+        if GDS is None:
+            GDS = 0
+        if BAD is None:
+            BAD = 0
+        if PUP is None:
+            PUP = 0
+        CNT = sum([GDS, BAD, PUP])  # OBS&NBR._CNT  # int
+        if CNT == 0:
+            CNT = None
+        if GDS == 0:
+            GDS = None
+        if BAD == 0:
+            BAD = None
+        if PUP == 0:
+            PUP = None
 
-    return ls_str, ls_int
+        # indices 0    1    2    3    4    5    6    7    8    9    10
+        ls_int = [DC0, DC1, DC2, DC3, DC4, ADV, CRD, GDS, BAD, PUP, CNT]
+        #         int  int  int  int  int  int  int  int  int  int  int
+
+        """
+        D.  Keep track as to how many GBP observation points are missing.
+            We may want to exclude observations with missing records when performing analysis.
+        """
+        # Extract the value we are evaluating in the following conditional statements.
+        val = ls_int[-1]  # `CNT` variable
+
+        """
+        Initialise the variable into which the output will be stored (RE: number of points missing).
+        `GRP` is the GBP Count (Group).
+        """
+        GRP = ""  # OBS&NBR._GRP
+        if (val == 0) or (val is None):
+            GRP = "E. All OBS points missing"
+        elif val < (NBR - 2):
+            GRP = "D. 3+ missing OBS points"
+        elif val == (NBR - 2):
+            GRP = "C. 2 missing OBS points"
+        elif val == (NBR - 1):
+            GRP = "B. 1 missing OBS point"
+        elif val == NBR:
+            GRP = "A. No missing OBS point"
+        else:
+            pass
+
+        """
+        Expand the `ls_OBS_NBR` with the `GRP` variable created in the 'D.' Section.
+        """
+        ls_str.append(GRP)
+
+        # indices   0        1
+        # ls_str = [OBS_NBR, GRP]
+        #           str      str
+
+        # indices   0    1    2    3    4    5    6    7    8    9    10
+        # ls_int = [DC0, DC1, DC2, DC3, DC4, ADV, CRD, GDS, BAD, PUP, CNT]
+        #           int  int  int  int  int  int  int  int  int  int  int
+
+        return ls_str, ls_int
 
 
 schema_Observation_GBIPX = t.StructType([
