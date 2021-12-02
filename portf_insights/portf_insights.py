@@ -696,9 +696,10 @@ def Performance_GBIPX(PIT, NBR, DLQ_profile, GBIPX_profile):
                                  goods_NBR, bads_NBR, paidup_NBR, GBP]
     """
     if PIT <= NBR:
-        print("There are not sufficient PERFORMANCE points to inspect.\n"
+        print(f"PIT = {str(PIT).zfill(2)} | NBR = {NBR}.\n"
+              "There are insufficient PERFORMANCE points to inspect.\n"
               "In other words:  (PIT <= NBR), instead of (PIT > NBR).\n"
-              "This routine is being aborted.")
+              "`None` values are returned as a result.")
         return [None, None], [None, None, None, None, None, None, None, None, None, None, None, None]
     else:  # i.e. PIT > NBR
         """
