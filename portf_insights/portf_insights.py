@@ -25,7 +25,7 @@ def Account_Behaviour(OBS1, OBS6, OBS12, OBS18, OBS24):
     Initialise the `Account_Behaviour_val` and the `Customer_Behaviour_val`.
     """
     Account_Behaviour_val = ""  # Account Behaviour (SME)
-    Customer_Behaviour_val = "to be announced"  # Customer Behaviour (SME)
+    Customer_Behaviour_val = ""  # Customer Behaviour (SME)
 
     if batch_evaluation("X-Exclusion", "or", OBS1, OBS6, OBS12, OBS18, OBS24):
         Account_Behaviour_val = "X. Exclusions"

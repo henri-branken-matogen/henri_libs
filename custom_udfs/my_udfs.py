@@ -1126,6 +1126,7 @@ def normalise_profile(profile, type_name):
             profile_chunk = "." * length_p_element + "|"
             profile_normed = profile_chunk * 60
         return profile_normed
+
     # Get string length of the profile.
     length_current = len(profile)
     if length_current == 0:  # CASE 1:  Entire profile is blank / missing / null.
