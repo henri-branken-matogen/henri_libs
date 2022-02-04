@@ -487,26 +487,32 @@ def Doubtful_Debt(Account_State_val, PIT_val):
             DoubtfulDebt6M = 1
             DoubtfulDebt9M = 1
             DoubtfulDebt12M = 1
+            return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
         elif PIT_val >= 10:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
             DoubtfulDebt6M = 1
             DoubtfulDebt9M = 1
+            return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
         elif PIT_val >= 7:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
             DoubtfulDebt6M = 1
+            return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
         elif PIT_val >= 4:
             DoubtfulDebt1M = 1
             DoubtfulDebt3M = 1
+            return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
         elif PIT_val >= 2:
             DoubtfulDebt1M = 1
+            return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
         else:
             DoubtfulDebt1M = None
             DoubtfulDebt3M = None
             DoubtfulDebt6M = None
             DoubtfulDebt9M = None
             DoubtfulDebt12M = None
+            return DoubtfulDebt1M, DoubtfulDebt3M, DoubtfulDebt6M, DoubtfulDebt9M, DoubtfulDebt12M
     else:
         DoubtfulDebt1M = None
         DoubtfulDebt3M = None
