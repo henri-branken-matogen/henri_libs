@@ -1,4 +1,5 @@
-import pyspark.sql.functions as F
+import pyspark.sql.functions as f
+import pyspark.sql.types as t
 from pyspark.sql.functions import udf
 from dateutil.relativedelta import relativedelta
 from datetime import date
@@ -33,17 +34,17 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
               how=join_type)
     sdf_comp_1 = sdf_comp\
         .withColumn("comparison",
-                    F.when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNull())), F.lit("equality"))\
-                     .when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNotNull())), F.lit("ineq left value is NULL"))\
-                     .when(((F.col(a_ref).isNotNull()) & (F.col(b_ref).isNull())), F.lit("ineq right value is NULL"))\
-                     .when(F.col(a_ref) == F.col(b_ref), F.lit("equality"))\
-                     .when(F.col(a_ref) != F.col(b_ref), F.lit("inequality"))\
-                     .otherwise(F.lit("ineq for other reason")))
+                    f.when(((f.col(a_ref).isNull()) & (f.col(b_ref).isNull())), f.lit("equality"))\
+                     .when(((f.col(a_ref).isNull()) & (f.col(b_ref).isNotNull())), f.lit("ineq left value is NULL"))\
+                     .when(((f.col(a_ref).isNotNull()) & (f.col(b_ref).isNull())), f.lit("ineq right value is NULL"))\
+                     .when(f.col(a_ref) == f.col(b_ref), f.lit("equality"))\
+                     .when(f.col(a_ref) != f.col(b_ref), f.lit("inequality"))\
+                     .otherwise(f.lit("ineq for other reason")))
 
     # Display all the inequal records.
     sdf_ineq = sdf_comp_1\
         .select(*[a_join, b_join, a_ref, b_ref, "comparison"])\
-        .filter(F.col("comparison") != "equality")
+        .filter(f.col("comparison") != "equality")
 
     if disp:
         sdf_ineq.display()
@@ -94,16 +95,16 @@ def compare_two_columns(sdf_a, sdf_b, on_column_name, col_a_name, col_b_name, jo
 #               how="inner")
 #     sdf_comp_1 = sdf_comp\
 #         .withColumn("comparison",
-#                     F.when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNull())), F.lit("equality"))\
-#                      .when(((F.col(a_ref).isNull()) & (F.col(b_ref).isNotNull())), F.lit("ineq left value is NULL"))\
-#                      .when(((F.col(a_ref).isNotNull()) & (F.col(b_ref).isNull())), F.lit("ineq right value is NULL"))\
-#                      .when(F.col(a_ref) == F.col(b_ref), F.lit("equality"))\
-#                      .when(F.col(a_ref) != F.col(b_ref), F.lit("inequality"))\
-#                      .otherwise(F.lit("ineq for other reason")))
+#                     f.when(((f.col(a_ref).isNull()) & (f.col(b_ref).isNull())), f.lit("equality"))\
+#                      .when(((f.col(a_ref).isNull()) & (f.col(b_ref).isNotNull())), f.lit("ineq left value is NULL"))\
+#                      .when(((f.col(a_ref).isNotNull()) & (f.col(b_ref).isNull())), f.lit("ineq right value is NULL"))\
+#                      .when(f.col(a_ref) == f.col(b_ref), f.lit("equality"))\
+#                      .when(f.col(a_ref) != f.col(b_ref), f.lit("inequality"))\
+#                      .otherwise(f.lit("ineq for other reason")))
 #     # Display all the inequal records.
 #     sdf_ineq = sdf_comp_1\
 #         .select(a_ref, b_ref, "comparison")\
-#         .filter(F.col("comparison") != "equality")
+#         .filter(f.col("comparison") != "equality")
 #
 #     sdf_ineq.display()
 #
@@ -122,16 +123,16 @@ def count_distribution(sdf_base, col_check, fancy=False):
     """
     n_len = sdf_base.count()
     sdf_base_1 = sdf_base\
-        .withColumn("idx", F.monotonically_increasing_id())
+        .withColumn("idx", f.monotonically_increasing_id())
     sdf_return = sdf_base_1\
-        .groupBy(F.col(col_check))\
-        .agg(F.count(F.col("idx")).alias("n_entries"),
-                     F.format_number(F.count(F.col("idx")) / n_len * 100.0, 5).alias("perc_entries"))\
-        .orderBy(F.col("n_entries").desc())
+        .groupBy(f.col(col_check))\
+        .agg(f.count(f.col("idx")).alias("n_entries"),
+                     f.format_number(f.count(f.col("idx")) / n_len * 100.0, 5).alias("perc_entries"))\
+        .orderBy(f.col("n_entries").desc())
     if fancy:
-        sdf_return.display(truncate=False)
+        sdf_return.display(truncate=false)
     else:
-        sdf_return.show(truncate=False)
+        sdf_return.show(truncate=false)
     return None
 
 
@@ -143,7 +144,7 @@ def distinct_count(sdf_base, col_name):
     :return: Return the raw number AND percentage of unique entries contained within the column.
     """
     n_len = sdf_base.count()
-    val_raw = sdf_base.select(F.countDistinct(col_name)).collect()[0][0]
+    val_raw = sdf_base.select(f.countDistinct(col_name)).collect()[0][0]
     val_pct = val_raw / n_len * 100.0
     dup_raw = n_len - val_raw
     dup_pct = dup_raw / n_len * 100
@@ -177,9 +178,9 @@ def distinct_stats(sdf_base, *args):
     :return: Returns nothing.  Displays tabular results on the screen for the user.
     """
     n_len = sdf_base.count()
-    sdf_return = sdf_base.select(*(F.countDistinct(c).alias(c + "_CNT") for c in tuple(args)))
+    sdf_return = sdf_base.select(*(f.countDistinct(c).alias(c + "_CNT") for c in tuple(args)))
     sdf_return.show()
-    sdf_return = sdf_base.select(*(F.format_number(F.countDistinct(c) / n_len * 100.0, 6)
+    sdf_return = sdf_base.select(*(f.format_number(f.countDistinct(c) / n_len * 100.0, 6)
                                  .alias(c + "_PCT") for c in tuple(args)))
     sdf_return.show()
     return None
@@ -190,11 +191,11 @@ def equal_comp(sdf_base, col_a_name, col_b_name, on_col_name, id_col_names):
         .select(*[id_col_names[0], id_col_names[1], on_col_name, col_a_name, col_b_name])
     sdf_comp_1 = sdf_comp\
         .withColumn("comparison",
-                    F.when((F.col(col_a_name).isNull() & F.col(col_b_name).isNull()), "equality")
-                     .when(F.col(col_a_name).isNull(), "left value is NULL")
-                     .when(F.col(col_b_name).isNull(), "right value is NULL")
-                     .when(F.col(col_a_name) == F.col(col_b_name), "equality")
-                     .when(F.col(col_a_name) != F.col(col_b_name), "no equality")
+                    f.when((f.col(col_a_name).isNull() & f.col(col_b_name).isNull()), "equality")
+                     .when(f.col(col_a_name).isNull(), "left value is NULL")
+                     .when(f.col(col_b_name).isNull(), "right value is NULL")
+                     .when(f.col(col_a_name) == f.col(col_b_name), "equality")
+                     .when(f.col(col_a_name) != f.col(col_b_name), "no equality")
                     )
     sdf_sample = sdf_comp_1\
         .filter(sdf_comp_1.comparison == "no equality")
@@ -243,11 +244,11 @@ def extract_date_tag(val, override=False, **dte_data):
 def get_extrema(sdf_base, colname):
     x_min = sdf_base\
         .groupby()\
-        .agg(F.min(colname))\
+        .agg(f.min(colname))\
         .first()[0]
     x_max = sdf_base\
         .groupby()\
-        .agg(F.max(colname))\
+        .agg(f.max(colname))\
         .first()[0]
     print(f"Minimum value of {colname} is:    {x_min}.")
     print(f"Maximum value of {colname} is:    {x_max}.")
@@ -264,7 +265,7 @@ def isolate(sdf_base, pkey_name, pkey_vals, *cols):
     """
     ls = [pkey_name] + list(cols)
     sdf_iso = sdf_base \
-        .filter(F.col(pkey_name).isin(pkey_vals))\
+        .filter(f.col(pkey_name).isin(pkey_vals))\
         .select(*ls) \
         .orderBy(pkey_name)
 
@@ -280,7 +281,7 @@ def null_percs_entire(sdf_base, fancy=False):
     """
     n_len = sdf_base.count()
     sdf_return = sdf_base\
-        .select(*(F.format_number(F.sum(F.col(c).isNull().cast("int")) / n_len * 100.0, 5)
+        .select(*(f.format_number(f.sum(f.col(c).isNull().cast("int")) / n_len * 100.0, 5)
                 .alias(c + "_PERC") for c in list(sdf_base.columns)))
     if fancy:
         sdf_return.display()
@@ -315,11 +316,11 @@ def show_null_stats(sdf_base, *args):
     """
     n_len = sdf_base.count()
     sdf_return = sdf_base\
-        .select(*(F.sum(F.col(c).isNull().cast("int"))
+        .select(*(f.sum(f.col(c).isNull().cast("int"))
                 .alias(c + "_N_NULL") for c in tuple(args)))
     for c in tuple(args):
         sdf_return = sdf_return\
-            .withColumn(c + "_PERC", F.format_number(F.col(c + "_N_NULL") / n_len * 100.0, 5))
+            .withColumn(c + "_PERC", f.format_number(f.col(c + "_N_NULL") / n_len * 100.0, 5))
     sdf_return.show()
     return None
 
@@ -330,4 +331,4 @@ def simul(val_a, val_b, value):
     else:
         return None
 
-udf_simul = udf(simul, returnType=IntegerType())
+udf_simul = udf(simul, returnType=t.IntegerType())
