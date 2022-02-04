@@ -125,7 +125,7 @@ def count_distribution(sdf_base, col_check, fancy=False):
     sdf_return = sdf_base_1\
         .groupBy(F.col(col_check))\
         .agg(F.count(F.col("idx")).alias("n_entries"),
-                    F.format_number(F.count(F.col("idx")) / n_len * 100.0, 5).alias("perc_entries"))\
+                     F.format_number(F.count(F.col("idx")) / n_len * 100.0, 5).alias("perc_entries"))\
         .orderBy(F.col("n_entries").desc())
     if fancy:
         sdf_return.display(truncate=False)
@@ -200,9 +200,6 @@ def equal_comp(sdf_base, col_a_name, col_b_name, on_col_name, id_col_names):
     sdf_sample.display()
     count_distribution(sdf_comp_1, "comparison")
     return None
-
-
-
 
 
 def extract_date_tag(val, override=False, **dte_data):
@@ -324,3 +321,12 @@ def show_null_stats(sdf_base, *args):
             .withColumn(c + "_PERC", F.format_number(F.col(c + "_N_NULL") / n_len * 100.0, 5))
     sdf_return.show()
     return None
+
+
+def simul(val_a, val_b, value):
+    if (val_a == value) and (val_b == value):
+        return 1
+    else:
+        return None
+
+udf_simul = udf(simul, returnType=IntegerType())
