@@ -130,9 +130,9 @@ def count_distribution(sdf_base, col_check, fancy=False):
                      f.format_number(f.count(f.col("idx")) / n_len * 100.0, 5).alias("perc_entries"))\
         .orderBy(f.col("n_entries").desc())
     if fancy:
-        sdf_return.display(truncate=false)
+        sdf_return.display(truncate=False)
     else:
-        sdf_return.show(truncate=false)
+        sdf_return.show(truncate=True)
     return None
 
 
