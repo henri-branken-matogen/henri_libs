@@ -3,6 +3,14 @@ import pyspark.sql.types as t
 import copy
 
 
+def keep_digits(x):
+    str_only_digits = [e for e in x if e.isdigit()]
+    return str_only_digits
+
+
+udf_keep_digits = f.udf(keep_digits, returnType=t.StringType())
+
+
 def Transaction_Debit_Credit(SRC, TDC, AMT):
 
     # Reverse all the Cell C Transactions in order to align with the Thanos signs.
