@@ -238,6 +238,9 @@ def Transaction_Receipt(REC, REM, RES):
             TXN_Receipt_Type = "????"
         else:
             TXN_Receipt_Type = copy.deepcopy(TXN_Receipt_Type_tmp)
+    else:
+        TXN_Receipt = 0
+        TXN_Receipt_Type = None
 
     # The Receipt Notes are only used by Cell C, but has valuable manual payment information.
     if REM is not None:
