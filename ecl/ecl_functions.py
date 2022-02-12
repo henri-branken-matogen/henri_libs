@@ -4,7 +4,7 @@ import copy
 
 
 def keep_digits(x):
-    str_only_digits = [e for e in x if e.isdigit()]
+    str_only_digits = int("".join([e for e in x if e.isdigit()]))
     return str_only_digits
 
 
@@ -215,6 +215,11 @@ def Transaction_Receipt(REC, REM, RES):
     :param REM:  Remark attached to the Transaction.
     :param RES:  Reserved variable (8) used to store banking information.
     """
+    if REC is not None:
+        pass
+    else:
+        REC = ""
+
     if REC != "":
         TXN_Receipt = 1
 
