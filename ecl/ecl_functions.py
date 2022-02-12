@@ -40,7 +40,7 @@ def Transaction_Debit_Credit(SRC, TDC, AMT):
     if AMT < 0 and TXN_Debit == 1:
         AMT_Neg = 1
 
-    return TXN_Credit, TXN_Debit, AMT_Pos, AMT_Neg
+    return [TXN_Credit, TXN_Debit, AMT_Pos, AMT_Neg]
 
 
 schema_Transaction_Debit_Credit = t.StructType([
