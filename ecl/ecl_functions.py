@@ -223,22 +223,21 @@ def Transaction_Receipt(REC, REM, RES):
     else:
         REC = ""
 
-    if REC != "":
+    if len(REC) >= 1:
         TXN_Receipt = 1
-
-    TXN_Receipt_Type_tmp = str("".join(e.upper() for e in REC if e.isalpha()))[0]  # 1st char indicates the receipt type
-    if TXN_Receipt_Type_tmp == "P":
-        TXN_Receipt_Type = "Payment"
-    elif TXN_Receipt_Type_tmp == "V":
-        TXN_Receipt_Type = "Void"
-    elif TXN_Receipt_Type_tmp == "F":
-        TXN_Receipt_Type = "Refund"
-    elif TXN_Receipt_Type_tmp == "T":
-        TXN_Receipt_Type = "Transfer"
-    elif TXN_Receipt_Type_tmp == "R":
-        TXN_Receipt_Type = "????"
-    else:
-        TXN_Receipt_Type = copy.deepcopy(TXN_Receipt_Type_tmp)
+        TXN_Receipt_Type_tmp = str("".join(e.upper() for e in REC if e.isalpha()))[0]  # 1st char indicates the receipt type
+        if TXN_Receipt_Type_tmp == "P":
+            TXN_Receipt_Type = "Payment"
+        elif TXN_Receipt_Type_tmp == "V":
+            TXN_Receipt_Type = "Void"
+        elif TXN_Receipt_Type_tmp == "F":
+            TXN_Receipt_Type = "Refund"
+        elif TXN_Receipt_Type_tmp == "T":
+            TXN_Receipt_Type = "Transfer"
+        elif TXN_Receipt_Type_tmp == "R":
+            TXN_Receipt_Type = "????"
+        else:
+            TXN_Receipt_Type = copy.deepcopy(TXN_Receipt_Type_tmp)
 
     # The Receipt Notes are only used by Cell C, but has valuable manual payment information.
     if REM is not None:
