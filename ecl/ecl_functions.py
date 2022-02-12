@@ -4,7 +4,7 @@ import copy
 
 
 def keep_digits(x):
-    str_only_digits = int("".join([e for e in x if e.isdigit()]))
+    str_only_digits = "".join([e for e in x if e.isdigit()])
     return str_only_digits
 
 
