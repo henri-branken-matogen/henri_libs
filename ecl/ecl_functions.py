@@ -225,19 +225,24 @@ def Transaction_Receipt(REC, REM, RES):
 
     if len(REC) >= 1:
         TXN_Receipt = 1
-        TXN_Receipt_Type_tmp = str("".join(e.upper() for e in REC if e.isalpha()))[0]  # 1st char indicates the receipt type
-        if TXN_Receipt_Type_tmp == "P":
-            TXN_Receipt_Type = "Payment"
-        elif TXN_Receipt_Type_tmp == "V":
-            TXN_Receipt_Type = "Void"
-        elif TXN_Receipt_Type_tmp == "F":
-            TXN_Receipt_Type = "Refund"
-        elif TXN_Receipt_Type_tmp == "T":
-            TXN_Receipt_Type = "Transfer"
-        elif TXN_Receipt_Type_tmp == "R":
-            TXN_Receipt_Type = "????"
+        TXN_Receipt_Type_tmp = str("".join(e.upper() for e in REC if e.isalpha()))
+        if len(TXN_Receipt_Type_tmp) >= 1:
+            first_char = TXN_Receipt_Type_tmp[0]
+            if first_char == "P":
+                TXN_Receipt_Type = "Payment"
+            elif first_char == "V":
+                TXN_Receipt_Type = "Void"
+            elif first_char == "F":
+                TXN_Receipt_Type = "Refund"
+            elif first_char == "T":
+                TXN_Receipt_Type = "Transfer"
+            elif first_char == "R":
+                TXN_Receipt_Type = "????"
+            else:
+                TXN_Receipt_Type = copy.deepcopy(TXN_Receipt_Type_tmp)
         else:
-            TXN_Receipt_Type = copy.deepcopy(TXN_Receipt_Type_tmp)
+            TXN_Receipt_Type = None
+
     else:
         TXN_Receipt = 0
         TXN_Receipt_Type = None
