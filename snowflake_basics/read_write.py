@@ -37,14 +37,17 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
     # Determine whether the table exists in the first place.  This is then stored inside `tb_exists`.
     try:
         query_1 = f"""SELECT * FROM {database}.{schema}.{tablename}"""
-        read_snowflake(user=user,
-                       password=password,
-                       query=query_1,
-                       sf_url=sf_url,
-                       database=database,
-                       schema=schema,
-                       warehouse=warehouse)
-        tb_exists = 1
+        x = read_snowflake(user=user,
+                           password=password,
+                           query=query_1,
+                           sf_url=sf_url,
+                           database=database,
+                           schema=schema,
+                           warehouse=warehouse)
+        if x.count() != 0:
+            tb_exists = 1
+        else:
+            tb_exists = 0
     except Py4JJavaError:
         # The table could not be found in Snowflake
         tb_exists = 0
@@ -59,7 +62,9 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                         database=database,
                                         schema=schema,
                                         warehouse=warehouse)
-        if sdf_check_part.count() == 0:  # The partition does not exist, therefore append.
+        n_new_pt = sdf_check_part.count()
+        print(f"`n_new_pt` = {n_new_pt:,}.")
+        if n_new_pt == 0:  # The partition does not exist, therefore append.
             # EXECUTE
             print("tb=1, pt=0, append_snowflake...")
             append_snowflake(user=user,
@@ -86,8 +91,11 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                      database=database,
                                      schema=schema,
                                      warehouse=warehouse)
+            n_rem = sdf_rem.count()
+            print(f"`n_rem` = {n_rem:,}.")
             # [2]
-            if sdf_rem.count() != 0:
+            if n_rem != 0:  # There is an actual remainder not containing the new partition value.
+                print("Writing the remainder.")
                 write_snowflake(user=user,
                                 password=password,
                                 sdf=sdf_rem,
@@ -96,21 +104,31 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                 database=database,
                                 schema=schema,
                                 warehouse=warehouse)
-            # [3]
-            # EXECUTE
-            print("tb=1, pt=1, append_snowflake...")
-            append_snowflake(user=user,
-                             password=password,
-                             sdf=sdf,
-                             tablename=tablename,
-                             sf_url=sf_url,
-                             database=database,
-                             schema=schema,
-                             warehouse=warehouse)
+                # [3]
+                # EXECUTE
+                print("tb=1, pt=1, append_snowflake...")
+                append_snowflake(user=user,
+                                 password=password,
+                                 sdf=sdf,
+                                 tablename=tablename,
+                                 sf_url=sf_url,
+                                 database=database,
+                                 schema=schema,
+                                 warehouse=warehouse)
+            else:  # There is no remainder...
+                print("tb=1, pt=1, write_snowflake...")
+                write_snowflake(user=user,
+                                 password=password,
+                                 sdf=sdf,
+                                 tablename=tablename,
+                                 sf_url=sf_url,
+                                 database=database,
+                                 schema=schema,
+                                 warehouse=warehouse)
     else:  # The table does not exist in the first place.
         # EXECUTE
-        print("tb=0, pt=0, append_snowflake...")
-        append_snowflake(user=user,
+        print("tb=0, pt=0, write_snowflake...")
+        write_snowflake(user=user,
                          password=password,
                          sdf=sdf,
                          tablename=tablename,
