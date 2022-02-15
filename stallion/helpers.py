@@ -304,16 +304,17 @@ def gen_year_month_str_pairs(yyyy_latest=9999, mm_latest=99, today_switch=True):
         return yyyy_slaf, mm_slaf, yyyy_prev, mm_prev
 
 
-def go_back_n_months(today_switch, ccyymm_custom, n_months):
+def go_back_n_months(ccyymm_custom, today_switch=True, n_months=1):
     """
     We want to go back `n` amount of months back in time from a certain PointInTime, and get the corresponding MONTH_ID
     after we went back `n_months`.
-    :param today_switch: A boolean value.  If True, then use the MONTH_ID of the present date as our starting point
-    from which we are going to subtract `n_months`.
     :param ccyymm_custom: A custom MONTH_ID that we use as our starting point from which we are going to subtract
     `n_months`.  This parameter is only of any use if `today_switch` is False.
+    :param today_switch: A boolean value.  If True, then use the MONTH_ID of the present date as our starting point
+    from which we are going to subtract `n_months`.  By default, this value is True.
     :param n_months: The number of months that we want to go back.  Put another way, the amount of months that we are
-    going to subtract from out starting MONTH_ID.
+    going to subtract from out starting MONTH_ID.  By default, this value is 1.  In general, the following should be
+    satisfied:  `n_months` >= 1.
     :return: Returns a string in the format of `ccyymm`.  This represents the MONTH_ID after subtracting the desired
     number of months from our starting MONTH_ID.
     """
