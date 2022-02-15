@@ -1,4 +1,5 @@
 import snowflake_basics.spark_session as ss
+from py4j.protocol import Py4JJavaError
 import os
 
 
@@ -28,6 +29,58 @@ def append_snowflake(user, password, sdf, tablename, sf_url,
         .mode("append")\
         .save()
     return None
+
+
+def append_safely(partition_var_name, partition_var_val, sdf, database, schema, tablename, user, password, sf_url,
+                  warehouse="MATOGEN_WH"):
+
+    # Determine whether the table exists in the first place.  This is then stored inside `tb_exists`.
+    try:
+        query_1 = f"""SELECT * FROM {database}.{schema}.{tablename}"""
+        read_snowflake(user=user,
+                       password=password,
+                       query=query_1,
+                       sf_url=sf_url,
+                       database=database,
+                       schema=schema,
+                       warehouse=warehouse)
+        tb_exists = 1
+    except Py4JJavaError:
+        # The table could not be found in Snowflake
+        tb_exists = 0
+
+    if tb_exists == 1:
+        query_2 = f"""SELECT * FROM {database}.{schema}.{tablename} 
+                      WHERE CAST({partition_var_name} AS VARCHAR) = '{partition_var_val}'"""
+        sdf_check_part = read_snowflake(user=user,
+                                        password=password,
+                                        query=query_2,
+                                        sf_url=sf_url,
+                                        database=database,
+                                        schema=schema,
+                                        warehouse=warehouse)
+        n_rows = sdf_check_part.count()
+        if n_rows == 0:  # The partition does not exist.
+            append_snowflake(user=user,
+                             password=password,
+                             sdf=sdf,
+                             tablename=tablename,
+                             sf_url=sf_url,
+                             database=database,
+                             schema=schema,
+                             warehouse=warehouse)
+        else:  # The partition already exists.
+            pass  # Do nothing
+    else:
+        append_snowflake(user=user,
+                         password=password,
+                         sdf=sdf,
+                         tablename=tablename,
+                         sf_url=sf_url,
+                         database=database,
+                         schema=schema,
+                         warehouse=warehouse)
+    return tb_exists
 
 
 def read_snowflake(user, password, query, sf_url, database="DEV",
