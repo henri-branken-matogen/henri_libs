@@ -227,7 +227,7 @@ def compare(value, cutoffs, label):
     return None
 
 
-def gen_stamp_suffixes(ccyymm_01, steps, reversal=False):
+def gen_stamp_suffixes(ccyymm_01, steps, ascending=False):
     """
     Generate and return a list of 36 ccyymm stamps.
     The first stamp in the list is the most recent, and corresponds to month 01.
@@ -235,15 +235,16 @@ def gen_stamp_suffixes(ccyymm_01, steps, reversal=False):
     :param ccyymm_01: The latest ccyymm stamp, in string format.
     :param steps: The number of stamps we must generate.  It corresponds to the length of the returned list.
     steps must be in integer format.
-    :return:  A list of `steps` ccyymm stamps that are in string format.
-    E.g.: ["202101", "202012", ..., "201803", "201802"].
+    :param ascending: A boolean determining whether the stamps should be ascending or descending.
+    :return:  A dictionary of (n_months, yyyymm) pairs.
+    E.g.: {1: "202101", 2: "202012", ..., n-1:"201803", n:"201802"}.
     """
     yyyy = int(ccyymm_01[:4])
     mm = int(ccyymm_01[4:])
     dte_01 = date(year=yyyy, month=mm, day=1)
     dte_00 = dte_01 + relativedelta(months=1)  # 1 month into the future with respect to `dte_01`.
     lookup_dict = dict()
-    if not reversal:
+    if not ascending:
         for n_months in range(1, steps + 1):
             dte = dte_00 - relativedelta(months=n_months)
             stamp = dte.strftime("%Y%m")
