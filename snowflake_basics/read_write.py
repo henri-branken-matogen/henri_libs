@@ -60,6 +60,8 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                         schema=schema,
                                         warehouse=warehouse)
         if sdf_check_part.count() == 0:  # The partition does not exist, therefore append.
+            # EXECUTE
+            print("tb=1, pt=0, append_snowflake...")
             append_snowflake(user=user,
                              password=password,
                              sdf=sdf,
@@ -83,7 +85,7 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                      sf_url=sf_url,
                                      database=database,
                                      schema=schema,
-                                     warehouse="MATOGEN_WH")
+                                     warehouse=warehouse)
             # [2]
             if sdf_rem.count() != 0:
                 write_snowflake(user=user,
@@ -93,8 +95,10 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                 sf_url=sf_url,
                                 database=database,
                                 schema=schema,
-                                warehouse="MATOGEN_WH")
+                                warehouse=warehouse)
             # [3]
+            # EXECUTE
+            print("tb=1, pt=1, append_snowflake...")
             append_snowflake(user=user,
                              password=password,
                              sdf=sdf,
@@ -104,6 +108,8 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                              schema=schema,
                              warehouse=warehouse)
     else:  # The table does not exist in the first place.
+        # EXECUTE
+        print("tb=0, pt=0, append_snowflake...")
         append_snowflake(user=user,
                          password=password,
                          sdf=sdf,
