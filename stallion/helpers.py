@@ -302,3 +302,29 @@ def gen_year_month_str_pairs(yyyy_latest=9999, mm_latest=99, today_switch=True):
         mm_prev = str(dte_prev.month)
         # Return the four values (y_2, m_2, y_1, m_1) based on `yyyy_latest` and `mm_latest` parameters.
         return yyyy_slaf, mm_slaf, yyyy_prev, mm_prev
+
+
+def go_back_n_months(today_switch, ccyymm_custom, n_months):
+    """
+    We want to go back `n` amount of months back in time from a certain PointInTime, and get the corresponding MONTH_ID
+    after we went back `n_months`.
+    :param today_switch: A boolean value.  If True, then use the MONTH_ID of the present date as our starting point
+    from which we are going to subtract `n_months`.
+    :param ccyymm_custom: A custom MONTH_ID that we use as our starting point from which we are going to subtract
+    `n_months`.  This parameter is only of any use if `today_switch` is False.
+    :param n_months: The number of months that we want to go back.  Put another way, the amount of months that we are
+    going to subtract from out starting MONTH_ID.
+    :return: Returns a string in the format of `ccyymm`.  This represents the MONTH_ID after subtracting the desired
+    number of months from our starting MONTH_ID.
+    """
+    if today_switch:
+        dt_today = date.today()
+        dt_this_month = date(year=dt_today.year, month=dt_today.month, day=1)
+        dt_wanted = dt_this_month - relativedelta(months=n_months)
+        ccyymm_wanted = str(dt_wanted.year) + str(dt_wanted.month).zfill(2)
+        return ccyymm_wanted
+    else:
+        dt_custom = date(year=int(ccyymm_custom[:4]), month=int(ccyymm_custom[4:]), day=1)
+        dt_wanted = dt_custom - relativedelta(months=n_months)
+        ccyymm_wanted = str(dt_wanted.year) + str(dt_wanted.month).zfill(2)
+        return ccyymm_wanted
