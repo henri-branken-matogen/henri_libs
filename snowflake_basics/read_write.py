@@ -50,7 +50,7 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
         tb_exists = 0
 
     if tb_exists == 1:
-        query_2 = f"""SELECT * FROM {database}.{schema}.{tablename} 
+        query_2 = f"""SELECT * FROM {database}.{schema}.{tablename}
                       WHERE CAST({partition_var_name} AS VARCHAR) = '{partition_var_val}'"""
         sdf_check_part = read_snowflake(user=user,
                                         password=password,
@@ -59,8 +59,7 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                         database=database,
                                         schema=schema,
                                         warehouse=warehouse)
-        n_rows = sdf_check_part.count()
-        if n_rows == 0:  # The partition does not exist.
+        if sdf_check_part.count() == 0:  # The partition does not exist, therefore append.
             append_snowflake(user=user,
                              password=password,
                              sdf=sdf,
@@ -69,9 +68,42 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                              database=database,
                              schema=schema,
                              warehouse=warehouse)
-        else:  # The partition already exists.
-            pass  # Do nothing
-    else:
+        else:
+            # The partition already exists.
+            # [1] Strip out the pre-existing partition.
+            # [2] Overwrite the remainder to the existing Snowflake table with the write function.
+            # [3] Append the new sdf of interest to the existing Snowflake table.
+
+            # [1]
+            query_3 = f"""SELECT * FROM {database}.{schema}.{tablename}
+                          WHERE CAST({partition_var_name} AS VARCHAR) <> '{partition_var_val}'"""
+            sdf_rem = read_snowflake(user=user,
+                                     password=password,
+                                     query=query_3,
+                                     sf_url=sf_url,
+                                     database=database,
+                                     schema=schema,
+                                     warehouse="MATOGEN_WH")
+            # [2]
+            if sdf_rem.count() != 0:
+                write_snowflake(user=user,
+                                password=password,
+                                sdf=sdf_rem,
+                                tablename=tablename,
+                                sf_url=sf_url,
+                                database=database,
+                                schema=schema,
+                                warehouse="MATOGEN_WH")
+            # [3]
+            append_snowflake(user=user,
+                             password=password,
+                             sdf=sdf,
+                             tablename=tablename,
+                             sf_url=sf_url,
+                             database=database,
+                             schema=schema,
+                             warehouse=warehouse)
+    else:  # The table does not exist in the first place.
         append_snowflake(user=user,
                          password=password,
                          sdf=sdf,
