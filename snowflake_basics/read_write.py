@@ -106,7 +106,7 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                 warehouse=warehouse)
                 # [3]
                 # EXECUTE
-                print("tb=1, pt=1, append_snowflake...")
+                print("tb=1, pt=1, append_snowflake after remainder written out...")
                 append_snowflake(user=user,
                                  password=password,
                                  sdf=sdf,
@@ -116,7 +116,7 @@ def append_safely(partition_var_name, partition_var_val, sdf, database, schema, 
                                  schema=schema,
                                  warehouse=warehouse)
             else:  # There is no remainder...
-                print("tb=1, pt=1, write_snowflake...")
+                print("tb=1, pt=1, write_snowflake after detecting no remainder...")
                 write_snowflake(user=user,
                                  password=password,
                                  sdf=sdf,
