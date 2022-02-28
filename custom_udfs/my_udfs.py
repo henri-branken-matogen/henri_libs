@@ -1064,6 +1064,15 @@ def mback_from_dte(dte_val, ref_dte):
 udf_mback_from_dte = udf(mback_from_dte, returnType=IntegerType())
 
 
+def my_round_fx(val, n_digits=0):
+    if val is None:
+        return None
+    ans = round(val, n_digits)
+    return int(ans)
+
+udf_my_round_fx = udf(my_round_fx, returnType=IntegerType())
+
+
 def norm_contact_number(number_1):
     """
     Takes an input contact number, and then sanitizes it to the correct format.
