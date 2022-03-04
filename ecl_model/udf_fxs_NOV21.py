@@ -4,10 +4,10 @@ import math
 
 
 # Dependent on `WOF_NOV21`
-def stage_fix(ACCOUNT_GBX, BD_USE, ACCOUNT_DLQ, STAGE):
+def stage_fix(ACCOUNT_GBX, BD_USE, ACCOUNT_DLQ, STAGE, WOF):
     if ACCOUNT_GBX == "X":
         return 4
-    elif BD_USE == 1:
+    elif (BD_USE == 1) or (WOF == 1):
         return 5
     elif ACCOUNT_DLQ == "4":
         return 3
@@ -47,10 +47,10 @@ udf_avg_rem_time_fix = f.udf(avg_rem_time_fix,
 # Dependent on `WOF_NOV21`
 def ECL(PD_USE, EAD, LGD_USE, PIT_LGD_ADJ, PIT_PD_ADJ,
         BAL_TOTAL, TTD, TTWO, STAGE_FIX, BDT_ALL,
-        PWOR, INTEREST_RATE):
+        PWOR, INTEREST_RATE, WOF):
     A = PD_USE * EAD * LGD_USE * PIT_LGD_ADJ * (1 - PWOR)
     B = (1 + INTEREST_RATE)**(-1 * (TTD + TTWO) / 12)
-    if STAGE_FIX == 5:
+    if (STAGE_FIX == 5) and (WOF == 0):
         return BDT_ALL
     else:
         if STAGE_FIX == 1:
@@ -161,8 +161,8 @@ udf_LGD_Downside = f.udf(LGD_Downside,
 
 # Dependent on `WOF_NOV21`
 def ECL_Base(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_BASE, EAD, LGD_BASE, TTD, TTWO,
-             INTEREST_PWOR, INTEREST_RATE):
-    if STAGE_FIX == 5:
+             INTEREST_PWOR, INTEREST_RATE, WOF):
+    if (STAGE_FIX == 5) and (WOF == 0):
         return BDT_ALL
     else:
         A = BAL_TOTAL * PD_BASE * EAD * LGD_BASE * (1 - INTEREST_PWOR)
@@ -176,8 +176,8 @@ udf_ECL_Base = f.udf(ECL_Base,
 
 # Dependent on `WOF_NOV21`
 def ECL_Upside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_UPSIDE, EAD, LGD_UPSIDE, TTD, TTWO,
-               INTEREST_PWOR, INTEREST_RATE):
-    if STAGE_FIX == 5:
+               INTEREST_PWOR, INTEREST_RATE, WOF):
+    if (STAGE_FIX == 5) and (WOF == 0):
         return BDT_ALL
     else:
         A = BAL_TOTAL * PD_UPSIDE * EAD * LGD_UPSIDE * (1 - INTEREST_PWOR)
@@ -191,8 +191,8 @@ udf_ECL_Upside = f.udf(ECL_Upside,
 
 # Dependent on `WOF_NOV21`
 def ECL_Downside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_DOWNSIDE, EAD, LGD_DOWNSIDE, TTD, TTWO,
-               INTEREST_PWOR, INTEREST_RATE):
-    if STAGE_FIX == 5:
+               INTEREST_PWOR, INTEREST_RATE, WOF):
+    if (STAGE_FIX == 5) and (WOF == 0):
         return BDT_ALL
     else:
         A = BAL_TOTAL * PD_DOWNSIDE * EAD * LGD_DOWNSIDE * (1 - INTEREST_PWOR)
