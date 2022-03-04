@@ -60,6 +60,9 @@ def ecl_n(BAL_TOTAL, PIT_PD_ADJ, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, EAD,
     return A * B
 
 
+udf_ecl_n = f.udf(ecl_n, returnType=t.DoubleType())
+
+
 # Dependent on `WOF_NOV21`
 def ECL(PD_USE, EAD, LGD_USE, PIT_LGD_ADJ, PIT_PD_ADJ,
         BAL_TOTAL, TTD, TTWO, STAGE_FIX, BDT_ALL,
