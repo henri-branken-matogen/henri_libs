@@ -111,12 +111,11 @@ udf_PD_Base = f.udf(PD_Base,
 def PD_Upside(UPDATED_STAGE, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, PIT_PD_ADJ, UPSIDE_PD):
     if UPDATED_STAGE in [3, 4, 5]:
         B = PD_STAGE_3
+    elif UPDATED_STAGE == 2:
+        B = PD_STAGE_2 * PIT_PD_ADJ * UPSIDE_PD
     else:
-        if UPDATED_STAGE == 2:
-            B = PD_STAGE_2
-        else:
-            B = PD_STAGE_1 * PIT_PD_ADJ
-    return min(1, B * PIT_PD_ADJ * UPSIDE_PD)
+        B = PD_STAGE_1 * PIT_PD_ADJ * PIT_PD_ADJ * UPSIDE_PD
+    return min([1.0, B])
 
 
 udf_PD_Upside = f.udf(PD_Upside,
@@ -126,12 +125,11 @@ udf_PD_Upside = f.udf(PD_Upside,
 def PD_Downside(UPDATED_STAGE, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, PIT_PD_ADJ, DOWNSIDE_PD):
     if UPDATED_STAGE in [3, 4, 5]:
         B = PD_STAGE_3
+    elif UPDATED_STAGE == 2:
+        B = PD_STAGE_2 * PIT_PD_ADJ * DOWNSIDE_PD
     else:
-        if UPDATED_STAGE == 2:
-            B = PD_STAGE_2
-        else:
-            B = PD_STAGE_1 * PIT_PD_ADJ
-    return min(1, B * PIT_PD_ADJ * DOWNSIDE_PD)
+        B = PD_STAGE_1 * PIT_PD_ADJ * PIT_PD_ADJ * DOWNSIDE_PD
+    return min([1.0, B])
 
 
 udf_PD_Downside = f.udf(PD_Downside,
