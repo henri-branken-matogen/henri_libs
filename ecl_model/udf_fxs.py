@@ -99,10 +99,10 @@ def PD_Base(UPDATED_STAGE, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, PIT_PD_ADJ, BASE_
         B = PD_STAGE_3
     else:
         if UPDATED_STAGE == 2:
-            B = PD_STAGE_2
+            B = PD_STAGE_2 * BASE_PD
         else:
-            B = PD_STAGE_1 * PIT_PD_ADJ
-    return min(1, B * BASE_PD)
+            B = PD_STAGE_1 * PIT_PD_ADJ * BASE_PD
+    return min(1, B)
 
 
 udf_PD_Base = f.udf(PD_Base,
