@@ -44,6 +44,22 @@ udf_avg_rem_time_fix = f.udf(avg_rem_time_fix,
                              returnType=t.IntegerType())
 
 
+def ecl_n(BAL_TOTAL, PIT_PD_ADJ, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, EAD,
+          LGD_NEW_TO_NPL, LGD_CURVE, PIT_LGD_ADJ, TTD, TTWO,
+          INTEREST_RATE, INTEREST_PWOR, n):
+    if n == 1:
+        A = BAL_TOTAL * PIT_PD_ADJ * PD_STAGE_1 * EAD * LGD_NEW_TO_NPL * PIT_LGD_ADJ * (1 - INTEREST_PWOR)
+    elif n == 2:
+        A = BAL_TOTAL * PIT_PD_ADJ * PD_STAGE_2 * EAD * LGD_NEW_TO_NPL * PIT_LGD_ADJ * (1 - INTEREST_PWOR)
+    elif n == 3:
+        A = BAL_TOTAL * PIT_PD_ADJ * PD_STAGE_3 * EAD * LGD_CURVE * PIT_LGD_ADJ * (1 - INTEREST_PWOR)
+    else:
+        return None
+
+    B = (1 + INTEREST_RATE)**((-TTD - TTWO) / 12.0)
+    return A * B
+
+
 # Dependent on `WOF_NOV21`
 def ECL(PD_USE, EAD, LGD_USE, PIT_LGD_ADJ, PIT_PD_ADJ,
         BAL_TOTAL, TTD, TTWO, STAGE_FIX, BDT_ALL,
