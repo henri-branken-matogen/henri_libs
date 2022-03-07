@@ -181,13 +181,12 @@ def ECL_Base(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_BASE, EAD, LGD_BASE, TTD, TTWO,
     if (STAGE_FIX == 5) and (WOF == 0):
         return BDT_ALL
     else:
-        A = BAL_TOTAL * PD_BASE * EAD * LGD_BASE * (1 - INTEREST_PWOR)
-        B = (1 + INTEREST_RATE)**(-1 * (TTD + TTWO) / 12)
+        A = BAL_TOTAL * PD_BASE * EAD * (LGD_BASE * (1.0 - INTEREST_PWOR))
+        B = (1.0 + INTEREST_RATE)**((-TTD - TTWO) / 12.0)
         return A * B
 
 
-udf_ECL_Base = f.udf(ECL_Base,
-                     returnType=t.DoubleType())
+udf_ECL_Base = f.udf(ECL_Base, returnType=t.DoubleType())
 
 
 # Dependent on `WOF_NOV21`
@@ -196,36 +195,34 @@ def ECL_Upside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_UPSIDE, EAD, LGD_UPSIDE, TTD, T
     if (STAGE_FIX == 5) and (WOF == 0):
         return BDT_ALL
     else:
-        A = BAL_TOTAL * PD_UPSIDE * EAD * LGD_UPSIDE * (1 - INTEREST_PWOR)
-        B = (1 + INTEREST_RATE)**(-1 * (TTD + TTWO) / 12)
+        A = BAL_TOTAL * PD_UPSIDE * EAD * (LGD_UPSIDE * (1.0 - INTEREST_PWOR))
+        B = (1.0 + INTEREST_RATE)**((-TTD - TTWO) / 12.0)
         return A * B
 
 
-udf_ECL_Upside = f.udf(ECL_Upside,
-                       returnType=t.DoubleType())
+udf_ECL_Upside = f.udf(ECL_Upside, returnType=t.DoubleType())
 
 
 # Dependent on `WOF_NOV21`
 def ECL_Downside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_DOWNSIDE, EAD, LGD_DOWNSIDE, TTD, TTWO,
-               INTEREST_PWOR, INTEREST_RATE, WOF):
+                 INTEREST_PWOR, INTEREST_RATE, WOF):
     if (STAGE_FIX == 5) and (WOF == 0):
         return BDT_ALL
     else:
-        A = BAL_TOTAL * PD_DOWNSIDE * EAD * LGD_DOWNSIDE * (1 - INTEREST_PWOR)
-        B = (1 + INTEREST_RATE)**(-1 * (TTD + TTWO) / 12)
+        A = BAL_TOTAL * PD_DOWNSIDE * EAD * (LGD_DOWNSIDE * (1.0 - INTEREST_PWOR))
+        B = (1.0 + INTEREST_RATE)**((-TTD - TTWO) / 12.0)
         return A * B
 
 
-udf_ECL_Downside = f.udf(ECL_Upside,
-                         returnType=t.DoubleType())
+udf_ECL_Downside = f.udf(ECL_Upside, returnType=t.DoubleType())
 
 
-def final_ecl(ECL_BASE, BASE_WEIGHTING, ECL_UPSIDE, UPSIDE_WEIGHTING, ECL_DOWNSIDE, DOWNSIDE_WEIGHTING):
+def final_ecl(ECL_BASE, BASE_WEIGHTING, ECL_UPSIDE, UPSIDE_WEIGHTING,
+              ECL_DOWNSIDE, DOWNSIDE_WEIGHTING):
     A = ECL_BASE * BASE_WEIGHTING
     B = ECL_UPSIDE * UPSIDE_WEIGHTING
     C = ECL_DOWNSIDE * DOWNSIDE_WEIGHTING
     return A + B + C
 
 
-udf_final_ecl = f.udf(final_ecl,
-                      returnType=t.DoubleType())
+udf_final_ecl = f.udf(final_ecl, returnType=t.DoubleType())
