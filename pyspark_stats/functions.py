@@ -331,4 +331,18 @@ def simul(val_a, val_b, value):
     else:
         return None
 
+
 udf_simul = udf(simul, returnType=t.IntegerType())
+
+
+def superpose_months(ccyymm, nval):
+    ccyymm = str(ccyymm)
+    ccyy = int(ccyymm[:4])
+    mm = int(ccyymm[4:])
+    if nval <= -1:
+        dt_out = date(year=ccyy, month=mm, day=1) - relativedelta(months=abs(nval))
+    else:
+        dt_out = date(year=ccyy, month=mm, day=1) + relativedelta(months=abs(nval))
+    ccyymm_out = str(dt_out.year) + str(dt_out.month).zfill(2)
+    ccyymm_out = int(ccyymm_out)
+    return ccyymm_out
