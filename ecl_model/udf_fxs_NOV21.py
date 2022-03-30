@@ -114,7 +114,7 @@ def PD_Upside(UPDATED_STAGE, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, PIT_PD_ADJ, UPS
     elif UPDATED_STAGE == 2:
         B = PD_STAGE_2 * PIT_PD_ADJ * UPSIDE_PD
     else:
-        B = PD_STAGE_1 * PIT_PD_ADJ * PIT_PD_ADJ * UPSIDE_PD
+        B = PD_STAGE_1 * PIT_PD_ADJ * UPSIDE_PD
     return min([1.0, B])
 
 
@@ -128,7 +128,7 @@ def PD_Downside(UPDATED_STAGE, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, PIT_PD_ADJ, D
     elif UPDATED_STAGE == 2:
         B = PD_STAGE_2 * PIT_PD_ADJ * DOWNSIDE_PD
     else:
-        B = PD_STAGE_1 * PIT_PD_ADJ * PIT_PD_ADJ * DOWNSIDE_PD
+        B = PD_STAGE_1 * PIT_PD_ADJ * DOWNSIDE_PD
     return min([1.0, B])
 
 
