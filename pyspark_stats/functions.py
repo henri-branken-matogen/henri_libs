@@ -336,6 +336,19 @@ udf_simul = udf(simul, returnType=t.IntegerType())
 
 
 def superpose_months(ccyymm, nval):
+    """
+    Superposes a certain number of months, specified by `nval`, onto the base year-month as specified by `ccyymm`.
+    For example:
+    superpose_months(202112, 1) would yield 202201.
+    superpose_months(202201, -1) would yield 202112.
+    superpose_months(202201, 5) would yield 202206.
+    :param ccyymm:  The base year-month on which we want to add/subtract months.  Can be of type Integer.
+    It must be 6 digits long for a valid operation to take place.
+    :param nval: Of type Integer.  Can be either positive or negative.  Represents the amount of months we wish to
+    add/subtract to the base ccyymm value.
+    :return:  Returns the result of the addition / subtraction operation.  Returns an integer that is 6 digits long.
+    The integer is specifically in the format of ccyymm.
+    """
     ccyymm = str(ccyymm)
     ccyy = int(ccyymm[:4])
     mm = int(ccyymm[4:])

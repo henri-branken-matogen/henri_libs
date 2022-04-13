@@ -229,14 +229,14 @@ def compare(value, cutoffs, label):
 
 def gen_stamp_suffixes(ccyymm_01, steps, ascending=False):
     """
-    Generate and return a list of 36 ccyymm stamps.
-    The first stamp in the list is the most recent, and corresponds to month 01.
-    The last stamp in the list is the most historic, and corresponds to month 36.
+    Generate and return a dictionary associated with a list of `steps` ccyymm stamps.
+    The first stamp in the list is the most recent, and corresponds to month_01.
+    The last stamp in the list is the most historic, and corresponds to month_<steps>.
     :param ccyymm_01: The latest ccyymm stamp, in string format.
-    :param steps: The number of stamps we must generate.  It corresponds to the length of the returned list.
-    steps must be in integer format.
+    :param steps: The number of stamps we want to generate.  It corresponds to the length of the returned list.
+    `steps` must be in integer format.
     :param ascending: A boolean determining whether the stamps should be ascending or descending.
-    :return:  A dictionary of (n_months, yyyymm) pairs.
+    :return:  A dictionary of (n_months, yyyymm) key-value pairs.
     E.g.: {1: "202101", 2: "202012", ..., n-1:"201803", n:"201802"}.
     """
     yyyy = int(ccyymm_01[:4])
@@ -244,13 +244,13 @@ def gen_stamp_suffixes(ccyymm_01, steps, ascending=False):
     dte_01 = date(year=yyyy, month=mm, day=1)
     dte_00 = dte_01 + relativedelta(months=1)  # 1 month into the future with respect to `dte_01`.
     lookup_dict = dict()
-    if not ascending:
+    if not ascending:  # must be descending.
         for n_months in range(1, steps + 1):
             dte = dte_00 - relativedelta(months=n_months)
             stamp = dte.strftime("%Y%m")
             lookup_dict[n_months] = stamp
         return lookup_dict
-    else:
+    else:  # must be ascending
         for n_months in range(1, steps + 1):
             x = steps - n_months
             dte = dte_01 - relativedelta(months=x)
