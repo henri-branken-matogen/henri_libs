@@ -4,6 +4,10 @@ import pyspark.sql.types as t
 
 
 def Filter_Administration(SEQ, Delinquency_Trigger, Filter_Waterfall):
+    """
+    Whether an account is under administration, insolvent, or in liquidation.  This comes from the CellC/CEC data, and
+    provision has been made for when Tshepi brings through the batch Experian data.
+    """
     # Set some default values to be returned:
     Filter_Administration = None
     Administration_PER = None
@@ -35,7 +39,9 @@ udf_Filter_Administration = f.udf(Filter_Administration, returnType=schema_Filte
 
 def Filter_Bad_Debt(SEQ, BAD_Month, Analysis_A, Analysis_B, Filter_Waterfall):
     """
-    Filter accounts when the account is in bad debt.
+    Filter accounts when the account is in bad debt.  Whether the account has reached a bad debt churned state (not
+    write off).  This will help resolve DOUBTFUL_DEBT mismatch we have as the month post the bad debt the account is
+    moved from the ACTIVE population to the CLOSED (churned) population.
     """
 
     # Set some default values of variables to be returned:
@@ -87,7 +93,9 @@ udf_Filter_Bad_Debt = f.udf(Filter_Bad_Debt, returnType=schema_Filter_Bad_Debt)
 
 def Filter_Business_Subscriptions(SEQ, PER, CHN_Business, Contracts, Filter_Waterfall):
     """
-    Filter accounts when subscriptions from a business.
+    Filter accounts when subscriptions from a business.  The % of subscriptions that come from a business channel,
+    should we want to exclude them from reporting.  I have found that not all enterprises are flagged correctly, and
+    the opportunity is for CEC to investigate these and flag them correctly, i.e. that they are enterprises.
     """
 
     # Make some default assignments:
@@ -102,7 +110,7 @@ def Filter_Business_Subscriptions(SEQ, PER, CHN_Business, Contracts, Filter_Wate
             Filter_Waterfall = re.sub(" +", " ", cat)
             Filter_Business = 1  # Flagged as a business account
             Business_PER = CHN_Business  # % business originated subscriptions
-    return (Business_Subscriptions, Filter_Waterfall, Filter_Business, Business_PER)
+    return Business_Subscriptions, Filter_Waterfall, Filter_Business, Business_PER
 
 
 schema_Filter_Business_Subscriptions = t.StructType([
@@ -118,7 +126,11 @@ udf_Filter_Business_Subscriptions = f.udf(Filter_Business_Subscriptions,
 
 def Filter_CD0_Collection(CD0_NBR, Analysis_A, Filter_Waterfall):
     """
-    Filter UTD accounts when Infinity identifies them as in Collections.
+    Filter UTD accounts when Infinity identifies them as in Collections.  This is part of the reconciliation Paul
+    requires between what we see in collections (from the AR files) and what infinity says they are working.  This
+    identifies where we see the account as being UTD, and Infinity say that they form part of their collections KPIs.
+    This will help close the gap between the two versions.  Bear in mind that the AR and Infinity snapshots are on the
+    same day!
     """
 
     # Set some default values:
@@ -130,8 +142,10 @@ def Filter_CD0_Collection(CD0_NBR, Analysis_A, Filter_Waterfall):
             Filter_Waterfall = "0X UTD account flagged as being in COLLECTION by Infinity"
         Filter_CD0_Collection = 1  # UTD account flagged as being in COLLECTION by Infinity
         CD0_Collection_PER = 1  # % UTD account flagged as being in COLLECTION by Infinity
+
+        # The following is marked as /* TMP */.
         Analysis_A = "---"
-    return (Filter_Waterfall, Filter_CD0_Collection, CD0_Collection_PER, Analysis_A)
+    return Filter_Waterfall, Filter_CD0_Collection, CD0_Collection_PER, Analysis_A
 
 
 schema_Filter_CD0_Collection = t.StructType([
@@ -146,7 +160,8 @@ udf_Filter_CD0_Collection = f.udf(Filter_CD0_Collection, returnType=schema_Filte
 
 def Filter_CD0_Current(CD0_NBR, Analysis_A, Filter_Waterfall):
     """
-    Filter UTD accounts and not in Infinity collections.
+    Filter UTD accounts and not in Infinity collections.  This is where the AR files aggre with Infinity that the
+    account is UTD, and what we expect each month.
     """
 
     # Set some default values:
@@ -158,10 +173,11 @@ def Filter_CD0_Current(CD0_NBR, Analysis_A, Filter_Waterfall):
             Filter_Waterfall = "00 UTD account and CURRENT per Infinity"
         Filter_CD0_Current = 1  # UTD account and CURRENT per Infinity.
         CD0_Current_PER = 1  # % UTD account and CURRENT per Infinity.
-        # The following is marked as `TMP`:
+
+        # The following is marked as /* TMP */:
         Analysis_A = "---"
 
-    return (Filter_Waterfall, Filter_CD0_Current, CD0_Current_PER, Analysis_A)
+    return Filter_Waterfall, Filter_CD0_Current, CD0_Current_PER, Analysis_A
 
 
 schema_Filter_CD0_Current = t.StructType([
@@ -176,7 +192,8 @@ udf_Filter_CD0_Current = f.udf(Filter_CD0_Current, returnType=schema_Filter_CD0_
 
 def Filter_CDX_Collection(CD1_NBR, CD2_NBR, CD3_NBR, CD4_NBR, Analysis_A, Filter_Waterfall, Aging_Attribute):
     """
-    Filter delinquent accounts when Infinity also identifies them as being in collections.
+    Filter delinquent accounts when Infinity also identifies them as being in collections.  This is where the AR files
+    agree with Infinity that the account is in arrears, and being collected on, and what we expect to see each month.
     """
     # Set some default values:
     Filter_CDX_Collection = None
@@ -194,7 +211,8 @@ def Filter_CDX_Collection(CD1_NBR, CD2_NBR, CD3_NBR, CD4_NBR, Analysis_A, Filter
             Filter_Waterfall = re.sub(" +", " ", cat)
         Filter_CDX_Collection = 1  # Delinquent account flagged as being in COLLECTION by Infinity
         CDX_Collection_PER = 1  # % Delinqeunt account flagged as being in COLLECTION by Infinity
-        # The following is being marked as `TMP`:
+
+        # The following is being marked as /* TMP */:
         Analysis_A = "---"
 
     return Filter_Waterfall, Filter_CDX_Collection, CDX_Collection_PER, Analysis_A
@@ -212,7 +230,8 @@ udf_Filter_CDX_Collection = f.udf(Filter_CDX_Collection, returnType=schema_Filte
 
 def Filter_CDX_Current(CD1_NBR, CD2_NBR, CD3_NBR, CD4_NBR, Analysis_A, Filter_Waterfall, Aging_Attribute):
     """
-    Filter accounts that are in arrears when Infinity identifies them as being CURRENT
+    Filter accounts that are in arrears when Infinity identifies them as being CURRENT.  This is where the AR file says
+    that the account is in arrears, but Infinity say that they are not being collected on.
     """
 
     # Set some Default Values:
@@ -232,10 +251,11 @@ def Filter_CDX_Current(CD1_NBR, CD2_NBR, CD3_NBR, CD4_NBR, Analysis_A, Filter_Wa
             Filter_Waterfall = re.sub(" +", " ", cat)
         Filter_CDX_Current = 1  # Delinquent account and CURRENT per Infinity.
         CDX_Current_PER = 1  # % Delinquent account and CURRENT per Infinity.
-        # The following are being marked as `TMP`:
+
+        # The following are being marked as /* TMP */:
         Analysis_A = "---"
 
-    return (Filter_Waterfall, Filter_CDX_Current, CDX_Current_PER, Analysis_A)
+    return Filter_Waterfall, Filter_CDX_Current, CDX_Current_PER, Analysis_A
 
 
 schema_Filter_CDX_Current = t.StructType([
@@ -248,9 +268,63 @@ schema_Filter_CDX_Current = t.StructType([
 udf_Filter_CDX_Current = f.udf(Filter_CDX_Current, returnType=schema_Filter_CDX_Current)
 
 
+def Filter_Channel_CEC(APP_Channel_CEC):
+    """
+    Filter Accounts based on the CEC-defined channel.  This is the CEC defined application channel.  The importance of
+    this is that we bind applications to activations (subscriptions) to accounts, so when we view accounts bad rate,
+    etc, we can correctly identify channel.  For instance, a growing channel is ONLINE, for which we currently don't
+    have any DMP decision service.  There are currently just under 30k online applications so this decision service will
+    now need to be provided for.  Using this filter approach, it will be easy for Tshepi to monitor how the channel is
+    growing and the resultant take-ups (activations), accounts generated and more importantly bad rates, bad debt.
+    He will not need you or me to extract this for him.
+    """
+    # Set some default values:
+    Filter_Channel_Store = None
+    Filter_Channel_Franchise = None
+    Filter_Channel_Outbound = None
+    Filter_Channel_Inbound = None
+    Filter_Channel_Dealer = None
+    Filter_Channel_Online = None
+    Filter_Channel_Other = None
+
+    if "STORE" in APP_Channel_CEC.upper():
+        Filter_Channel_Store = 1  # Channel = Own Store.
+    elif "FRANCHISE" in APP_Channel_CEC.upper():
+        Filter_Channel_Franchise = 1  # Channel = Franchise Store.
+    elif "OUTBOUND" in APP_Channel_CEC.upper():
+        Filter_Channel_Outbound = 1  # Channel = Telesales Outbound.
+    elif "INBOUND" in APP_Channel_CEC.upper():
+        Filter_Channel_Inbound = 1  # Channel = Telesales Inbound.
+    elif "DEALER" in APP_Channel_CEC.upper():
+        Filter_Channel_Dealer = 1  # Channel = Dealer.
+    elif "ONLINE" in APP_Channel_CEC.upper():
+        Filter_Channel_Online = 1  # Channel = Online.
+    else:
+        Filter_Channel_Other = 1  # Channel = Other.
+
+    return (Filter_Channel_Store, Filter_Channel_Franchise, Filter_Channel_Outbound, Filter_Channel_Inbound,
+            Filter_Channel_Dealer, Filter_Channel_Online, Filter_Channel_Other)
+
+
+schema_Filter_Channel_CEC = t.StructType([
+    t.StructField("FILTER_CHANNEL_STORE", t.IntegerType(), True),
+    t.StructField("FILTER_CHANNEL_FRANCHISE", t.IntegerType(), True),
+    t.StructField("FILTER_CHANNEL_OUTBOUND", t.IntegerType(), True),
+    t.StructField("FILTER_CHANNEL_INBOUND", t.IntegerType(), True),
+    t.StructField("FILTER_CHANNEL_DEALER", t.IntegerType(), True),
+    t.StructField("FILTER_CHANNEL_ONLINE", t.IntegerType(), True),
+    t.StructField("FILTER_CHANNEL_OTHER", t.IntegerType(), True)
+])
+
+udf_Filter_Channel_CEC = f.udf(Filter_Channel_CEC,
+                               returnType=schema_Filter_Channel_CEC)
+
+
 def Filter_Contract_Abnormal_Date(SEQ, CON_Abnormal_Date, Filter_Waterfall):
     """
-    Filter Accounts based on contract churned status.
+    Filter Accounts based on contract churned status.  Identifies subscritpion abnormal dates are are excluded during
+    application to activation matching routine.  These should not be CEC activations, and should be excluded from
+    subscriptions analysis.
     """
 
     # Set default values:
@@ -263,7 +337,7 @@ def Filter_Contract_Abnormal_Date(SEQ, CON_Abnormal_Date, Filter_Waterfall):
             Filter_Waterfall = re.sub(" +", "", cat)
         Filter_Contract_Abnormal_Date = 1  # Subscription has an abnormal start date.
         Contract_Abnormal_Date_PER = 1  # % subscriptions with abnormal start dates.
-    return (Filter_Waterfall, Filter_Contract_Abnormal_Date, Contract_Abnormal_Date_PER)
+    return Filter_Waterfall, Filter_Contract_Abnormal_Date, Contract_Abnormal_Date_PER
 
 
 schema_Filter_Contract_Abnormal_Date = t.StructType([
@@ -275,7 +349,8 @@ schema_Filter_Contract_Abnormal_Date = t.StructType([
 
 def Filter_Contract_Barred(SEQ, CON_Status_Bar_Outgoing, Filter_Waterfall):
     """
-    Filter Accounts based on the Contract Churned Status.
+    Filter Accounts based on the Contract Churned Status.  Identifies contracts that are barred.  Just a reminder how
+    this works is that you can now view barred contracts via the accounts insights file using this filter approach.
     """
 
     # Set some default values:
@@ -289,7 +364,7 @@ def Filter_Contract_Barred(SEQ, CON_Status_Bar_Outgoing, Filter_Waterfall):
         Filter_Contract_Barred = 1  # Subscriptions barred from outgoing calls
         Contract_Barred_PER = 1  # % subscriptions barred from outgoing calls
 
-    return (Filter_Waterfall, Filter_Contract_Barred, Contract_Barred_PER)
+    return Filter_Waterfall, Filter_Contract_Barred, Contract_Barred_PER
 
 
 schema_Filter_Contract_Barred = t.StructType([
@@ -303,7 +378,8 @@ udf_Filter_Contract_Barred = f.udf(Filter_Contract_Barred, returnType=schema_Fil
 
 def Filter_Contract_Churned(SEQ, CON_Status_Churned, Filter_Waterfall):
     """
-    Filter Accounts based on Contract Churned Status.
+    Filter Accounts based on Contract Churned Status.  Identifies churned contracts, i.e., you can then filter the
+    account insights for voluntary and involuntary churned accounts.
     """
 
     # Set some default values:
@@ -314,10 +390,10 @@ def Filter_Contract_Churned(SEQ, CON_Status_Churned, Filter_Waterfall):
         if Filter_Waterfall == "":
             cat = str(SEQ) + " Subscriptions involuntary or voluntary churned"
             Filter_Waterfall = re.sub(" +", " ", cat)
-        Filter_Contract_Churned = 1  # Subscriptions involuntary or voluntary churned
-        Contract_Churned_PER = 1  # % subscriptions involuntary or voluntary churned
+        Filter_Contract_Churned = 1  # Subscriptions involuntary or voluntary churned.
+        Contract_Churned_PER = 1  # % subscriptions involuntary or voluntary churned.
 
-    return (Filter_Waterfall, Filter_Contract_Churned, Contract_Churned_PER)
+    return Filter_Waterfall, Filter_Contract_Churned, Contract_Churned_PER
 
 
 schema_Filter_Contract_Churned = t.StructType([
@@ -331,7 +407,8 @@ udf_Filter_Contract_Churned = f.udf(Filter_Contract_Churned, returnType=schema_F
 
 def Filter_Debt_Prescription(SEQ, Delinquency_Trigger, Filter_Waterfall):
     """
-    Filter Accounts when Debt Prescription is invoked.
+    Filter Accounts when Debt Prescription is invoked.  Identifies account that have prescribed debt.  This is a
+    historic regulation issue and good to know whether the debt presribed i.e. no longer legally can be collected on.
     """
 
     # Set some default values:
@@ -345,7 +422,7 @@ def Filter_Debt_Prescription(SEQ, Delinquency_Trigger, Filter_Waterfall):
         Filter_Debt_Prescription = 1  # Debt prescription invoked.
         Debt_Prescription_PER = 1  # % number of accounts flagged as under debt prescription.
 
-    return (Filter_Waterfall, Filter_Debt_Prescription, Debt_Prescription_PER)
+    return Filter_Waterfall, Filter_Debt_Prescription, Debt_Prescription_PER
 
 
 schema_Filter_Debt_Prescription = t.StructType([
@@ -359,7 +436,9 @@ udf_Filter_Debt_Prescription = f.udf(Filter_Debt_Prescription, returnType=schema
 
 def Filter_Debt_Review(SEQ, Delinquency_Trigger, Filter_Waterfall):
     """
-    Filter when the customer is under debt review.
+    Filter when the customer is under debt review.  This is where Cell C / CEC identified the account as being under
+    debt review.  I have also provided for when Tshepi implements this Experian batch process to update this filter
+    automatically.
     """
 
     # Set some default values:
@@ -395,7 +474,7 @@ udf_Filter_Debt_Review = f.udf(Filter_Bad_Debt, returnType=schema_Filter_Debt_Re
 
 def Filter_Deceased(SEQ, Delinquency_Trigger, Filter_Waterfall):
     """
-    Filter accounts when the customer is deceased.
+    Filter accounts when the customer is deceased.  Same principle but just where the account is deceased.
     """
 
     if Delinquency_Trigger == "A. Deceased":
@@ -423,8 +502,130 @@ schema_Filter_Deceased = t.StructType([
 udf_Filter_Deceased = f.udf(Filter_Deceased, returnType=schema_Filter_Deceased)
 
 
+def Filter_Decision_Outcome(APP_Decision_Outcome):
+    """
+    Filter Accounts basede on the Decision Outcome.  Where the application matched to an account (via the contract
+    activation) was initially approved, referred, or declined.  will help to identify where referrals result in
+    accounts/contracts, or a decline outcome was overridden by the Cell C operational team.
+    """
+    Filter_Decision_Outcome_APP = None
+    Filter_Decision_Outcome_REF = None
+    Filter_Decision_Outcome_DEC = None
+    Filter_Decision_Outcome_XXX = None
+
+    if APP_Decision_Outcome.upper() == "APPROVE":
+        Filter_Decision_Outcome_SEQ = 1
+        Filter_Decision_Outcome_APP = 1  # Approved
+    elif APP_Decision_Outcome.upper() == "REFER":
+        Filter_Decision_Outcome_SEQ = 2
+        Filter_Decision_Outcome_REF = 1  # Referred
+    elif APP_Decision_Outcome.upper() == "DECLINE":
+        Filter_Decision_Outcome_SEQ = 3
+        Filter_Decision_Outcome_DEC = 1  # Declined.
+    else:
+        Filter_Decision_Outcome_SEQ = 9
+        Filter_Decision_Outcome_XXX = 1  # Unknown Decision Outcome.
+
+    return (Filter_Decision_Outcome_SEQ, Filter_Decision_Outcome_APP, Filter_Decision_Outcome_REF,
+            Filter_Decision_Outcome_DEC, Filter_Decision_Outcome_XXX)
+
+
+schema_Filter_Decision_Outcome = t.StructType([
+    t.StructField("FILTER_DECISION_OUTCOME_SEQ", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_APP", t.IntegerType(), True),
+    t.StructField("FITLER_DECISION_OUTCOME_REF", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_DEC", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_XXX", t.IntegerType(), True)
+])
+
+udf_Filter_Decision_Outcome = f.udf(Filter_Decision_Outcome,
+                                    returnType=schema_Filter_Decision_Outcome)
+
+
+def Filter_Decision_Service(APP_DecisionService):
+    """
+    Filter accounts based on the decision services deployed.  The decision service applied to the application, which
+    resulted in an activation/account, so that Tshepi can monitor bad rates each month without our assistance.
+    I have future proffed for future decision services such as NTC (New To Credit, i.e. Thin File), FTA (First Time
+    Account, i.e. MOB=0), IMM (Immature accounts, i.e. MOB=1-5), CLR (Clear Account State), etc.
+    """
+    Filter_Decision_Service_NTC = None
+    Filter_Decision_Service_NEW = None
+    Filter_Decision_Service_CAM = None
+    Filter_Decision_Service_FTA = None
+    Filter_Decision_Service_IMM = None
+    Filter_Decision_Service_EST = None
+    Filter_Decision_Service_CRD = None
+    Filter_Decision_Service_PUP = None
+    Filter_Decision_Service_CLR = None
+    Filter_Decision_Service_RES = None
+    Filter_Decision_Service_ERR = None
+    Filter_Decision_Service_EXT = None
+    Filter_Decision_Service_DIS = None
+    Filter_Decision_Service_DBT = None
+    Filter_Decision_Service_XXX = None
+
+    if APP_DecisionService.upper() == "THIN":
+        Filter_Decision_Service_NTC = 1  # New to Credit, aka Thin File.
+    elif APP_DecisionService.upper() == "NEW":
+        Filter_Decision_Service_NEW = 1  # New Account (MOB < 6).
+    elif APP_DecisionService.upper() == "CAMPAIGN":
+        Filter_Decision_Service_CAM = 1  # Telemarketing Prospects (MOB < 6).
+    elif APP_DecisionService.upper() == "FTA":
+        Filter_Decision_Service_FTA = 1  # First Time Applicant (MOB = 0).
+    elif APP_DecisionService.upper() == "IMM":
+        Filter_Decision_Service_IMM = 1  # Immature Account (MOB 1-5).
+    elif APP_DecisionService.upper() == "ESTABLISHED":
+        Filter_Decision_Service_EST = 1  # Established Account.
+    elif APP_DecisionService.upper() == "CRD":
+        Filter_Decision_Service_CRD = 1  # UTD Credit Balance.
+    elif APP_DecisionService.upper() == "PUP":
+        Filter_Decision_Service_PUP = 1  # UTD Paid Up.
+    elif APP_DecisionService.upper() == "CLR":
+        Filter_Decision_Service_CLR = 1  # UTD Clear Payment Behaviour.
+    elif APP_DecisionService.upper() == "RES":
+        Filter_Decision_Service_RES = 1  # UTD Responsible Payment Behaviour.
+    elif APP_DecisionService.upper() == "ERR":
+        Filter_Decision_Service_ERR = 1  # UTD Erratic Payment Behaviour.
+    elif APP_DecisionService.upper() == "EXT":
+        Filter_Decision_Service_EXT = 1  # 30 Days Extended Payment Behaviour.
+    elif APP_DecisionService.upper() == "DIS":
+        Filter_Decision_Service_DIS = 1  # 60-90 Days Distressed Payment Behaviour.
+    elif APP_DecisionService.upper() == "DBT":
+        Filter_Decision_Service_DBT = 1  # 120+ Doubtful Debt Payment Behaviour
+    else:
+        Filter_Decision_Service_XXX = 1  # Applications via unknown decision services.
+
+    return (Filter_Decision_Service_NTC, Filter_Decision_Service_NEW, Filter_Decision_Service_CAM,
+            Filter_Decision_Service_FTA, Filter_Decision_Service_IMM, Filter_Decision_Service_EST,
+            Filter_Decision_Service_CRD, Filter_Decision_Service_PUP, Filter_Decision_Service_CLR,
+            Filter_Decision_Service_RES, Filter_Decision_Service_ERR, Filter_Decision_Service_EXT,
+            Filter_Decision_Service_DIS, Filter_Decision_Service_DBT, Filter_Decision_Service_XXX)
+
+
+schema_Filter_Decision_Service = t.StructType([
+    t.StructField("FILTER_DECISION_SERVICE_NTC", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_NEW", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_CAM", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_FTA", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_IMM", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_EST", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_CRD", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_PUP", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_CLR", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_RES", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_ERR", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_EXT", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_DIS", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_DBT", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_XXX", t.IntegerType(), True),
+])
+
+udf_Filter_Decision_Service = f.udf(Filter_Decision_Service, returnType=schema_Filter_Decision_Service)
+
+
 def Filter_Enterprise(SEQ, Customer_TYP, Filter_Waterfall, Trigger_Analysis_B, Trigger_Account_Type,
-                      Trigger_IDValidate):
+                      Trigger_IDValidate, Analysis_B):
     """
     Filter Accounts when an enterprise.
     """
@@ -449,7 +650,8 @@ def Filter_Enterprise(SEQ, Customer_TYP, Filter_Waterfall, Trigger_Analysis_B, T
         if Trigger_Analysis_B == 1:
             Analysis_B = "---"
     # The following is marked as `TMP`:
-    Analysis_B = "---"
+    if Analysis_B == "INDIVIDUAL":
+        Analysis_B = "---"
 
     return (Filter_Waterfall, Filter_Enterprise, Enterprise_PER, Enterprise_Analysis_B,
             Enterprise_Account_Type, Enterprise_IDValidate, Analysis_B)
@@ -470,7 +672,8 @@ udf_Filter_Enterprise = f.udf(Filter_Enterprise, returnType=schema_Filter_Enterp
 
 def Filter_Fraud(SEQ, Delinquency_Trigger, Filter_Waterfall):
     """
-    Filter accounts when identified as fraud.
+    Filter accounts when identified as fraud.  Where Cell C / CEC flag the account as being fraudulent. This flag
+    depends on the team continuing to identify and investigate true fraud.
     """
 
     # Set some default values:
@@ -497,7 +700,8 @@ udf_Filter_Fraud = f.udf(Filter_Fraud, returnType=schema_Filter_Fraud)
 
 def Filter_FTTH_Subscriptions(SEQ, PER, PRD_FTTH, Contracts, Filter_Waterfall):
     """
-    Filter accounts when the subscription product is FTTH.
+    Filter accounts when the subscription product is FTTH.  Fibre subscriptions so that we can filter out accounts that
+    have fibre-only subscriptions (as not a CEC account if I understand correctly - needs to be verified with them).
     """
 
     # Set some default values:
@@ -514,7 +718,7 @@ def Filter_FTTH_Subscriptions(SEQ, PER, PRD_FTTH, Contracts, Filter_Waterfall):
             Filter_FTTH = 1  # Flagged as a FTTH subscription.
             FTTH_PER = PRD_FTTH  # % FTTH product subscriptions
 
-    return (FTTH_Subscriptions, Filter_Waterfall, Filter_FTTH, FTTH_PER)
+    return FTTH_Subscriptions, Filter_Waterfall, Filter_FTTH, FTTH_PER
 
 
 schema_Filter_FTTH_Subscriptions = t.StructType([
@@ -529,7 +733,8 @@ udf_Filter_FTTH_Subscriptions = f.udf(Filter_FTTH_Subscriptions, returnType=sche
 
 def Filter_High_Balances(SEQ, BAL, Balance_SME, Filter_Waterfall):
     """
-    Filter accounts when abnormally high balance.
+    Filter accounts when abnormally high balance.  Based on the balance RAND value, this will allow us to trap unusual
+    accounts to be excluded, e.g. reconciliation accounts.  Optional whether to use this or not.
     """
 
     # Set some default values:
@@ -543,7 +748,7 @@ def Filter_High_Balances(SEQ, BAL, Balance_SME, Filter_Waterfall):
         Filter_High_Balance = 1  # Flagged as an abnormally high-balance account.
         High_Balance_PER = Balance_SME  # % High balance amount (negative or postive).
 
-    return (Filter_Waterfall, Filter_High_Balance, High_Balance_PER)
+    return Filter_Waterfall, Filter_High_Balance, High_Balance_PER
 
 
 schema_Filter_High_Balances = t.StructType([
@@ -557,7 +762,8 @@ udf_Filter_High_Balances = f.udf(Filter_High_Balances, returnType=schema_Filter_
 
 def Filter_High_Contracts(SEQ, SUB, Contracts, Filter_Waterfall):
     """
-    Filter accounts when abnormally high number of contracts (or subscriptions).
+    Filter accounts when abnormally high number of contracts (or subscriptions).  Similar but based on an unusually high
+    number of subscriptions which tend to be businesses.
     """
 
     # Define some default values:
@@ -571,7 +777,7 @@ def Filter_High_Contracts(SEQ, SUB, Contracts, Filter_Waterfall):
         Filter_High_Contracts = 1  # Flagged as an abnormally high number contracts.
         High_Contracts_PER = Contracts  # % High number of contacts (subscriptions)
 
-    return (Filter_Waterfall, Filter_High_Contracts, High_Contracts_PER)
+    return Filter_Waterfall, Filter_High_Contracts, High_Contracts_PER
 
 
 schema_Filter_High_Contracts = t.StructType([
@@ -599,7 +805,7 @@ def Filter_Not_Infinity(SEQ, Source, Filter_Waterfall):
         Filter_Not_Infinity = 1  # Not processed by Infinity.
         Not_Infinity_PER = 1  # % not processed by Infinity.
 
-    return (Filter_Waterfall, Filter_Not_Infinity, Not_Infinity_PER)
+    return Filter_Waterfall, Filter_Not_Infinity, Not_Infinity_PER
 
 
 schema_Filter_Not_Infinity = t.StructType([
@@ -613,7 +819,8 @@ udf_Filter_Not_Infinity = f.udf(Filter_Not_Infinity, returnType=schema_Filter_No
 
 def Filter_Onseller_Subscriptions(SEQ, PER, CHN_Onseller, Contracts, Filter_Waterfall):
     """
-    Filter accounts when any subscriptions from an onseller.
+    Filter accounts when any subscriptions from an onseller.  Onseller subscriptions which are not meant to be CEC
+    managed accounts, and they need to be excluded.
     """
 
     # Set some default values:
@@ -629,7 +836,7 @@ def Filter_Onseller_Subscriptions(SEQ, PER, CHN_Onseller, Contracts, Filter_Wate
                 Filter_Waterfall = re.sub(" +", " ", cat)
             Filter_Onseller = 1  # Flagged as an onseller account.
             Onseller_PER = CHN_Onseller  # % onseller originated subscriptions.
-    return (Onseller_Subscriptions, Filter_Waterfall, Filter_Onseller, Onseller_PER)
+    return Onseller_Subscriptions, Filter_Waterfall, Filter_Onseller, Onseller_PER
 
 
 schema_Filter_Onseller_Subscriptions = t.StructType([
@@ -643,9 +850,68 @@ udf_Filter_Onseller_Subscriptions = f.udf(Filter_Onseller_Subscriptions,
                                           returnType=schema_Filter_Onseller_Subscriptions)
 
 
+def Filter_Risk_Grade(APP_RiskGrade):
+    """
+    Filter Accounts based on the decision outcome.  Identifes the risk grade triggered at application time that
+    resulted in an account/activation and can be used to measure subsequent bad rates, etc.
+    """
+    Filter_Risk_Grade_1 = None
+    Filter_Risk_Grade_2 = None
+    Filter_Risk_Grade_3 = None
+    Filter_Risk_Grade_4 = None
+    Filter_Risk_Grade_5 = None
+    Filter_Risk_Grade_6 = None
+    Filter_Risk_Grade_7 = None
+    Filter_Risk_Grade_8 = None
+    Filter_Risk_Grade_9 = None
+    Filter_Risk_Grade_X = None
+
+    if str(APP_RiskGrade).upper() == "1":
+        Filter_Risk_Grade_1 = 1  # Risk Grade 1
+    elif str(APP_RiskGrade).upper() == "2":
+        Filter_Risk_Grade_2 = 1  # Risk Grade 2
+    elif str(APP_RiskGrade).upper() == "3":
+        Filter_Risk_Grade_3 = 1  # Risk Grade 3
+    elif str(APP_RiskGrade).upper() == "4":
+        Filter_Risk_Grade_4 = 1  # Risk Grade 4
+    elif str(APP_RiskGrade).upper() == "5":
+        Filter_Risk_Grade_5 = 1  # Risk Grade 5
+    elif str(APP_RiskGrade).upper() == "6":
+        Filter_Risk_Grade_6 = 1  # Risk Grade 6
+    elif str(APP_RiskGrade).upper() == "7":
+        Filter_Risk_Grade_7 = 1  # Risk Grade 7
+    elif str(APP_RiskGrade).upper() == "8":
+        Filter_Risk_Grade_8 = 1  # Risk Grade 8
+    elif str(APP_RiskGrade).upper() == "9":
+        Filter_Risk_Grade_9 = 1  # Risk Grade 9
+    else:
+        Filter_Risk_Grade_X = 1  # Unknown Risk Grade.
+
+    return (Filter_Risk_Grade_1, Filter_Risk_Grade_2, Filter_Risk_Grade_3, Filter_Risk_Grade_4, Filter_Risk_Grade_5,
+            Filter_Risk_Grade_6, Filter_Risk_Grade_7, Filter_Risk_Grade_8, Filter_Risk_Grade_9, Filter_Risk_Grade_X)
+
+
+schema_Filter_Risk_Grade = t.StructType([
+    t.StructField("FILTER_RISK_GRADE_1", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_2", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_3", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_4", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_5", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_6", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_7", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_8", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_9", t.IntegerType(), True),
+    t.StructField("FILTER_RISK_GRADE_X", t.IntegerType(), True)
+])
+
+udf_Filter_Risk_Grade = f.udf(Filter_Risk_Grade, returnType=schema_Filter_Risk_Grade)
+
+
 def Filter_Written_Off(SEQ, Delinquency_Trigger, Analysis_A, Analysis_B, Filter_Waterfall):
     """
-    Filter accounts when the account is written off.
+    Filter accounts when the account is written off.  Based on what Cell C and CEC and Infinity tell us are written off
+    accounts.  We are still missing the true write-off file here which is going to be problematic to verify true
+    write-offs (not bad debt!).
     """
 
     # Set some default values:
@@ -673,7 +939,7 @@ def Filter_Written_Off(SEQ, Delinquency_Trigger, Analysis_A, Analysis_B, Filter_
         # The following is to be derived from the **FUTURTE WRITE-OFF FILE**.
         Written_Off_Extract_File = None
 
-        # The following fields are marked as TMP:
+        # The following fields are marked as /* TMP */:
         if Analysis_A == "WRITEOFF":
             Analysis_A = "---"
         if (Analysis_A == "COLLECTION") and (Analysis_B == "LEGAL"):

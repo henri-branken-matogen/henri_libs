@@ -209,6 +209,48 @@ def Customer_Type(type_sas, type_sla):
 udf_Customer_Type = udf(Customer_Type, returnType=StringType())
 
 
+def Customer_Type2(TYP, IDT, ANB):
+    Customer_TYP = "Unknown"  # The variable specifying the `Customer Type`.
+    Trigger_IDValidate = None
+    Trigger_Account_Type = None
+    Trigger_Analysis_B = None
+
+    # A.  Use the IDType (from the ID Validation Routine) to allocate thie initial probable Customer Type.
+    if IDT in ["N", "n", "I", "i"]:
+        Customer_TYP = "Consumer"
+    elif IDT in ["B", "b"]:
+        Customer_TYP = "Enterprise"
+        Trigger_IDValidate = 1  # ID Validation = Enterprise.
+    else:
+        pass
+
+    # B.  Override what has been supplied by Cell C / CEC and override:
+    if TYP.strip().upper() in ["1", "SOUTHAFRICANID", "2", "PASSPORT", "5", "TEMPRESIDENCE", "OTHERS", "EMIS"]:
+        Customer_TYP = "Consumer"
+    elif TYP.strip().upper() in ["3", "COMPANYID", "BUSINESSREGNUM"]:
+        Customer_TYP = "Enterprise"
+        Trigger_Account_Type = 1  # Account_Type = Enterprise.
+    else:
+        pass
+
+    # C.  Override by inspecting the Infininty Collections Field.
+    if ANB.upper() == "BUSINESS":
+        Customer_TYP = "Enterprise"
+        Trigger_Analysis_B = 1  # Analysis_B = Business
+
+    return Customer_TYP, Trigger_IDValidate, Trigger_Account_Type, Trigger_Analysis_B
+
+
+schema_Customer_Type2 = StructType([
+    StructField("CUSTOMER_TYP", StringType(), True),
+    StructField("TRIGGER_IDVALIDATE", IntegerType(), True),
+    StructField("TRIGGER_ACCOUNT_TYPE", IntegerType(), True),
+    StructField("TRIGGER_ANALYSIS_B", IntegerType(), True)
+])
+
+udf_Customer_Type2 = udf(Customer_Type2, returnType=schema_Customer_Type2)
+
+
 def date_comparison(dte_m0m, dte_m1m):
     """
     Function that evaluates two date values (which come from 2 columns) on whether they are Null or not, and
