@@ -632,7 +632,7 @@ def NewCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_AvgMonthsOnB
         NEW8 = 73
     elif ALL_MaxDelqEver in ["!", "$", "-", "="]:
         NEW8 = 0
-    elif ALL_MaxDelqEver in  [".", "-1", "?", "@"]:
+    elif ALL_MaxDelqEver in [".", "-1", "?", "@"]:
         NEW8 = 77
     elif ALL_MaxDelqEver in ["0", "1"]:
         NEW8 = 77

@@ -210,12 +210,19 @@ udf_Customer_Type = udf(Customer_Type, returnType=StringType())
 
 
 def Customer_Type2(TYP, IDT, ANB):
+    """
+    Invoked in `1_sanitise_slaf`.
+    :param IDT:  Of type String.  This comes from the ID Validation Routine.
+    :param TYP:  This comes from the Service Line Age File, supplied by Cell C / CEC.  The Account Type.
+    :param ANB:  `Analysis_B` field in the Service Line Age File.  This is an Infinity Collections field.
+    """
+
     Customer_TYP = "Unknown"  # The variable specifying the `Customer Type`.
     Trigger_IDValidate = None
     Trigger_Account_Type = None
     Trigger_Analysis_B = None
 
-    # A.  Use the IDType (from the ID Validation Routine) to allocate thie initial probable Customer Type.
+    # A.  Use the IDType (from the ID Validation Routine) to allocate the initial probable Customer Type.
     if IDT in ["N", "n", "I", "i"]:
         Customer_TYP = "Consumer"
     elif IDT in ["B", "b"]:
