@@ -186,19 +186,19 @@ def CampaignCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_MaxDelq
     ls_CAM = [CAM1, CAM2, CAM3, CAM4, CAM5, CAM6, CAM7, CAM8]
     ls_CAM_eval = [type(x) == int for x in ls_CAM]
     if all(ls_CAM_eval):
-        Campaign_Score = sum(ls_CAM)
+        CAM_CustomerScore = sum(ls_CAM)
     else:
         ls_CAM_norm = [0 if x is None else x for x in ls_CAM]
-        Campaign_Score = sum(ls_CAM_norm)
+        CAM_CustomerScore = sum(ls_CAM_norm)
 
-    Campaign_Score_LNODDS = (Campaign_Score - CONSTANT_EST) / (PDO / math.log(2))
-    Campaign_Score_PROB = math.exp(Campaign_Score_LNODDS) / (1 + math.exp(Campaign_Score_LNODDS))
+    CAM_CustomerScore_LNODDS = (CAM_CustomerScore - CONSTANT_EST) / (PDO / math.log(2))
+    CAM_CustomerScore_PROB = math.exp(CAM_CustomerScore_LNODDS) / (1 + math.exp(CAM_CustomerScore_LNODDS))
 
-    return Campaign_Score, Campaign_Score_LNODDS, Campaign_Score_PROB
+    return CAM_CustomerScore, CAM_CustomerScore_LNODDS, CAM_CustomerScore_PROB
 
 
 def EstablishedCustomerScore(ALL_Perc0Delq90Days, ALL_NumTrades180Days, ALL_Num0Delq1Year, UNS_MaxDelq1YearLT24M,
-                             ALL_PercPayments2Years, RCG_NumTradesUtilisedT10, UNN_PercTradesUtilisedLT100MR60,
+                             ALL_PercPayments2Years, RCG_NumTradesUtilisedLT10, UNN_PercTradesUtilisedLT100MR60,
                              ALL_AvgMonthsOnBook, PDO=20, CONSTANT_EST=582):
     EST1 = EST2 = EST3 = EST4 = EST5 = EST6 = EST7 = EST8 = None  # Initialise the `EST<x>` variables.
 
@@ -334,17 +334,17 @@ def EstablishedCustomerScore(ALL_Perc0Delq90Days, ALL_NumTrades180Days, ALL_Num0
     """
     `EST6` Calculation.  Derived from `ALL_Perc0Delq90Days`.
     """
-    if RCG_NumTradesUtilisedT10 is None:
+    if RCG_NumTradesUtilisedLT10 is None:
         EST6 = 73
-    elif RCG_NumTradesUtilisedT10 < -6:
+    elif RCG_NumTradesUtilisedLT10 < -6:
         EST6 = 0
-    elif RCG_NumTradesUtilisedT10 < 0:
+    elif RCG_NumTradesUtilisedLT10 < 0:
         EST6 = 73
-    elif RCG_NumTradesUtilisedT10 < 1:
+    elif RCG_NumTradesUtilisedLT10 < 1:
         EST6 = 75
-    elif RCG_NumTradesUtilisedT10 < 2:
+    elif RCG_NumTradesUtilisedLT10 < 2:
         EST6 = 87
-    elif RCG_NumTradesUtilisedT10 >= 2:
+    elif RCG_NumTradesUtilisedLT10 >= 2:
         EST6 = 96
     else:
         pass
@@ -406,14 +406,14 @@ def EstablishedCustomerScore(ALL_Perc0Delq90Days, ALL_NumTrades180Days, ALL_Num0
     ls_EST = [EST1, EST2, EST3, EST4, EST5, EST6, EST7, EST8]
     ls_EST_eval = [type(x) == int for x in ls_EST]
     if all(ls_EST_eval):
-        Est_Cust_Score = sum(ls_EST)
+        EST_CustomerScore = sum(ls_EST)
     else:
         ls_EST_norm = [0 if x is None else x for x in ls_EST]
-        Est_Cust_Score = sum(ls_EST_norm)
+        EST_CustomerScore = sum(ls_EST_norm)
 
-    Est_Cust_Score_LNODDS = (Est_Cust_Score - CONSTANT_EST) / (PDO / math.log(2))
-    Est_Cust_Score_PROB = math.exp(Est_Cust_Score_LNODDS) / (1 + math.exp(Est_Cust_Score_LNODDS))
-    return Est_Cust_Score, Est_Cust_Score_LNODDS, Est_Cust_Score_PROB
+    EST_CustomerScore_LNODDS = (EST_CustomerScore - CONSTANT_EST) / (PDO / math.log(2))
+    EST_CustomerScore_PROB = math.exp(EST_CustomerScore_LNODDS) / (1 + math.exp(EST_CustomerScore_LNODDS))
+    return EST_CustomerScore, EST_CustomerScore_LNODDS, EST_CustomerScore_PROB
 
 
 def NewCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_AvgMonthsOnBook, ALL_MaxDelq180DaysLT24M,
@@ -652,11 +652,11 @@ def NewCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_AvgMonthsOnB
     ls_NEW = [NEW1, NEW2, NEW3, NEW4, NEW5, NEW6, NEW7, NEW8]
     ls_NEW_eval = [type(x) == int for x in ls_NEW]
     if all(ls_NEW_eval):
-        New_Cust_Score = sum(ls_NEW)
+        NEW_CustomerScore = sum(ls_NEW)
     else:
         ls_NEW_norm = [0 if x is None else x for x in ls_NEW]
-        New_Cust_Score = sum(ls_NEW_norm)
+        NEW_CustomerScore = sum(ls_NEW_norm)
 
-    New_Cust_Score_LNODDS = (New_Cust_Score - CONSTANT_NEW) / (PDO / math.log(2))
-    New_Cust_Score_PROB = math.exp(New_Cust_Score_LNODDS) / (1 + math.exp(New_Cust_Score_LNODDS))
-    return New_Cust_Score, New_Cust_Score_LNODDS, New_Cust_Score_PROB
+    NEW_CustomerScore_LNODDS = (NEW_CustomerScore - CONSTANT_NEW) / (PDO / math.log(2))
+    NEW_CustomerScore_PROB = math.exp(NEW_CustomerScore_LNODDS) / (1 + math.exp(NEW_CustomerScore_LNODDS))
+    return NEW_CustomerScore, NEW_CustomerScore_LNODDS, NEW_CustomerScore_PROB
