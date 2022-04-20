@@ -1,4 +1,6 @@
 import math
+import pyspark.sql.functions as f
+import pyspark.sql.types as t
 
 
 def CampaignCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_MaxDelq180DaysLT24M, AIL_AvgMonthsOnBook,
@@ -195,6 +197,16 @@ def CampaignCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_MaxDelq
     CAM_CustomerScore_PROB = math.exp(CAM_CustomerScore_LNODDS) / (1 + math.exp(CAM_CustomerScore_LNODDS))
 
     return CAM_CustomerScore, CAM_CustomerScore_LNODDS, CAM_CustomerScore_PROB
+
+
+schema_CampaignCustomerScore = t.StructType([
+    t.StructField("CAM_CustomerScore", t.IntegerType(), True),
+    t.StructField("CAM_CustomerScore_LNODDS", t.DoubleType(), True),
+    t.StructField("CAM_CustomerScore_PROB", t.DoubleType(), True)
+])
+
+
+udf_CampaignCustomerScore = f.udf(CampaignCustomerScore, returnType=schema_CampaignCustomerScore)
 
 
 def EstablishedCustomerScore(ALL_Perc0Delq90Days, ALL_NumTrades180Days, ALL_Num0Delq1Year, UNS_MaxDelq1YearLT24M,
@@ -416,13 +428,23 @@ def EstablishedCustomerScore(ALL_Perc0Delq90Days, ALL_NumTrades180Days, ALL_Num0
     return EST_CustomerScore, EST_CustomerScore_LNODDS, EST_CustomerScore_PROB
 
 
+schema_EstablishedCustomerScore = t.StructType([
+    t.StructField("EST_CustomerScore", t.IntegerType(), True),
+    t.StructField("EST_CustomerScore_LNODDS", t.DoubleType(), True),
+    t.StructField("EST_CustomerScore_PROB", t.DoubleType(), True)
+])
+
+
+udf_EstablishedCustomerScore = f.udf(EstablishedCustomerScore, returnType=schema_EstablishedCustomerScore)
+
+
 def NewCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_AvgMonthsOnBook, ALL_MaxDelq180DaysLT24M,
                      ALL_NumTrades180Days, RCG_NumTradesUtilisedLT10, ALL_Perc0Delq90Days, ALL_MaxDelqEver,
                      PDO=20, CONSTANT_NEW=582):
     NEW1 = NEW2 = NEW3 = NEW4 = NEW5 = NEW6 = NEW7 = NEW8 = None  # Initialise the `NEW<x>` variables.
 
     """
-    `NEW1` calculation.  Derived from `ALL_Num0Delq1Year`. 
+    `NEW1` calculation.  Derived from `ALL_Num0Delq1Year`.
     """
     if ALL_Num0Delq1Year is None:
         NEW1 = 73
@@ -660,3 +682,13 @@ def NewCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_AvgMonthsOnB
     NEW_CustomerScore_LNODDS = (NEW_CustomerScore - CONSTANT_NEW) / (PDO / math.log(2))
     NEW_CustomerScore_PROB = math.exp(NEW_CustomerScore_LNODDS) / (1 + math.exp(NEW_CustomerScore_LNODDS))
     return NEW_CustomerScore, NEW_CustomerScore_LNODDS, NEW_CustomerScore_PROB
+
+
+schema_NewCustomerScore = t.StructType([
+    t.StructField("NEW_CustomerScore", t.IntegerType(), True),
+    t.StructField("NEW_CustomerScore_LNODDS", t.DoubleType(), True),
+    t.StructField("NEW_CustomerScore_PROB", t.DoubleType(), True)
+])
+
+
+udf_NewCustomerScore = f.udf(NewCustomerScore, returnType=schema_NewCustomerScore)

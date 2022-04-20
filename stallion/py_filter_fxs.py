@@ -553,6 +553,7 @@ def Filter_Decision_Service(APP_DecisionService):
     Filter_Decision_Service_NEW = None
     Filter_Decision_Service_CAM = None
     Filter_Decision_Service_FTA = None
+    Filter_Decision_Service_WEB = None
     Filter_Decision_Service_IMM = None
     Filter_Decision_Service_EST = None
     Filter_Decision_Service_CRD = None
@@ -565,18 +566,23 @@ def Filter_Decision_Service(APP_DecisionService):
     Filter_Decision_Service_DBT = None
     Filter_Decision_Service_XXX = None
 
+    # No Credit Profile.
     if APP_DecisionService.upper() == "THIN":
         Filter_Decision_Service_NTC = 1  # New to Credit, aka Thin File.
-    elif APP_DecisionService.upper() == "NEW":
-        Filter_Decision_Service_NEW = 1  # New Account (MOB < 6).
-    elif APP_DecisionService.upper() == "CAMPAIGN":
-        Filter_Decision_Service_CAM = 1  # Telemarketing Prospects (MOB < 6).
+
+    # Months On Book < 6  ** Priority sequence still to be confirmed using bad rates. **
     elif APP_DecisionService.upper() == "FTA":
         Filter_Decision_Service_FTA = 1  # First Time Applicant (MOB = 0).
+    elif APP_DecisionService.upper() == "WEB":
+        Filter_Decision_Service_WEB = 1  # WEB (Online) Applications (MOB=1-5).
+    elif APP_DecisionService.upper() == "CAMPAIGN":
+        Filter_Decision_Service_CAM = 1  # Telemarketing Prospects (MOB < 6).
     elif APP_DecisionService.upper() == "IMM":
         Filter_Decision_Service_IMM = 1  # Immature Account (MOB 1-5).
-    elif APP_DecisionService.upper() == "ESTABLISHED":
-        Filter_Decision_Service_EST = 1  # Established Account.
+    elif APP_DecisionService.upper() == "NEW":
+        Filter_Decision_Service_NEW = 1  # New Account (MOB < 6).
+
+    # Months on Book 6+  ** Unique therefore sequence not important **.
     elif APP_DecisionService.upper() == "CRD":
         Filter_Decision_Service_CRD = 1  # UTD Credit Balance.
     elif APP_DecisionService.upper() == "PUP":
@@ -593,14 +599,17 @@ def Filter_Decision_Service(APP_DecisionService):
         Filter_Decision_Service_DIS = 1  # 60-90 Days Distressed Payment Behaviour.
     elif APP_DecisionService.upper() == "DBT":
         Filter_Decision_Service_DBT = 1  # 120+ Doubtful Debt Payment Behaviour
+    elif APP_DecisionService.upper() == "ESTABLISHED":
+        Filter_Decision_Service_EST = 1  # Established Account.
     else:
         Filter_Decision_Service_XXX = 1  # Applications via unknown decision services.
 
-    return (Filter_Decision_Service_NTC, Filter_Decision_Service_NEW, Filter_Decision_Service_CAM,
-            Filter_Decision_Service_FTA, Filter_Decision_Service_IMM, Filter_Decision_Service_EST,
+    return (Filter_Decision_Service_NTC, Filter_Decision_Service_FTA, Filter_Decision_Service_WEB,
+            Filter_Decision_Service_CAM, Filter_Decision_Service_IMM, Filter_Decision_Service_NEW,
             Filter_Decision_Service_CRD, Filter_Decision_Service_PUP, Filter_Decision_Service_CLR,
             Filter_Decision_Service_RES, Filter_Decision_Service_ERR, Filter_Decision_Service_EXT,
-            Filter_Decision_Service_DIS, Filter_Decision_Service_DBT, Filter_Decision_Service_XXX)
+            Filter_Decision_Service_DIS, Filter_Decision_Service_DBT, Filter_Decision_Service_EST,
+            Filter_Decision_Service_XXX)
 
 
 schema_Filter_Decision_Service = t.StructType([
