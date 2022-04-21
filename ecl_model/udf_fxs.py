@@ -230,9 +230,18 @@ udf_ECL_Downside = f.udf(ECL_Upside, returnType=t.DoubleType())
 
 
 def final_ecl(ECL_BASE, BASE_WEIGHTING, ECL_UPSIDE, UPSIDE_WEIGHTING, ECL_DOWNSIDE, DOWNSIDE_WEIGHTING):
-    A = ECL_BASE * BASE_WEIGHTING
-    B = ECL_UPSIDE * UPSIDE_WEIGHTING
-    C = ECL_DOWNSIDE * DOWNSIDE_WEIGHTING
+    if ECL_BASE is None:
+        A = 0
+    else:
+        A = ECL_BASE * BASE_WEIGHTING
+    if ECL_UPSIDE is None:
+        B = 0
+    else:
+        B = ECL_UPSIDE * UPSIDE_WEIGHTING
+    if ECL_DOWNSIDE is None:
+        C = 0
+    else:
+        C = ECL_DOWNSIDE * DOWNSIDE_WEIGHTING
     return A + B + C
 
 
