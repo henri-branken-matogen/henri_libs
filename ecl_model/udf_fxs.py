@@ -183,7 +183,8 @@ def ECL_Base(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_BASE, EAD, LGD_BASE, TTD, TTWO,
     else:
         A = BAL_TOTAL * PD_BASE * EAD * (LGD_BASE * (1.0 - INTEREST_PWOR))
         B = (1.0 + INTEREST_RATE)**((-TTD - TTWO) / 12.0)
-        return max(0, A * B)
+        C = A * B
+        return max([0, C])
 
 
 udf_ECL_Base = f.udf(ECL_Base, returnType=t.DoubleType())
@@ -197,7 +198,8 @@ def ECL_Upside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_UPSIDE, EAD, LGD_UPSIDE, TTD, T
     else:
         A = BAL_TOTAL * PD_UPSIDE * EAD * (LGD_UPSIDE * (1.0 - INTEREST_PWOR))
         B = (1.0 + INTEREST_RATE)**((-TTD - TTWO) / 12.0)
-        return max(0, A * B)
+        C = A * B
+        return max([0, C])
 
 
 udf_ECL_Upside = f.udf(ECL_Upside, returnType=t.DoubleType())
@@ -211,7 +213,8 @@ def ECL_Downside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_DOWNSIDE, EAD, LGD_DOWNSIDE, 
     else:
         A = BAL_TOTAL * PD_DOWNSIDE * EAD * (LGD_DOWNSIDE * (1.0 - INTEREST_PWOR))
         B = (1.0 + INTEREST_RATE)**((-TTD - TTWO) / 12.0)
-        return max(0, A * B)
+        C = A * B
+        return max([0, C])
 
 
 udf_ECL_Downside = f.udf(ECL_Upside, returnType=t.DoubleType())
