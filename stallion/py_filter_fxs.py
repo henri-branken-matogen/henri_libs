@@ -3,6 +3,121 @@ import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
 
+def Filter_Activations_Initialise():
+    """
+    Create the empty application-activation matches, which are updated each time a new activation gets linked to
+    a single application.
+    """
+    Filter_Declined_No_Activations = None  # Declined application with any subscription activations.
+    Filter_Arrears_No_Activations = None  # Arrears account application without any subscription activations.
+    Filter_Referred_No_Activations = None  # Referred application withou any subscription activations.
+    Filter_Approved_No_Activations = None  # Approved application without any subscription activations (NTU).
+    Filter_Declined_With_Activations = None  # Declined application with matched subscription activations.
+    Filter_Arrears_With_Activations = None  # Arrears account application with matched subscription activations
+    Filter_Referred_With_Activations = None  # Referred application with matched subscription activations.
+    Filter_Approved_With_Activations = None  # Approved application with mathced subscription activations.
+    Filter_Immature_Activations = None  # Immature customer activation without an application.
+    Filter_Clear_Activations = None  # UTD Clear Customer Activation without an application.
+    Filter_Responsible_Activations = None  # UTD Responsible customer activation without an application.
+    Filter_Erratic_Activations = None  # UTD Erratic customer activation without an application.
+    Filter_Arrears_Activations = None  # Arrears Customer Activation without an application.
+    Filter_Other_Activations = None  # Other customer states activations without an application.
+
+    return (Filter_Declined_No_Activations, Filter_Arrears_No_Activations, Filter_Referred_No_Activations,
+            Filter_Approved_No_Activations, Filter_Declined_With_Activations, Filter_Arrears_With_Activations,
+            Filter_Referred_With_Activations, Filter_Approved_With_Activations, Filter_Immature_Activations,
+            Filter_Clear_Activations, Filter_Responsible_Activations, Filter_Erratic_Activations,
+            Filter_Arrears_Activations, Filter_Other_Activations)
+
+
+schema_Filter_Activations_Initialise = t.StructType([
+    t.StructField("FILTER_DECLINED_NO_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_ARREARS_NO_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_REFERRED_NO_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_APPROVED_NO_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_DECLINED_WITH_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_ARREARS_WITH_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_REFERRED_WITH_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_APPROVED_WITH_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_IMMATURE_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_CLEAR_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_RESPONSIBLE_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_ERRATIC_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_ARREARS_ACTIVATIONS", t.StringType(), True),
+    t.StructField("FILTER_OTHER_ACTIVATIONS", t.StringType(), True)
+])
+
+udf_Filter_Activations_Initialise = f.udf(Filter_Activations_Initialise,
+                                          returnType=schema_Filter_Activations_Initialise)
+
+
+def Filter_Activation_Status(Matched_Distance, Filter_Decision_Outcome_Declined, Filter_Decision_Outcome_Arrears,
+                             Filter_Decision_Outcome_Referred, Filter_Decision_Outcome_Approved,
+                             Filter_Declined_No_Activations, Filter_Arrears_No_Activations,
+                             Filter_Referred_No_Activations, Filter_Approved_No_Activations,
+                             Filter_Declined_With_Activations, Filter_Arrears_With_Activations,
+                             Filter_Referred_With_Activations, Filter_Approved_With_Activations):
+
+    Filter_Activation_SEQ = None
+    if Filter_Declined_No_Activations is None:
+        Filter_Declined_No_Activations = 0
+    if Filter_Arrears_No_Activations is None:
+        Filter_Arrears_No_Activations = 0
+    if Filter_Referred_No_Activations is None:
+        Filter_Referred_No_Activations = 0
+    if Filter_Approved_No_Activations is None:
+        Filter_Approved_No_Activations = 0
+    if Filter_Declined_With_Activations is None:
+        Filter_Declined_With_Activations = 0
+
+    if (Matched_Distance is None) and (Filter_Decision_Outcome_Declined is not None):
+        Filter_Activation_SEQ = 7
+        Filter_Declined_No_Activations += 1
+    elif (Matched_Distance is None) and (Filter_Decision_Outcome_Arrears is not None):
+        Filter_Activation_SEQ = 6
+        Filter_Arrears_No_Activations += 1
+    elif (Matched_Distance is None) and (Filter_Decision_Outcome_Referred is not None):
+        Filter_Activation_SEQ = 5
+        Filter_Referred_No_Activations += 1
+    elif (Matched_Distance is None) and (Filter_Decision_Outcome_Approved is not None):
+        Filter_Activation_SEQ = 4
+        Filter_Approved_No_Activations += 1
+    elif (Matched_Distance is not None) and (Filter_Decision_Outcome_Declined is not None):
+        Filter_Activation_SEQ = 3
+        Filter_Declined_With_Activations += 1
+    elif (Matched_Distance is not None) and (Filter_Decision_Outcome_Arrears is not None):
+        Filter_Activation_SEQ = 2
+        Filter_Arrears_With_Activations += 1
+    elif (Matched_Distance is not None) and (Filter_Decision_Outcome_Referred is not None):
+        Filter_Activation_SEQ = 1
+        Filter_Referred_With_Activations += 1
+    elif (Matched_Distance is not None) and (Filter_Decision_Outcome_Approved is not None):
+        Filter_Activation_SEQ = 1
+        Filter_Approved_With_Activations += 1
+    else:
+        pass
+
+    return (Filter_Activation_SEQ, Filter_Declined_No_Activations, Filter_Arrears_No_Activations,
+            Filter_Referred_No_Activations, Filter_Approved_No_Activations, Filter_Declined_With_Activations,
+            Filter_Arrears_With_Activations, Filter_Referred_With_Activations, Filter_Approved_With_Activations)
+
+
+schema_Filter_Activation_Status = t.StructType([
+    t.StructField("FILTER_ACTIVATION_SEQ", t.IntegerType(), True),
+    t.StructField("FILTER_DECLINED_NO_ACTIVATIONS", t.IntegerType(), True),
+    t.StructField("FILTER_ARREARS_NO_ACTIVATIONS", t.IntegerType(), True),
+    t.StructField("FILTER_REFERRED_NO_ACTIVATIONS", t.IntegerType(), True),
+    t.StructField("FILTER_APPROVED_NO_ACTIVATIONS", t.IntegerType(), True),
+    t.StructField("FILTER_DECLINED_WITH_ACTIVATIONS", t.IntegerType(), True),
+    t.StructField("FILTER_ARREARS_WITH_ACTIVATIONS", t.IntegerType(), True),
+    t.StructField("FILTER_REFERRED_WITH_ACTIVATIONS", t.IntegerType(), True),
+    t.StructField("FILTER_APPROVED_WITH_ACTIVATIONS", t.IntegerType(), True)
+])
+
+udf_Filter_Activation_Status = f.udf(Filter_Activation_Status,
+                                     returnType=schema_Filter_Activation_Status)
+
+
 def Filter_Administration(SEQ, Delinquency_Trigger, Filter_Waterfall):
     """
     Whether an account is under administration, insolvent, or in liquidation.  This comes from the CellC/CEC data, and
@@ -345,6 +460,9 @@ schema_Filter_Contract_Abnormal_Date = t.StructType([
     t.StructField("FILTER_CONTRACT_ABNORMAL_DATE", t.IntegerType(), True),
     t.StructField("CONTRACT_ABNORMAL_DATE_PER", t.IntegerType(), True)
 ])
+
+udf_Filter_Contract_Abnormal_Date = f.udf(Filter_Contract_Abnormal_Date,
+                                          returnType=schema_Filter_Contract_Abnormal_Date)
 
 
 def Filter_Contract_Barred(SEQ, CON_Status_Bar_Outgoing, Filter_Waterfall):
