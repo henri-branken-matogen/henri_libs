@@ -600,7 +600,7 @@ schema_Filter_Debt_Review = t.StructType([
     t.StructField("DEBT_REVIEW_CREDIT_BUREAU", t.IntegerType(), True)
 ])
 
-udf_Filter_Debt_Review = f.udf(Filter_Bad_Debt, returnType=schema_Filter_Debt_Review)
+udf_Filter_Debt_Review = f.udf(Filter_Debt_Review, returnType=schema_Filter_Debt_Review)
 
 
 def Filter_Deceased(SEQ, Delinquency_Trigger, Filter_Waterfall):
