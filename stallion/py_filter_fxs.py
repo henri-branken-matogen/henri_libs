@@ -213,6 +213,11 @@ def Filter_Business_Subscriptions(SEQ, PER, CHN_Business, Contracts, Filter_Wate
     the opportunity is for CEC to investigate these and flag them correctly, i.e. that they are enterprises.
     """
 
+    if CHN_Business is None:
+        CHN_Business = 0
+    if Contracts is None:
+        Contracts = 0
+
     # Make some default assignments:
     Business_Subscriptions = None
     Filter_Business = None
@@ -220,7 +225,7 @@ def Filter_Business_Subscriptions(SEQ, PER, CHN_Business, Contracts, Filter_Wate
 
     if CHN_Business >= 1:
         Business_Subscriptions = CHN_Business  # Number business subscriptions
-        if CHN_Business >= int(PER * Contracts / 100.0):
+        if CHN_Business >= int(PER * Contracts / 100):
             cat = str(SEQ) + " " + str(PER) + "% business subscriptions"
             Filter_Waterfall = re.sub(" +", " ", cat)
             Filter_Business = 1  # Flagged as a business account
@@ -247,6 +252,9 @@ def Filter_CD0_Collection(CD0_NBR, Analysis_A, Filter_Waterfall):
     This will help close the gap between the two versions.  Bear in mind that the AR and Infinity snapshots are on the
     same day!
     """
+
+    if CD0_NBR is None:
+        CD0_NBR = 0
 
     # Set some default values:
     Filter_CD0_Collection = None
@@ -278,6 +286,9 @@ def Filter_CD0_Current(CD0_NBR, Analysis_A, Filter_Waterfall):
     Filter UTD accounts and not in Infinity collections.  This is where the AR files aggre with Infinity that the
     account is UTD, and what we expect each month.
     """
+
+    if CD0_NBR is None:
+        CD0_NBR = 0
 
     # Set some default values:
     Filter_CD0_Current = None
@@ -393,6 +404,8 @@ def Filter_Channel_CEC(APP_Channel_CEC):
     growing and the resultant take-ups (activations), accounts generated and more importantly bad rates, bad debt.
     He will not need you or me to extract this for him.
     """
+    if (APP_Channel_CEC is None): APP_Channel_CEC = ""
+
     # Set some default values:
     Filter_Channel_Store = None
     Filter_Channel_Franchise = None
@@ -869,6 +882,8 @@ def Filter_High_Balances(SEQ, BAL, Balance_SME, Filter_Waterfall):
     accounts to be excluded, e.g. reconciliation accounts.  Optional whether to use this or not.
     """
 
+    if (Balance_SME is None): Balance_SME = 0
+
     # Set some default values:
     Filter_High_Balance = None
     High_Balance_PER = None
@@ -897,6 +912,8 @@ def Filter_High_Contracts(SEQ, SUB, Contracts, Filter_Waterfall):
     Filter accounts when abnormally high number of contracts (or subscriptions).  Similar but based on an unusually high
     number of subscriptions which tend to be businesses.
     """
+
+    if (Contracts is None): Contracts = 0
 
     # Define some default values:
     Filter_High_Contracts = None
