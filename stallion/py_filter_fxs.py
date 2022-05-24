@@ -836,9 +836,14 @@ def Filter_FTTH_Subscriptions(SEQ, PER, PRD_FTTH, Contracts, Filter_Waterfall):
     Filter_FTTH = None
     FTTH_PER = None
 
+    if PRD_FTTH is None:
+        PRD_FTTH = 0
+    if Contracts is None:
+        Contracts = 0
+
     if PRD_FTTH >= 1:
         FTTH_Subscriptions = PRD_FTTH
-        if PRD_FTTH >= int(PER * Contracts / 100.0):
+        if PRD_FTTH >= int(PER * Contracts / 100):
             if Filter_Waterfall == "":
                 cat = str(SEQ) + " " + str(PER) + "% FTTH subscriptions"
                 Filter_Waterfall = re.sub(" +", " ", cat)
