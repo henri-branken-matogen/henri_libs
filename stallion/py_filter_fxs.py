@@ -962,7 +962,7 @@ def Filter_Onseller_Subscriptions(SEQ, PER, CHN_Onseller, Contracts, Filter_Wate
 
     if CHN_Onseller >= 1:
         Onseller_Subscriptions = CHN_Onseller
-        if CHN_Onseller >= int(PER * Contracts / 100.0):
+        if CHN_Onseller >= int(PER * int(Contracts) / 100.0):
             if Filter_Waterfall == "":
                 cat = str(SEQ) + " " + str(PER) + "% onseller subscriptions"
                 Filter_Waterfall = re.sub(" +", " ", cat)
