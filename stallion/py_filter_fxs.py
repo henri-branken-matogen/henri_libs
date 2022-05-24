@@ -950,6 +950,11 @@ def Filter_Onseller_Subscriptions(SEQ, PER, CHN_Onseller, Contracts, Filter_Wate
     managed accounts, and they need to be excluded.
     """
 
+    if CHN_Onseller is None:
+        CHN_Onseller = 0
+    if Contracts is None:
+        Contracts = 0
+
     # Set some default values:
     Onseller_Subscriptions = None
     Filter_Onseller = None

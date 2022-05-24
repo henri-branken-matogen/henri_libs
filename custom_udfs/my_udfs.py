@@ -248,7 +248,7 @@ def Customer_Type2(TYP, IDT, ANB):
         pass
 
     # C.  Override by inspecting the Infininty Collections Field.
-    if ANB.upper() == "BUSINESS":
+    if ANB.strip().upper() == "BUSINESS":
         Customer_TYP = "Enterprise"
         Trigger_Analysis_B = 1  # Analysis_B = Business
 
