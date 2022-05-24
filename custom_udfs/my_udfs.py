@@ -217,6 +217,13 @@ def Customer_Type2(TYP, IDT, ANB):
     :param ANB:  `Analysis_B` field in the Service Line Age File.  This is an Infinity Collections field.
     """
 
+    if TYP is None:
+        TYP = ""
+    if IDT is None:
+        IDT = ""
+    if ANB is None:
+        ANB = ""
+
     Customer_TYP = "Unknown"  # The variable specifying the `Customer Type`.
     Trigger_IDValidate = None
     Trigger_Account_Type = None
