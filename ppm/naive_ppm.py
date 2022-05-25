@@ -26,68 +26,68 @@ def Portfolio_Performance_Summary(sdf, VAR, PER):
 
     # Step 2:  Update the Metrics
     sdf_2 = sdf_1 \
-        .withColumn(f"Balance_{PER}", (f.col("Balance") / f.col("Records")).astype(t.IntegerType())) \
-        .withColumn(f"Instalment_{PER}", (f.col("Instalment") / f.col("Records")).astype(t.IntegerType())) \
-        .withColumn(f"NextCycle30Days_{PER}",
+        .withColumn("Balance_PER", (f.col("Balance") / f.col("Records")).astype(t.IntegerType())) \
+        .withColumn("Instalment_PER", (f.col("Instalment") / f.col("Records")).astype(t.IntegerType())) \
+        .withColumn("NextCycle30Days_PER",
                     (f.col("NextCycle30Days") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"SecondCycle60Days_{PER}",
+        .withColumn("SecondCycle60Days_PER",
                     (f.col("SecondCycle60Days") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"ThirdCycle90Days_{PER}",
+        .withColumn("ThirdCycle90Days_PER",
                     (f.col("ThirdCycle90Days") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"BadRate1M_{PER}",
+        .withColumn("BadRate1M_PER",
                     ((f.col("Bads1") / reduce(add, [f.col("Goods1"), f.col("Bads1")])) * f.lit(100)).astype(
                         t.IntegerType())) \
-        .withColumn(f"BadRate3M_{PER}",
+        .withColumn("BadRate3M_PER",
                     ((f.col("Bads3") / reduce(add, [f.col("Goods3"), f.col("Bads3")])) * f.lit(100)).astype(
                         t.IntegerType())) \
-        .withColumn(f"BadRate6M_{PER}",
+        .withColumn("BadRate6M_PER",
                     ((f.col("Bads6") / reduce(add, [f.col("Goods6"), f.col("Bads6")])) * f.lit(100)).astype(
                         t.IntegerType())) \
-        .withColumn(f"BadRate9M_{PER}",
+        .withColumn("BadRate9M_PER",
                     ((f.col("Bads9") / reduce(add, [f.col("Goods9"), f.col("Bads9")])) * f.lit(100)).astype(
                         t.IntegerType())) \
-        .withColumn(f"BadRate12M_{PER}",
+        .withColumn("BadRate12M_PER",
                     ((f.col("Bads12") / reduce(add, [f.col("Goods12"), f.col("Bads12")])) * f.lit(100)).astype(
                         t.IntegerType())) \
-        .withColumn(f"DoubtfulDebt1M_{PER}",
+        .withColumn("DoubtfulDebt1M_PER",
                     (f.col("DoubtfulDebt1M") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DoubtfulDebt3M_{PER}",
+        .withColumn("DoubtfulDebt3M_PER",
                     (f.col("DoubtfulDebt3M") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DoubtfulDebt6M_{PER}",
+        .withColumn("DoubtfulDebt6M_PER",
                     (f.col("DoubtfulDebt6M") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DoubtfulDebt9M_{PER}",
+        .withColumn("DoubtfulDebt9M_PER",
                     (f.col("DoubtfulDebt9M") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DoubtfulDebt12M_{PER}",
+        .withColumn("DoubtfulDebt12M_PER",
                     (f.col("DoubtfulDebt12M") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"Records_DC0_{PER}", f.col("Records_DC0")) \
-        .withColumn(f"Records_DC1_{PER}", f.col("Records_DC1")) \
-        .withColumn(f"Records_DC2_{PER}", f.col("Records_DC2")) \
-        .withColumn(f"Records_DC3_{PER}", f.col("Records_DC3")) \
-        .withColumn(f"Records_DC4_{PER}", f.col("Records_DC4")) \
-        .withColumn(f"DC0_Credit_Paidup_{PER}",
+        .withColumn("Records_DC0_PER", f.col("Records_DC0")) \
+        .withColumn("Records_DC1_PER", f.col("Records_DC1")) \
+        .withColumn("Records_DC2_PER", f.col("Records_DC2")) \
+        .withColumn("Records_DC3_PER", f.col("Records_DC3")) \
+        .withColumn("Records_DC4_PER", f.col("Records_DC4")) \
+        .withColumn("DC0_Credit_Paidup_PER",
                     (f.col("DC0_Credit_Paidup") / f.col("Records_DC0") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC0_UTD_{PER}", (f.col("DC0_UTD") / f.col("Records_DC0") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC0_Forward_Roll_{PER}",
+        .withColumn("DC0_UTD_PER", (f.col("DC0_UTD") / f.col("Records_DC0") * f.lit(100)).astype(t.IntegerType())) \
+        .withColumn("DC0_Forward_Roll_PER",
                     (f.col("DC0_Forward_Roll") / f.col("Records_DC0") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC1_Cured_{PER}", (f.col("DC1_Cured") / f.col("Records_DC1") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC1_30Days_{PER}", (f.col("DC1_30Days") / f.col("Records_DC1") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC1_Forward_Roll_{PER}",
+        .withColumn("DC1_Cured_PER", (f.col("DC1_Cured") / f.col("Records_DC1") * f.lit(100)).astype(t.IntegerType())) \
+        .withColumn("DC1_30Days_PER", (f.col("DC1_30Days") / f.col("Records_DC1") * f.lit(100)).astype(t.IntegerType())) \
+        .withColumn("DC1_Forward_Roll_PER",
                     (f.col("DC1_Forward_Roll") / f.col("Records_DC1") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC2_Cured_{PER}", (f.col("DC2_Cured") / f.col("Records_DC2") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC2_Backward_Roll_{PER}",
+        .withColumn("DC2_Cured_PER", (f.col("DC2_Cured") / f.col("Records_DC2") * f.lit(100)).astype(t.IntegerType())) \
+        .withColumn("DC2_Backward_Roll_PER",
                     (f.col("DC2_Backward_Roll") / f.col("Records_DC2") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC2_60Days_{PER}", (f.col("DC2_60Days") / f.col("Records_DC2") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC2_Forward_Roll_{PER}",
+        .withColumn("DC2_60Days_PER", (f.col("DC2_60Days") / f.col("Records_DC2") * f.lit(100)).astype(t.IntegerType())) \
+        .withColumn("DC2_Forward_Roll_PER",
                     (f.col("DC2_Forward_Roll") / f.col("Records_DC2") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC3_Cured_{PER}", (f.col("DC3_Cured") / f.col("Records_DC3") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC3_Backward_Roll_{PER}",
+        .withColumn("DC3_Cured_PER", (f.col("DC3_Cured") / f.col("Records_DC3") * f.lit(100)).astype(t.IntegerType())) \
+        .withColumn("DC3_Backward_Roll_PER",
                     (f.col("DC3_Backward_Roll") / f.col("Records_DC3") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC3_90Days_{PER}", (f.col("DC3_90Days") / f.col("Records_DC3") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC3_Forward_Roll_{PER}",
+        .withColumn("DC3_90Days_PER", (f.col("DC3_90Days") / f.col("Records_DC3") * f.lit(100)).astype(t.IntegerType())) \
+        .withColumn("DC3_Forward_Roll_PER",
                     (f.col("DC3_Forward_Roll") / f.col("Records_DC3") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC4_Backward_Roll_{PER}",
+        .withColumn("DC4_Backward_Roll_PER",
                     (f.col("DC4_Backward_Roll") / f.col("Records_DC4") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"DC4_120Days_{PER}", (f.col("DC4_120Days") / f.col("Records_DC4") * f.lit(100)).astype(t.IntegerType()))
+        .withColumn("DC4_120Days_PER", (f.col("DC4_120Days") / f.col("Records_DC4") * f.lit(100)).astype(t.IntegerType()))
     return sdf_2
 
 
