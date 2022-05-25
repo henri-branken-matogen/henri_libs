@@ -235,25 +235,25 @@ def segment_by_aging(sdf, ACC, AGE):
     """
     if AGE.upper() == "Y":
         sdf_2 = sdf \
-            .withColumn("Records_DC0", f.when(f.col("Account_AGE") == "0", f.col(ACC)) \
-                        .otherwise(f.lit(None))) \
-            .withColumn("Records_DC1", f.when(f.col("Account_AGE") == "1", f.col(ACC)) \
-                        .otherwise(f.lit(None))) \
-            .withColumn("Records_DC2", f.when(f.col("Account_AGE") == "2", f.col(ACC)) \
-                        .otherwise(f.lit(None))) \
-            .withColumn("Records_DC3", f.when(f.col("Account_AGE") == "3", f.col(ACC)) \
-                        .otherwise(f.lit(None))) \
-            .withColumn("Records_DC4", f.when(f.col("Account_AGE") == "4", f.col(ACC)) \
-                        .otherwise(f.lit(None)))
+            .withColumn("Records_DC0", f.when(f.col("Account_AGE") == "0", f.col(ACC))
+                                        .otherwise(f.lit(None))) \
+            .withColumn("Records_DC1", f.when(f.col("Account_AGE") == "1", f.col(ACC))
+                                        .otherwise(f.lit(None))) \
+            .withColumn("Records_DC2", f.when(f.col("Account_AGE") == "2", f.col(ACC))
+                                        .otherwise(f.lit(None))) \
+            .withColumn("Records_DC3", f.when(f.col("Account_AGE") == "3", f.col(ACC))
+                                        .otherwise(f.lit(None))) \
+            .withColumn("Records_DC4", f.when(f.col("Account_AGE") == "4", f.col(ACC))
+                                        .otherwise(f.lit(None)))
 
         sdf_3 = sdf_2 \
-            .withColumn("YOY_Aging", f.when(f.col("Account_AGE") == "0", f.lit("10. UTD Accounts")) \
-                        .when(f.col("Account_AGE") == "1", f.lit("11. 30 Day Accounts")) \
-                        .when(f.col("Account_AGE") == "2", f.lit("12. 60 Day Accounts")) \
-                        .when(f.col("Account_AGE") == "3", f.lit("13. 90 Day Accounts")) \
-                        .when(f.col("Account_AGE") == "4", f.lit("14. 120+ Day Accounts")) \
-                        .when(f.col("Account_AGE") == "C", f.lit("60. Voluntary Churn (Aging)")) \
-                        .when(f.col("Account_AGE") == "P", f.lit("60. Voluntary Churn (Aging)")) \
+            .withColumn("YOY_Aging", f.when(f.col("Account_AGE") == "0", f.lit("10. UTD Accounts"))
+                        .when(f.col("Account_AGE") == "1", f.lit("11. 30 Day Accounts"))
+                        .when(f.col("Account_AGE") == "2", f.lit("12. 60 Day Accounts"))
+                        .when(f.col("Account_AGE") == "3", f.lit("13. 90 Day Accounts"))
+                        .when(f.col("Account_AGE") == "4", f.lit("14. 120+ Day Accounts"))
+                        .when(f.col("Account_AGE") == "C", f.lit("60. Voluntary Churn (Aging)"))
+                        .when(f.col("Account_AGE") == "P", f.lit("60. Voluntary Churn (Aging)"))
                         .otherwise(f.lit("70. Exclusions (Aging)")))
         return sdf_3
     else:
