@@ -104,10 +104,11 @@ def create_temporary_data_file(sdf, DIM, YOY, ACC):
     YOY_DIM = "YOY_" + DIM
 
     ls_keep = [
-        "Balance", "Instalment", ACC, "Account_M00", "Account_New", DIM_State,
+        "Balance", "Instalment", ACC, "Account_M00", "Account_New", "Account_AGE", DIM_State,
         "NextCycle30Days", "SecondCycle60Days", "ThirdCycle90Days",
         "Goods1", "Bads1", "Goods3", "Bads3", "Goods6", "Bads6", "Goods9", "Bads9", "Goods12", "Bads12",
-        "DoubtfulDebt1M", "DoubtfulDebt3M", "DoubtfulDebt6M", "DoubtfulDebt9M", "DoubtfulDebt12M"
+        "DoubtfulDebt1M", "DoubtfulDebt3M", "DoubtfulDebt6M", "DoubtfulDebt9M", "DoubtfulDebt12M",
+        "TRANSITION_1_AGE"
     ]
 
     ls_KEEP = [x.upper() for x in ls_keep]
