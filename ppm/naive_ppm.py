@@ -89,7 +89,10 @@ def Portfolio_Performance_Summary(sdf, VAR, PER):
         .withColumn(f"DC4_Backward_Roll_{PER}",
                     (f.col("DC4_Backward_Roll") / f.col("Records_DC4") * f.lit(100)).astype(t.IntegerType())) \
         .withColumn(f"DC4_120Days_{PER}", (f.col("DC4_120Days") / f.col("Records_DC4") * f.lit(100)).astype(t.IntegerType()))
-    return sdf_2
+
+    sdf_3 = sdf_2\
+        .drop(*ls_summary_vars)
+    return sdf_3
 
 
 def create_temporary_data_file(sdf, DIM, YOY, ACC):
