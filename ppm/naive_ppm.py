@@ -60,11 +60,11 @@ def Portfolio_Performance_Summary(sdf, VAR, PER):
                     (f.col("DoubtfulDebt9M") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
         .withColumn(f"DoubtfulDebt12M_{PER}",
                     (f.col("DoubtfulDebt12M") / f.col("Records") * f.lit(100)).astype(t.IntegerType())) \
-        .withColumn(f"Records_DC0_{PER}", f.col("Records_DC0")) \
-        .withColumn(f"Records_DC1_{PER}", f.col("Records_DC1")) \
-        .withColumn(f"Records_DC2_{PER}", f.col("Records_DC2")) \
-        .withColumn(f"Records_DC3_{PER}", f.col("Records_DC3")) \
-        .withColumn(f"Records_DC4_{PER}", f.col("Records_DC4")) \
+        .withColumn(f"Records_DC0_{PER}", f.col("Records_DC0").astype(t.IntegerType())) \
+        .withColumn(f"Records_DC1_{PER}", f.col("Records_DC1").astype(t.IntegerType())) \
+        .withColumn(f"Records_DC2_{PER}", f.col("Records_DC2").astype(t.IntegerType())) \
+        .withColumn(f"Records_DC3_{PER}", f.col("Records_DC3").astype(t.IntegerType())) \
+        .withColumn(f"Records_DC4_{PER}", f.col("Records_DC4").astype(t.IntegerType())) \
         .withColumn(f"DC0_Credit_Paidup_{PER}",
                     (f.col("DC0_Credit_Paidup") / f.col("Records_DC0") * f.lit(100)).astype(t.IntegerType())) \
         .withColumn(f"DC0_UTD_{PER}", (f.col("DC0_UTD") / f.col("Records_DC0") * f.lit(100)).astype(t.IntegerType())) \
