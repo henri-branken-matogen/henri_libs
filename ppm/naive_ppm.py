@@ -388,8 +388,6 @@ def summarise_and_combine(sdf, DIM, PER):
 def Portfolio_Performance_Period(sdf, DIM, YOY, ACC, AGE, PER):
     sdf_1 = create_temporary_data_file(sdf, DIM, YOY, ACC)
     sdf_2 = unpack_primary_portfolio_segmentation(sdf_1, DIM)
-    print("This is sdf_2:")
-    sdf_2.display()
     sdf_3 = segment_by_aging(sdf_2, ACC, AGE)
     sdf_4 = create_roll_rate_metrics(sdf_3, AGE)
     sdf_5 = summarise_and_combine(sdf_4, DIM, PER)
