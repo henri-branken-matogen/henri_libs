@@ -155,7 +155,7 @@ def primary_portfolio_segmentation(Account_M00, Account_New, DIM_STATE):
         YOY_DIM_val = "03. Clear Behaviour"
         YOY_Portfolio_val = "00. Active (01 to 07)"
         return YOY_DIM_val, YOY_Portfolio_val
-    elif "RES" in DIM_STATE.upper():
+    elif "RESP" in DIM_STATE.upper():
         YOY_DIM_val = "04. Responsible Behaviour"
         YOY_Portfolio_val = "00. Active (01 to 07)"
         return YOY_DIM_val, YOY_Portfolio_val
@@ -167,7 +167,7 @@ def primary_portfolio_segmentation(Account_M00, Account_New, DIM_STATE):
         YOY_DIM_val = "06. Extended Behaviour"
         YOY_Portfolio_val = "00. Active (01 to 07)"
         return YOY_DIM_val, YOY_Portfolio_val
-    elif "DIS" in DIM_STATE.upper():
+    elif "DISTRESSED" in DIM_STATE.upper():
         YOY_DIM_val = "07. Distressed Behaviour"
         YOY_Portfolio_val = "00. Active (01 to 07)"
         return YOY_DIM_val, YOY_Portfolio_val
