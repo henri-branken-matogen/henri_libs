@@ -148,11 +148,15 @@ def primary_portfolio_segmentation(Account_M00, Account_New, DIM_STATE):
             YOY_DIM_val = "01. New (MOB=00)"
             YOY_Portfolio_val = "00. Active (01 to 07)"
             return YOY_DIM_val, YOY_Portfolio_val
+        else:
+            return "", ""
     elif Account_New is not None:
         if Account_New >= 1:
             YOY_DIM_val = "02. Immature (MOB=01-05)"
             YOY_Portfolio_val = "00. Active (01 to 07)"
             return YOY_DIM_val, YOY_Portfolio_val
+        else:
+            return "", ""
     elif "CLR" in DIM_STATE.upper():
         YOY_DIM_val = "03. Clear Behaviour"
         YOY_Portfolio_val = "00. Active (01 to 07)"
