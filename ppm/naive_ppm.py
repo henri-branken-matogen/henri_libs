@@ -387,6 +387,7 @@ def summarise_and_combine(sdf, DIM, PER):
 
 def Portfolio_Performance_Period(sdf, DIM, YOY, ACC, AGE, PER):
     sdf_1 = create_temporary_data_file(sdf, DIM, YOY, ACC)
+    print("This is sdf_1:")
     sdf_1.display()
     sdf_2 = unpack_primary_portfolio_segmentation(sdf_1, DIM)
     sdf_3 = segment_by_aging(sdf_2, ACC, AGE)
