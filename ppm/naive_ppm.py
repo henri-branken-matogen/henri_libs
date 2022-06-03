@@ -143,20 +143,14 @@ def primary_portfolio_segmentation(Account_M00, Account_New, DIM_STATE):
     :return: Based on the waterfall logic in this function, we assign values to `YOY_DIM_val` and `YOY_Portfolio_val`
     and then return these.  They are of type String.
     """
-    if Account_M00 is not None:
-        if Account_M00 >= 1:
-            YOY_DIM_val = "01. New (MOB=00)"
-            YOY_Portfolio_val = "00. Active (01 to 07)"
-            return YOY_DIM_val, YOY_Portfolio_val
-        else:
-            return "", ""
-    elif Account_New is not None:
-        if Account_New >= 1:
-            YOY_DIM_val = "02. Immature (MOB=01-05)"
-            YOY_Portfolio_val = "00. Active (01 to 07)"
-            return YOY_DIM_val, YOY_Portfolio_val
-        else:
-            return "", ""
+    if (Account_M00 is not None) and (Account_M00 >= 1):
+        YOY_DIM_val = "01. New (MOB=00)"
+        YOY_Portfolio_val = "00. Active (01 to 07)"
+        return YOY_DIM_val, YOY_Portfolio_val
+    elif (Account_New is not None) and (Account_New >= 1):
+        YOY_DIM_val = "02. Immature (MOB=01-05)"
+        YOY_Portfolio_val = "00. Active (01 to 07)"
+        return YOY_DIM_val, YOY_Portfolio_val
     elif "CLR" in DIM_STATE.upper():
         YOY_DIM_val = "03. Clear Behaviour"
         YOY_Portfolio_val = "00. Active (01 to 07)"
@@ -393,6 +387,7 @@ def summarise_and_combine(sdf, DIM, PER):
 
 def Portfolio_Performance_Period(sdf, DIM, YOY, ACC, AGE, PER):
     sdf_1 = create_temporary_data_file(sdf, DIM, YOY, ACC)
+    sdf_1.display()
     sdf_2 = unpack_primary_portfolio_segmentation(sdf_1, DIM)
     sdf_3 = segment_by_aging(sdf_2, ACC, AGE)
     sdf_4 = create_roll_rate_metrics(sdf_3, AGE)
