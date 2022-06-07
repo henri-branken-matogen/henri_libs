@@ -745,11 +745,11 @@ def Filter_Decision_Service(APP_DecisionService):
 
 schema_Filter_Decision_Service = t.StructType([
     t.StructField("FILTER_DECISION_SERVICE_NTC", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_NEW", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_CAM", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_SERVICE_FTA", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_WEB", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_CAM", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_SERVICE_IMM", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_EST", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_NEW", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_SERVICE_CRD", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_SERVICE_PUP", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_SERVICE_CLR", t.IntegerType(), True),
@@ -758,7 +758,8 @@ schema_Filter_Decision_Service = t.StructType([
     t.StructField("FILTER_DECISION_SERVICE_EXT", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_SERVICE_DIS", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_SERVICE_DBT", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_XXX", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_EST", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_SERVICE_XXX", t.IntegerType(), True)
 ])
 
 udf_Filter_Decision_Service = f.udf(Filter_Decision_Service, returnType=schema_Filter_Decision_Service)
