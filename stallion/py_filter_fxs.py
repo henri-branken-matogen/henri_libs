@@ -639,6 +639,8 @@ def Filter_Decision_Outcome(APP_Decision_Outcome):
     activation) was initially approved, referred, or declined.  will help to identify where referrals result in
     accounts/contracts, or a decline outcome was overridden by the Cell C operational team.
     """
+    if APP_Decision_Outcome is None:
+        APP_Decision_Outcome = ""
     Filter_Decision_Outcome_APP = None
     Filter_Decision_Outcome_REF = None
     Filter_Decision_Outcome_DEC = None
