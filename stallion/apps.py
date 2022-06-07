@@ -107,7 +107,7 @@ def DUP_subroutine(sdf_inp):
         .withColumn("RET_Month", f.lag(f.col("APP_Month"), 1).over(windowspecIDKEY))\
         .withColumn("RET_Month_dte", udf_change_day(f.col("RET_Date")))\
         .withColumn("RET_Decision_Outcome", f.lag(f.col("Filter_Decision_Outcome_SEQ"), 1).over(windowspecIDKEY))\
-        .withColumn("RET_RiskGrade", f.lag(f.col("APP_Risk_Grade"), 1).over(windowspecIDKEY))
+        .withColumn("RET_Risk_Grade", f.lag(f.col("APP_Risk_Grade"), 1).over(windowspecIDKEY))
 
     sdf_2 = sdf_1\
         .withColumn("DUP_Days_Between_Applications", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
