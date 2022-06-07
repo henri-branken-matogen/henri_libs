@@ -111,8 +111,7 @@ def DUP_subroutine(sdf_inp):
         .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
         .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
         .withColumn("RET_Application", f.lag(f.col("DUP_Application"), 1).over(windowspecIDKEY))\
-        .withColumn("APP_Month_dte", f.to_date(f.col("APP_Month"), "yyyyMMdd"))\
-        .withColumn("APP_Month_dte", udf_change_day(f.col("APP_Month_dte")))\
+        .withColumn("APP_Month_dte", udf_change_day(f.col("APP_Date")))\
         .withColumn("RET_Month", f.lag(f.col("APP_Month"), 1).over(windowspecIDKEY))\
         .withColumn("RET_Month_dte", f.to_date(f.col("RET_Month"), "yyyyMMdd"))\
         .withColumn("RET_Month_dte", udf_change_day(f.col("RET_Month_dte")))\
