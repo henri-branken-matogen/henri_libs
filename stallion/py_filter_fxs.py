@@ -680,6 +680,8 @@ def Filter_Decision_Service(APP_DecisionService):
     I have future proffed for future decision services such as NTC (New To Credit, i.e. Thin File), FTA (First Time
     Account, i.e. MOB=0), IMM (Immature accounts, i.e. MOB=1-5), CLR (Clear Account State), etc.
     """
+    if APP_DecisionService is None:
+        APP_DecisionService = ""
     Filter_Decision_Service_NTC = None
     Filter_Decision_Service_NEW = None
     Filter_Decision_Service_CAM = None
