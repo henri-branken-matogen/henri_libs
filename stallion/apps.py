@@ -85,9 +85,11 @@ def DUP_subroutine(sdf_inp):
     In STEP 4, we sort by the optimal decision services outcome, best risk grade obtained, and highest subscription
     limit within the acceptable period.
     """
-    def change_day():
-        return lambda x: x.replace(day=1)
-    udf_change_day = f.udf(change_day, returnType=t.DateType())
+    def change_day(x_dte):
+        y_dte = x_dte.replace(day=1)
+        return y_dte
+    udf_change_day = f.udf(change_day,
+                           returnType=t.DateType())
 
     sdf_0 = sdf_inp\
         .repartition(1)\
