@@ -143,7 +143,7 @@ def DUP_subroutine(sdf_inp):
                                             f.col("APP_RiskGrade").isNotNull() &
                                             f.col("RET_RiskGrade").isNotNull() &
                                             (f.col("APP_RiskGrade") != f.col("RET_RiskGrade")),
-                                            f.col("RET_RiskGrade").astype(int) - f.col("APP_RiskGrade").astype(int))
+                                            f.col("RET_RiskGrade").astype(t.IntegerType()) - f.col("APP_RiskGrade").astype(t.IntegerType()))
                                       .otherwise(f.lit(None)))\
         .drop(*["RET_IDKey",
                 "RET_Date",
