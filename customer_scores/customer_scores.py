@@ -156,7 +156,7 @@ def CampaignCustomerScore(ALL_Num0Delq1Year, ALL_PercPayments2Years, ALL_MaxDelq
         CAM7 = 0
     elif ALL_Perc0Delq90Days < 0:
         CAM7 = 64
-    elif ALL_MaxDelqEver < 55:
+    elif ALL_Perc0Delq90Days < 55:
         CAM7 = 64
     elif ALL_Perc0Delq90Days < 70:
         CAM7 = 67
