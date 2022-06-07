@@ -74,7 +74,7 @@ def Flag_DUP_Applicant(SRT, sdf_inp, DAY=28):
         .withColumn("DUP_Application", f.when((f.col("DUP_DaysBetweenApplications") >= f.lit(0)) &
                                               (f.col("DUP_DaysBetweenApplications") <= f.lit(DAY)), f.lit(1))
                                         .otherwise(f.col("DUP_Application")))\
-        .drop(*["RET_IDKey", "APP_Date"])
+        .drop(*["RET_IDKey", "RET_Date"])
 
     return sdf_3
 
