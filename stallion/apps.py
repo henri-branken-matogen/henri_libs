@@ -86,8 +86,11 @@ def DUP_subroutine(sdf_inp):
     limit within the acceptable period.
     """
     def change_day(x_dte):
-        y_dte = x_dte.replace(day=1)
-        return y_dte
+        if x_dte is None:
+            return None
+        else:
+            y_dte = x_dte.replace(day=1)
+            return y_dte
     udf_change_day = f.udf(change_day,
                            returnType=t.DateType())
 
