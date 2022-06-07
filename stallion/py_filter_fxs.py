@@ -664,7 +664,7 @@ def Filter_Decision_Outcome(APP_Decision_Outcome):
 schema_Filter_Decision_Outcome = t.StructType([
     t.StructField("FILTER_DECISION_OUTCOME_SEQ", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_OUTCOME_APP", t.IntegerType(), True),
-    t.StructField("FITLER_DECISION_OUTCOME_REF", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_REF", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_OUTCOME_DEC", t.IntegerType(), True),
     t.StructField("FILTER_DECISION_OUTCOME_XXX", t.IntegerType(), True)
 ])
