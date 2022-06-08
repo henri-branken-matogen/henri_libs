@@ -10,7 +10,7 @@ def Filter_Activations_Initialise():
     """
     Filter_Declined_No_Activations = None  # Declined application with any subscription activations.
     Filter_Arrears_No_Activations = None  # Arrears account application without any subscription activations.
-    Filter_Referred_No_Activations = None  # Referred application withou any subscription activations.
+    Filter_Referred_No_Activations = None  # Referred application without any subscription activations.
     Filter_Approved_No_Activations = None  # Approved application without any subscription activations (NTU).
     Filter_Declined_With_Activations = None  # Declined application with matched subscription activations.
     Filter_Arrears_With_Activations = None  # Arrears account application with matched subscription activations
@@ -635,40 +635,47 @@ udf_Filter_Deceased = f.udf(Filter_Deceased, returnType=schema_Filter_Deceased)
 
 def Filter_Decision_Outcome(APP_Decision_Outcome):
     """
-    Filter Accounts basede on the Decision Outcome.  Where the application matched to an account (via the contract
+    Filter Accounts based on the Decision Outcome.  Where the application matched to an account (via the contract
     activation) was initially approved, referred, or declined.  will help to identify where referrals result in
     accounts/contracts, or a decline outcome was overridden by the Cell C operational team.
     """
     if APP_Decision_Outcome is None:
         APP_Decision_Outcome = ""
-    Filter_Decision_Outcome_APP = None
-    Filter_Decision_Outcome_REF = None
-    Filter_Decision_Outcome_DEC = None
-    Filter_Decision_Outcome_XXX = None
+    else:
+        APP_Decision_Outcome = APP_Decision_Outcome.upper()
+    Filter_Decision_Outcome_Approved = None
+    Filter_Decision_Outcome_Referred = None
+    Filter_Decision_Outcome_Arrears = None
+    Filter_Decision_Outcome_Declined = None
+    Filter_Decision_Outcome_Unknown = None
 
     if APP_Decision_Outcome.upper() == "APPROVE":
         Filter_Decision_Outcome_SEQ = 1
-        Filter_Decision_Outcome_APP = 1  # Approved
+        Filter_Decision_Outcome_Approved = 1  # Approved
     elif APP_Decision_Outcome.upper() == "REFER":
         Filter_Decision_Outcome_SEQ = 2
-        Filter_Decision_Outcome_REF = 1  # Referred
-    elif APP_Decision_Outcome.upper() == "DECLINE":
+        Filter_Decision_Outcome_Referred = 1  # Referred
+    elif APP_Decision_Outcome.upper() == "ARREARS":
         Filter_Decision_Outcome_SEQ = 3
-        Filter_Decision_Outcome_DEC = 1  # Declined.
+        Filter_Decision_Outcome_Arrears = 1  # Arrears
+    elif APP_Decision_Outcome.upper() == "DECLINE":
+        Filter_Decision_Outcome_SEQ = 4
+        Filter_Decision_Outcome_Declined = 1  # Declined
     else:
         Filter_Decision_Outcome_SEQ = 9
-        Filter_Decision_Outcome_XXX = 1  # Unknown Decision Outcome.
+        Filter_Decision_Outcome_Unknown = 1  # Unknown Decision Outcome.
 
-    return (Filter_Decision_Outcome_SEQ, Filter_Decision_Outcome_APP, Filter_Decision_Outcome_REF,
-            Filter_Decision_Outcome_DEC, Filter_Decision_Outcome_XXX)
+    return (Filter_Decision_Outcome_SEQ, Filter_Decision_Outcome_Approved, Filter_Decision_Outcome_Referred,
+            Filter_Decision_Outcome_Arrears, Filter_Decision_Outcome_Declined, Filter_Decision_Outcome_Unknown)
 
 
 schema_Filter_Decision_Outcome = t.StructType([
     t.StructField("FILTER_DECISION_OUTCOME_SEQ", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_OUTCOME_APP", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_OUTCOME_REF", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_OUTCOME_DEC", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_OUTCOME_XXX", t.IntegerType(), True)
+    t.StructField("FILTER_DECISION_OUTCOME_APPROVED", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_REFERRED", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_ARREARS", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_DECLINED", t.IntegerType(), True),
+    t.StructField("FILTER_DECISION_OUTCOME_UNKNOWN", t.IntegerType(), True)
 ])
 
 udf_Filter_Decision_Outcome = f.udf(Filter_Decision_Outcome,
@@ -684,86 +691,78 @@ def Filter_Decision_Service(APP_DecisionService):
     """
     if APP_DecisionService is None:
         APP_DecisionService = ""
-    Filter_Decision_Service_NTC = None
-    Filter_Decision_Service_NEW = None
-    Filter_Decision_Service_CAM = None
-    Filter_Decision_Service_FTA = None
-    Filter_Decision_Service_WEB = None
-    Filter_Decision_Service_IMM = None
-    Filter_Decision_Service_EST = None
-    Filter_Decision_Service_CRD = None
-    Filter_Decision_Service_PUP = None
-    Filter_Decision_Service_CLR = None
-    Filter_Decision_Service_RES = None
-    Filter_Decision_Service_ERR = None
-    Filter_Decision_Service_EXT = None
-    Filter_Decision_Service_DIS = None
-    Filter_Decision_Service_DBT = None
-    Filter_Decision_Service_XXX = None
-
-    # No Credit Profile.
-    if APP_DecisionService.upper() == "THIN":
-        Filter_Decision_Service_NTC = 1  # New to Credit, aka Thin File.
-
-    # Months On Book < 6  ** Priority sequence still to be confirmed using bad rates. **
-    elif APP_DecisionService.upper() == "FTA":
-        Filter_Decision_Service_FTA = 1  # First Time Applicant (MOB = 0).
-    elif APP_DecisionService.upper() == "WEB":
-        Filter_Decision_Service_WEB = 1  # WEB (Online) Applications (MOB=1-5).
-    elif APP_DecisionService.upper() == "CAMPAIGN":
-        Filter_Decision_Service_CAM = 1  # Telemarketing Prospects (MOB < 6).
-    elif APP_DecisionService.upper() == "IMM":
-        Filter_Decision_Service_IMM = 1  # Immature Account (MOB 1-5).
-    elif APP_DecisionService.upper() == "NEW":
-        Filter_Decision_Service_NEW = 1  # New Account (MOB < 6).
-
-    # Months on Book 6+  ** Unique therefore sequence not important **.
-    elif APP_DecisionService.upper() == "CRD":
-        Filter_Decision_Service_CRD = 1  # UTD Credit Balance.
-    elif APP_DecisionService.upper() == "PUP":
-        Filter_Decision_Service_PUP = 1  # UTD Paid Up.
-    elif APP_DecisionService.upper() == "CLR":
-        Filter_Decision_Service_CLR = 1  # UTD Clear Payment Behaviour.
-    elif APP_DecisionService.upper() == "RES":
-        Filter_Decision_Service_RES = 1  # UTD Responsible Payment Behaviour.
-    elif APP_DecisionService.upper() == "ERR":
-        Filter_Decision_Service_ERR = 1  # UTD Erratic Payment Behaviour.
-    elif APP_DecisionService.upper() == "EXT":
-        Filter_Decision_Service_EXT = 1  # 30 Days Extended Payment Behaviour.
-    elif APP_DecisionService.upper() == "DIS":
-        Filter_Decision_Service_DIS = 1  # 60-90 Days Distressed Payment Behaviour.
-    elif APP_DecisionService.upper() == "DBT":
-        Filter_Decision_Service_DBT = 1  # 120+ Doubtful Debt Payment Behaviour
-    elif APP_DecisionService.upper() == "ESTABLISHED":
-        Filter_Decision_Service_EST = 1  # Established Account.
     else:
-        Filter_Decision_Service_XXX = 1  # Applications via unknown decision services.
+        APP_DecisionService = APP_DecisionService.upper()
+    Filter_New_To_Credit = None
+    Filter_First_Account_Applicant = None
+    Filter_Web_Service = None
+    Filter_Telesales_Inbound = None
+    Filter_Telesales_Outbound = None
+    Filter_Immature_State = None
+    Filter_Clear_State = None
+    Filter_Responsible_State = None
+    Filter_Erratic_State = None
+    Filter_Arrears_State = None
+    Filter_XXXXXX_State = None
+    Filter_DMP_Campaign = None
+    Filter_DMP_New = None
+    Filter_DMP_Established = None
+    Filter_DMP_Unknown = None
 
-    return (Filter_Decision_Service_NTC, Filter_Decision_Service_FTA, Filter_Decision_Service_WEB,
-            Filter_Decision_Service_CAM, Filter_Decision_Service_IMM, Filter_Decision_Service_NEW,
-            Filter_Decision_Service_CRD, Filter_Decision_Service_PUP, Filter_Decision_Service_CLR,
-            Filter_Decision_Service_RES, Filter_Decision_Service_ERR, Filter_Decision_Service_EXT,
-            Filter_Decision_Service_DIS, Filter_Decision_Service_DBT, Filter_Decision_Service_EST,
-            Filter_Decision_Service_XXX)
+    # No Credit Profile
+    if "NEW TO CREDIT" in APP_DecisionService:
+        Filter_New_To_Credit = 1
+    elif "FIRST ACCOUNT APPLICANT" in APP_DecisionService:
+        Filter_First_Account_Applicant = 1
+    elif "WEB SERVICE" in APP_DecisionService:
+        Filter_Web_Service = 1
+    elif "TELESALES INBOUND" in APP_DecisionService:
+        Filter_Telesales_Inbound = 1
+    elif "TELESALES OUTBOUND" in APP_DecisionService:
+        Filter_Telesales_Outbound = 1
+    elif "IMMATURE CUSTOMER STATE" in APP_DecisionService:
+        Filter_Immature_State = 1
+    elif "CLEAR CUSTOMER STATE" in APP_DecisionService:
+        Filter_Clear_State = 1
+    elif "RESPONSIBLE CUSTOMER STATE" in APP_DecisionService:
+        Filter_Responsible_State = 1
+    elif "ERRATIC CUSTOMER STATE" in APP_DecisionService:
+        Filter_Erratic_State = 1
+    elif "ARREARS CUSTOMER STATE" in APP_DecisionService:
+        Filter_Arrears_State = 1
+    elif "XXXXXXX CUSTOMER STATE" in APP_DecisionService:
+        Filter_XXXXXX_State = 1
+    elif "CAMPAIGN" in APP_DecisionService:
+        Filter_DMP_Campaign = 1
+    elif "NEW" in APP_DecisionService:
+        Filter_DMP_New = 1
+    elif "ESTABLISHED" in APP_DecisionService:
+        Filter_DMP_Established = 1
+    else:
+        Filter_DMP_Unknown = 1
+
+    return (Filter_New_To_Credit, Filter_First_Account_Applicant, Filter_Web_Service, Filter_Telesales_Inbound,
+            Filter_Telesales_Outbound, Filter_Immature_State, Filter_Clear_State, Filter_Responsible_State,
+            Filter_Erratic_State, Filter_Arrears_State, Filter_XXXXXX_State, Filter_DMP_Campaign,
+            Filter_DMP_New, Filter_DMP_Established, Filter_DMP_Unknown)
 
 
 schema_Filter_Decision_Service = t.StructType([
-    t.StructField("FILTER_DECISION_SERVICE_NTC", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_FTA", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_WEB", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_CAM", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_IMM", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_NEW", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_CRD", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_PUP", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_CLR", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_RES", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_ERR", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_EXT", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_DIS", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_DBT", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_EST", t.IntegerType(), True),
-    t.StructField("FILTER_DECISION_SERVICE_XXX", t.IntegerType(), True)
+    t.StructField("FILTER_NEW_TO_CREDIT", t.IntegerType(), True),
+    t.StructField("FILTER_FIRST_ACCOUNT_APPLICANT", t.IntegerType(), True),
+    t.StructField("FILTER_WEB_SERVICE", t.IntegerType(), True),
+    t.StructField("FILTER_TELESALES_INBOUND", t.IntegerType(), True),
+    t.StructField("FILTER_TELESALES_OUTBOUND", t.IntegerType(), True),
+    t.StructField("FILTER_IMMATURE_STATE", t.IntegerType(), True),
+    t.StructField("FILTER_CLEAR_STATE", t.IntegerType(), True),
+    t.StructField("FILTER_RESPONSIBLE_STATE", t.IntegerType(), True),
+    t.StructField("FILTER_ERRATIC_STATE", t.IntegerType(), True),
+    t.StructField("FILTER_ARREARS_STATE", t.IntegerType(), True),
+    t.StructField("FILTER_XXXXXX_STATE", t.IntegerType(), True),
+    t.StructField("FILTER_DMP_CAMPAIGN", t.IntegerType(), True),
+    t.StructField("FILTER_DMP_NEW", t.IntegerType(), True),
+    t.StructField("FILTER_DMP_ESTABLISHED", t.IntegerType(), True),
+    t.StructField("FILTER_DMP_UNKNOWN", t.IntegerType(), True)
 ])
 
 udf_Filter_Decision_Service = f.udf(Filter_Decision_Service, returnType=schema_Filter_Decision_Service)
