@@ -89,6 +89,9 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
                                   Subscriber_Number, CON_Start_Date, Matched_Distance, CON_Period):
     APP_Subscriptions = NBR
 
+    if Matched_Distance is None:
+        Matched_Distance = 0
+
     APP_Subscriber_Number1 = APP_Subscriber_Number2 = APP_Subscriber_Number3 = APP_Subscriber_Number4 = APP_Subscriber_Number5 = None
     APP_Activation_Date1 = APP_Activation_Date2 = APP_Activation_Date3 = APP_Activation_Date4 = APP_Activation_Date5 = None
     APP_Activation_Weeks1 = APP_Activation_Weeks2 = APP_Activation_Weeks3 = APP_Activation_Weeks4 = APP_Activation_Weeks5 = None
