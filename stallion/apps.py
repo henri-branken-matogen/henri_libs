@@ -449,8 +449,7 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Subscriber_Number"),
                                                             f.col("CON_Start_Date"),
                                                             f.col("Matched_Distance"),
-                                                            f.col("CON_Period")))
-                    .otherwise([None for _ in range(25)]))
+                                                            f.col("CON_Period"))))
 
     sdf_6 = sdf_5\
         .withColumn("APP_Subscriptions", f.col("nest.APP_Subscriptions"))\
