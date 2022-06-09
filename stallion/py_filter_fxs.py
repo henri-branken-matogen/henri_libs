@@ -69,6 +69,12 @@ def Filter_Activation_Status(Matched_Distance, Filter_Decision_Outcome_Declined,
         Filter_Approved_No_Activations = 0
     if Filter_Declined_With_Activations is None:
         Filter_Declined_With_Activations = 0
+    if Filter_Arrears_With_Activations is None:
+        Filter_Arrears_With_Activations = 0
+    if Filter_Referred_With_Activations is None:
+        Filter_Referred_With_Activations = 0
+    if Filter_Approved_With_Activations is None:
+        Filter_Approved_With_Activations = 0
 
     if (Matched_Distance is None) and (Filter_Decision_Outcome_Declined is not None):
         Filter_Activation_SEQ = 7
