@@ -4,68 +4,6 @@ from pyspark.sql import Window
 from stallion.py_filter_fxs import *
 
 
-def Flag_DUP_Applicant(SRT, sdf_inp, DAY=28):
-    """
-    This is the Python translation of the SAS Code `Flag_DUP_Applicant.sas`.
-    """
-    if SRT.upper() == "ASCENDING":
-        sdf_0 = sdf_inp\
-            .repartition(1)\
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").asc(),
-                      f.col("DUP_Application").asc()])
-
-        windowspecIDKEY = Window \
-            .partitionBy(f.col("IDKey")) \
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").asc(),
-                      f.col("DUP_Application").asc()])
-
-        sdf_1 = sdf_0\
-            .repartition(1)\
-            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
-            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
-            .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
-                                          .otherwise(f.lit(None)))
-    else:
-        sdf_0 = sdf_inp\
-            .repartition(1)\
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").desc(),
-                      f.col("DUP_Application").desc()])
-
-        windowspecIDKEY = Window \
-            .partitionBy(f.col("IDKey")) \
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").desc(),
-                      f.col("DUP_Application").desc()])
-
-        sdf_1 = sdf_0 \
-            .repartition(1) \
-            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY)) \
-            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
-            .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
-                                          .otherwise(f.lit(None)))
-
-    if SRT.upper() == "ASCENDING":
-        sdf_2 = sdf_1\
-            .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
-                                                                f.datediff(f.col("APP_Date"), f.col("RET_Date")))
-                                                          .otherwise(f.lit(None)))
-    else:
-        sdf_2 = sdf_1 \
-            .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
-                                                                f.datediff(f.col("RET_Date"), f.col("APP_Date")))
-                                                          .otherwise(f.lit(None)))
-
-    sdf_3 = sdf_2\
-        .withColumn("DUP_Application", f.when((f.col("DUP_Days_Between_Applications") >= f.lit(0)) &
-                                              (f.col("DUP_Days_Between_Applications") <= f.lit(DAY)), f.lit(1))
-                                        .otherwise(f.col("DUP_Application")))\
-        .drop(*["RET_IDKey", "RET_Date"])
-    return sdf_3
-
-
 def DUP_subroutine(sdf_inp):
     """
     This is the Python translation of STEP 4 in `Input_Applications_DMP.sas`.
@@ -339,6 +277,68 @@ schema_Applications_Contracts_Update = t.StructType([
 
 udf_Applications_Contracts_Update = f.udf(Applications_Contracts_Update,
                                           returnType=schema_Applications_Contracts_Update)
+
+
+def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
+    """
+    This is the Python translation of the SAS Code `Flag_DUP_Applicant.sas`.
+    """
+    if SRT.upper() == "ASCENDING":
+        sdf_0 = sdf_inp\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").asc(),
+                      f.col("DUP_Application").asc()])
+
+        windowspecIDKEY = Window \
+            .partitionBy(f.col("IDKey")) \
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").asc(),
+                      f.col("DUP_Application").asc()])
+
+        sdf_1 = sdf_0\
+            .repartition(1)\
+            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
+            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
+            .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
+                                          .otherwise(f.lit(None)))
+    else:
+        sdf_0 = sdf_inp\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").desc(),
+                      f.col("DUP_Application").desc()])
+
+        windowspecIDKEY = Window \
+            .partitionBy(f.col("IDKey")) \
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").desc(),
+                      f.col("DUP_Application").desc()])
+
+        sdf_1 = sdf_0 \
+            .repartition(1) \
+            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY)) \
+            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
+            .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
+                                          .otherwise(f.lit(None)))
+
+    if SRT.upper() == "ASCENDING":
+        sdf_2 = sdf_1\
+            .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
+                                                                f.datediff(f.col("APP_Date"), f.col("RET_Date")))
+                                                          .otherwise(f.lit(None)))
+    else:
+        sdf_2 = sdf_1 \
+            .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
+                                                                f.datediff(f.col("RET_Date"), f.col("APP_Date")))
+                                                          .otherwise(f.lit(None)))
+
+    sdf_3 = sdf_2\
+        .withColumn("DUP_Application", f.when((f.col("DUP_Days_Between_Applications") >= f.lit(0)) &
+                                              (f.col("DUP_Days_Between_Applications") <= f.lit(DAY)), f.lit(1))
+                                        .otherwise(f.col("DUP_Application")))\
+        .drop(*["RET_IDKey", "RET_Date"])
+    return sdf_3
 
 
 def Match_Applications_Contracts(sdf_0):
@@ -663,3 +663,155 @@ def Match_Applications_Contracts(sdf_0):
         .select(*[ls_keep])
 
     return sdf_7
+
+
+def RiskGrade_Mandate(Applicants, APP_Accounts, BadRate12M, BadRate9M, BadRate6M):
+    Risk_Grade_Mandate = None
+    if Applicants is None:
+        Applicants = 0
+    if APP_Accounts is None:
+        APP_Accounts = 0
+
+    # Only Calculate the Risk_Grade_Mandate when there are 100+ applications and 50+ accounts touched.
+    if (Applicants >= 100) and (APP_Accounts >= 50):
+        # Calculate `RiskGradeBadRate12M`
+        if (BadRate12M is None) or (BadRate12M == 0):
+            RiskGradeBadRate12M = 0
+        elif BadRate12M < 6.7:
+            RiskGradeBadRate12M = 1
+        elif BadRate12M < 12.4:
+            RiskGradeBadRate12M = 2
+        elif BadRate12M < 18.1:
+            RiskGradeBadRate12M = 3
+        elif BadRate12M < 25.1:
+            RiskGradeBadRate12M = 4
+        elif BadRate12M < 26.1:
+            RiskGradeBadRate12M = 5
+        elif BadRate12M < 39.2:
+            RiskGradeBadRate12M = 6
+        elif BadRate12M < 47.2:
+            RiskGradeBadRate12M = 7
+        elif BadRate12M < 57.1:
+            RiskGradeBadRate12M = 8
+        else:
+            RiskGradeBadRate12M = 9
+
+        # Calculate `RiskGradeBadRate9M`
+        if (BadRate9M is None) or (BadRate9M == 0):
+            RiskGradeBadRate9M = 0
+        elif BadRate9M < 5.9:
+            RiskGradeBadRate9M = 1
+        elif BadRate9M < 11.1:
+            RiskGradeBadRate9M = 2
+        elif BadRate9M < 15.2:
+            RiskGradeBadRate9M = 3
+        elif BadRate9M < 20.9:
+            RiskGradeBadRate9M = 4
+        elif BadRate9M < 30.3:
+            RiskGradeBadRate9M = 5
+        elif BadRate9M < 31.7:
+            RiskGradeBadRate9M = 6
+        elif BadRate9M < 40.1:
+            RiskGradeBadRate9M = 7
+        elif BadRate9M < 50.3:
+            RiskGradeBadRate9M = 8
+        else:
+            RiskGradeBadRate9M = 9
+
+        # Calculate `RiskGradeBadRate6M`
+        if (BadRate6M is None) or (BadRate6M == 0):
+            RiskGradeBadRate6M = 0
+        elif BadRate6M < 4.8:
+            RiskGradeBadRate6M = 1
+        elif BadRate6M < 9.3:
+            RiskGradeBadRate6M = 2
+        elif BadRate6M < 11.6:
+            RiskGradeBadRate6M = 3
+        elif BadRate6M < 15.1:
+            RiskGradeBadRate6M = 4
+        elif BadRate6M < 22.3:
+            RiskGradeBadRate6M = 5
+        elif BadRate6M < 23.8:
+            RiskGradeBadRate6M = 6
+        elif BadRate6M < 29.8:
+            RiskGradeBadRate6M = 7
+        elif BadRate6M < 39.3:
+            RiskGradeBadRate6M = 8
+        else:
+            RiskGradeBadRate6M = 9
+
+        # Calculate `Risk_Grade_Mandate`
+        if (BadRate12M is not None) and (BadRate9M is not None) and (BadRate6M is not None):
+            Risk_Grade_Mandate = int(10 * sum([RiskGradeBadRate12M, RiskGradeBadRate9M, RiskGradeBadRate6M]) / 3) / 10
+        elif (BadRate12M is not None) and (BadRate9M is not None):
+            Risk_Grade_Mandate = int(10 * sum([RiskGradeBadRate12M, RiskGradeBadRate9M]) / 2) / 10
+        elif (BadRate9M is not None) and (BadRate6M is not None):
+            Risk_Grade_Mandate = int(10 * sum([RiskGradeBadRate9M, RiskGradeBadRate6M]) / 2) / 10
+        elif (BadRate9M is not None) and (BadRate6M is not None):
+            Risk_Grade_Mandate = int(10 * sum([RiskGradeBadRate12M, RiskGradeBadRate6M]) / 2) / 10
+        elif BadRate12M is not None:
+            Risk_Grade_Mandate = BadRate12M
+        elif BadRate9M is not None:
+            Risk_Grade_Mandate = BadRate9M
+        elif BadRate6M is not None:
+            Risk_Grade_Mandate = BadRate6M
+        else:
+            pass
+    else:
+        pass
+    return Risk_Grade_Mandate
+
+
+udf_RiskGrade_Mandate = f.udf(RiskGrade_Mandate,
+                              returnType=t.FloatType())
+
+
+def Risk_Grade_Matrix(sdf_inp, RiskGrade, SA1, SA2, SA3, SA4, SA5, SA6,
+                      CustomScore, SB1, SB2, SB3, SB4, SB5, SB6):
+    sdf_0 = sdf_inp\
+        .withColumn("Decision_Services_Outcome",
+                    f.when(f.col("Decision_Services_Waterfall") == "",
+                           f.concat(f.lit("Approve "), f.lit(RiskGrade)))
+                     .otherwise(f.lit("Decline")))\
+        .withColumn("Decision_Services_Waterfall",
+                    f.when(f.col("Decision_Services_Waterfall") == "",
+                           f.lit("P. Pass Credit Policies"))
+                     .otherwise(f.col("Decision_Services_Waterfall")))
+
+    sdf_1 = sdf_0\
+        .withColumn("CBX_Prism_TM_BND",
+                    f.when(f.col("CBX_Prism_TM") < SA1,
+                           f.lit("001"))
+                     .when(f.col("CBX_Prism_TM") < SA2,
+                           f.lit(SA1))
+                     .when(f.col("CBX_Prism_TM") < SA3,
+                           f.lit(SA2))
+                     .when(f.col("CBX_Prism_TM") < SA4,
+                           f.lit(SA3))
+                     .when(f.col("CBX_Prism_TM") < SA5,
+                           f.lit(SA4))
+                     .when(f.col("CBX_Prism_TM") < SA6,
+                           f.lit(SA5))
+                     .otherwise(f.lit(SA6)))
+
+    sdf_2 = sdf_1\
+        .withColumn((CustomScore + "_BND"),
+                    f.when(f.col(CustomScore) < SB1,
+                           f.lit("001"))
+                     .when(f.col(CustomScore) < SB2,
+                           f.lit(SB1))
+                     .when(f.col(CustomScore) < SB3,
+                           f.lit(SB2))
+                     .when(f.col(CustomScore) < SB4,
+                           f.lit(SB3))
+                     .when(f.col(CustomScore) < SB5,
+                           f.lit(SB4))
+                     .when(f.col(CustomScore) < SB6,
+                           f.lit(SB5))
+                     .otherwise(f.lit(SB6)))
+
+    sdf_3 = sdf_2\
+        .withColumn("Decision_Services_Matrix",
+                    f.concat(f.col("CBX_Prism_TM_BND"), f.lit("x"), f.col(CustomScore + "_BND")))
+
+    return sdf_3
