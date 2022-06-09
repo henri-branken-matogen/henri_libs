@@ -479,8 +479,6 @@ def Match_Applications_Contracts(sdf_0):
         .withColumn("APP_Activation_Month5", f.col("nest.APP_Activation_Month5"))\
         .drop(*["nest"])
 
-    sdf_6.printSchema()
-
     ls_keep = [
         "AIL_AvgMonthsOnBook",
         "ALL_AvgMonthsOnBook",
