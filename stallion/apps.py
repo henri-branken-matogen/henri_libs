@@ -89,8 +89,8 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
                                   Subscriber_Number, CON_Start_Date, Matched_Distance, CON_Period):
     APP_Subscriptions = NBR
 
-    if Matched_Distance is None:
-        Matched_Distance = 0
+    # if Matched_Distance is None:
+    #     Matched_Distance = 0
 
     APP_Subscriber_Number1 = APP_Subscriber_Number2 = APP_Subscriber_Number3 = APP_Subscriber_Number4 = APP_Subscriber_Number5 = None
     APP_Activation_Date1 = APP_Activation_Date2 = APP_Activation_Date3 = APP_Activation_Date4 = APP_Activation_Date5 = None
@@ -119,12 +119,16 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
         APP_Subscriber_Number1 = Subscriber_Number
         APP_Activation_Date1 = CON_Start_Date
         APP_Activation_Days1 = Matched_Distance
-        if APP_Activation_Days1 == 0:
+        if APP_Activation_Days1 is None:
+            APP_Activation_Weeks1 = None
+        elif APP_Activation_Days1 == 0:
             APP_Activation_Weeks1 = 0
-        if APP_Activation_Days1 <= -1:
+        elif APP_Activation_Days1 <= -1:
             APP_Activation_Weeks1 = int((APP_Activation_Days1 + 1) / 7) - 1
-        if APP_Activation_Days1 >= 1:
+        elif APP_Activation_Days1 >= 1:
             APP_Activation_Weeks1 = int((APP_Activation_Days1 - 1) / 7) + 1
+        else:
+            pass
         APP_Activation_Month1 = CON_Period
     elif NBR == 2:
         if APP_Account_Number1 == Account:
@@ -148,12 +152,16 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
         APP_Subscriber_Number2 = Subscriber_Number
         APP_Activation_Date2 = CON_Start_Date
         APP_Activation_Days2 = Matched_Distance
-        if APP_Activation_Days2 == 0:
+        if APP_Activation_Days2 is None:
+            APP_Activation_Weeks2 = None
+        elif APP_Activation_Days2 == 0:
             APP_Activation_Weeks2 = 0
-        if APP_Activation_Days2 <= -1:
+        elif APP_Activation_Days2 <= -1:
             APP_Activation_Weeks2 = int((APP_Activation_Days2 + 1) / 7) - 1
-        if APP_Activation_Days2 >= 1:
+        elif APP_Activation_Days2 >= 1:
             APP_Activation_Weeks2 = int((APP_Activation_Days2 - 1) / 7) + 1
+        else:
+            pass
         APP_Activation_Month2 = CON_Period
     elif NBR == 3:
         if APP_Account_Number1 == Account:
@@ -177,12 +185,16 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
         APP_Subscriber_Number3 = Subscriber_Number
         APP_Activation_Date3 = CON_Start_Date
         APP_Activation_Days3 = Matched_Distance
-        if APP_Activation_Days3 == 0:
+        if APP_Activation_Days3 is None:
+            APP_Activation_Weeks3 = None
+        elif APP_Activation_Days3 == 0:
             APP_Activation_Weeks3 = 0
-        if APP_Activation_Days3 <= -1:
+        elif APP_Activation_Days3 <= -1:
             APP_Activation_Weeks3 = int((APP_Activation_Days3 + 1) / 7) - 1
-        if APP_Activation_Days3 >= 1:
+        elif APP_Activation_Days3 >= 1:
             APP_Activation_Weeks3 = int((APP_Activation_Days3 - 1) / 7) + 1
+        else:
+            pass
         APP_Activation_Month3 = CON_Period
     elif NBR == 4:
         if APP_Account_Number1 == Account:
@@ -206,12 +218,16 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
         APP_Subscriber_Number4 = Subscriber_Number
         APP_Activation_Date4 = CON_Start_Date
         APP_Activation_Days4 = Matched_Distance
-        if APP_Activation_Days4 == 0:
+        if APP_Activation_Days4 is None:
+            APP_Activation_Weeks4 = None
+        elif APP_Activation_Days4 == 0:
             APP_Activation_Weeks4 = 0
-        if APP_Activation_Days4 <= -1:
+        elif APP_Activation_Days4 <= -1:
             APP_Activation_Weeks4 = int((APP_Activation_Days4 + 1) / 7) - 1
-        if APP_Activation_Days4 >= 1:
+        elif APP_Activation_Days4 >= 1:
             APP_Activation_Weeks4 = int((APP_Activation_Days4 - 1) / 7) + 1
+        else:
+            pass
         APP_Activation_Month4 = CON_Period
     else:
         if APP_Account_Number1 == Account:
@@ -235,12 +251,16 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
         APP_Subscriber_Number5 = Subscriber_Number
         APP_Activation_Date5 = CON_Start_Date
         APP_Activation_Days5 = Matched_Distance
-        if APP_Activation_Days5 == 0:
+        if APP_Activation_Days5 is None:
+            APP_Activation_Weeks5 = None
+        elif APP_Activation_Days5 == 0:
             APP_Activation_Weeks5 = 0
-        if APP_Activation_Days5 <= -1:
+        elif APP_Activation_Days5 <= -1:
             APP_Activation_Weeks5 = int((APP_Activation_Days5 + 1) / 7) - 1
-        if APP_Activation_Days5 >= 1:
+        elif APP_Activation_Days5 >= 1:
             APP_Activation_Weeks5 = int((APP_Activation_Days5 - 1) / 7) + 1
+        else:
+            pass
         APP_Activation_Month5 = CON_Period
 
     return (APP_Subscriptions, APP_Account_Number1, APP_Account_Number2, APP_Account_Number3, APP_Accounts,
