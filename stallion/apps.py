@@ -1,5 +1,7 @@
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
+from operator import add
+from functools import reduce
 from pyspark.sql import Window
 from stallion.py_filter_fxs import *
 
@@ -302,66 +304,160 @@ udf_Applications_Contracts_Update = f.udf(Applications_Contracts_Update,
                                           returnType=schema_Applications_Contracts_Update)
 
 
-def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
-    """
-    This is the Python translation of the SAS Code `Flag_DUP_Applicant.sas`.
-    """
-    if SRT.upper() == "ASCENDING":
+def Flag_Dup_Applicant(SRT, sdf_inp, DAY=14):
+    if SRT.upper() == "DESCENDING":
         sdf_0 = sdf_inp\
             .repartition(1)\
             .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").asc(),
-                      f.col("DUP_Application").asc()])
-
-        windowspecIDKEY = Window \
+                      f.col("APP_Date").desc(),
+                      f.col("APP_Record_Number").asc()])
+        windowspecDESC = Window \
             .partitionBy(f.col("IDKey")) \
             .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").asc(),
-                      f.col("DUP_Application").asc()])
-
+                      f.col("APP_Date").desc(),
+                      f.col("APP_Record_Number").asc()])
         sdf_1 = sdf_0\
+            .withColumn("APP_Record_Number", f.monotonically_increasing_id())
+        sdf_2 = sdf_1\
             .repartition(1)\
-            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
-            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
-            .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
-                                          .otherwise(f.lit(None)))
+            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecDESC))\
+            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecDESC))\
+            .withColumn("RET_Days_Between_Applications", f.lag(f.col("DUP_Days_Between_Applications"), 1).over(windowspecDESC))\
+            .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecDESC))
     else:
         sdf_0 = sdf_inp\
             .repartition(1)\
             .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").desc(),
-                      f.col("DUP_Application").desc()])
-
-        windowspecIDKEY = Window \
+                      f.col("APP_Date").asc(),
+                      f.col("APP_Record_Number").desc()])
+        windowspecASC = Window \
             .partitionBy(f.col("IDKey")) \
             .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").desc(),
-                      f.col("DUP_Application").desc()])
-
-        sdf_1 = sdf_0 \
-            .repartition(1) \
-            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY)) \
-            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
-            .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
-                                          .otherwise(f.lit(None)))
-
-    if SRT.upper() == "ASCENDING":
-        sdf_2 = sdf_1\
-            .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
-                                                                f.datediff(f.col("APP_Date"), f.col("RET_Date")))
-                                                          .otherwise(f.lit(None)))
-    else:
+                      f.col("APP_Date").asc(),
+                      f.col("APP_Record_Number").desc()])
+        sdf_1 = sdf_0\
+            .withColumn("APP_Record_Number", f.monotonically_increasing_id())
         sdf_2 = sdf_1 \
-            .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
-                                                                f.datediff(f.col("RET_Date"), f.col("APP_Date")))
-                                                          .otherwise(f.lit(None)))
+            .repartition(1) \
+            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecASC)) \
+            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecASC)) \
+            .withColumn("RET_Days_Between_Applications",
+                        f.lag(f.col("DUP_Days_Between_Applications"), 1).over(windowspecASC)) \
+            .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecASC))
 
     sdf_3 = sdf_2\
-        .withColumn("DUP_Application", f.when((f.col("DUP_Days_Between_Applications") >= f.lit(0)) &
-                                              (f.col("DUP_Days_Between_Applications") <= f.lit(DAY)), f.lit(1))
-                                        .otherwise(f.col("DUP_Application")))\
-        .drop(*["RET_IDKey", "RET_Date"])
-    return sdf_3
+        .withColumn("DUP_Applicant", f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                                            f.lit("Y"))
+                                      .otherwise(f.lit("N")))
+
+    if SRT.upper() == "ASCENDING":
+        sdf_4 = sdf_3\
+            .withColumn("DUP_Days_Between_Applications",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                               f.datediff(f.col("APP_Date"), f.col("RET_Date")))
+                         .otherwise(f.col("DUP_Days_Between_Applications")))\
+            .withColumn("RET_Days_Between_Applications",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                               reduce(add, [f.col("RET_Days_Between_Applications"),
+                                            f.col("DUP_Days_Between_Applications")]))
+                         .otherwise(f.col("RET_Days_Between_Applications")))\
+            .withColumn("RET_Days_Between_Applications",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between") > f.lit(DAY)),
+                               f.lit(None))
+                         .otherwise(f.col("RET_Days_Between_Applications")))\
+            .withColumn("RET_Application_Sequence",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between") > f.lit(DAY)),
+                               reduce(add, [f.col("RET_Application_Sequence"), f.lit(1)]))
+                         .otherwise(f.lit(None)))\
+            .withColumn("DUP_Application_Sequence",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                               f.col("RET_Application_Sequence"))
+                         .otherwise(f.col("DUP_Application_Sequence")))
+    else:
+        sdf_4 = sdf_3\
+            .select("*")
+
+    sdf_5 = sdf_4\
+        .withColumn("DUP_Days_Between_Applications",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(None))
+                     .otherwise(f.col("DUP_Days_Between_Applications")))\
+        .withColumn("RET_Days_Between_Applications",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(None))
+                    .otherwise(f.col("RET_Days_Between_Applications"))) \
+        .withColumn("DUP_Application_Sequence",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(0))
+                    .otherwise(f.col("DUP_Application_Sequence"))) \
+        .withColumn("RET_Application_Sequence",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(0))
+                    .otherwise(f.col("RET_Application_Sequence")))
+
+    return sdf_5
+
+
+# def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
+#     """
+#     This is the Python translation of the SAS Code `Flag_DUP_Applicant.sas`.
+#     """
+#     if SRT.upper() == "ASCENDING":
+#         sdf_0 = sdf_inp\
+#             .repartition(1)\
+#             .orderBy([f.col("IDKey").asc(),
+#                       f.col("APP_Date").asc(),
+#                       f.col("DUP_Application").asc()])
+#
+#         windowspecIDKEY = Window \
+#             .partitionBy(f.col("IDKey")) \
+#             .orderBy([f.col("IDKey").asc(),
+#                       f.col("APP_Date").asc(),
+#                       f.col("DUP_Application").asc()])
+#
+#         sdf_1 = sdf_0\
+#             .repartition(1)\
+#             .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
+#             .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
+#             .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
+#                                           .otherwise(f.lit(None)))
+#     else:
+#         sdf_0 = sdf_inp\
+#             .repartition(1)\
+#             .orderBy([f.col("IDKey").asc(),
+#                       f.col("APP_Date").desc(),
+#                       f.col("DUP_Application").desc()])
+#
+#         windowspecIDKEY = Window \
+#             .partitionBy(f.col("IDKey")) \
+#             .orderBy([f.col("IDKey").asc(),
+#                       f.col("APP_Date").desc(),
+#                       f.col("DUP_Application").desc()])
+#
+#         sdf_1 = sdf_0 \
+#             .repartition(1) \
+#             .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY)) \
+#             .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
+#             .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
+#                                           .otherwise(f.lit(None)))
+#
+#     if SRT.upper() == "ASCENDING":
+#         sdf_2 = sdf_1\
+#             .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
+#                                                                 f.datediff(f.col("APP_Date"), f.col("RET_Date")))
+#                                                           .otherwise(f.lit(None)))
+#     else:
+#         sdf_2 = sdf_1 \
+#             .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
+#                                                                 f.datediff(f.col("RET_Date"), f.col("APP_Date")))
+#                                                           .otherwise(f.lit(None)))
+#
+#     sdf_3 = sdf_2\
+#         .withColumn("DUP_Application", f.when((f.col("DUP_Days_Between_Applications") >= f.lit(0)) &
+#                                               (f.col("DUP_Days_Between_Applications") <= f.lit(DAY)), f.lit(1))
+#                                         .otherwise(f.col("DUP_Application")))\
+#         .drop(*["RET_IDKey", "RET_Date"])
+#     return sdf_3
 
 
 def Match_Applications_Contracts(sdf_0):
@@ -788,52 +884,104 @@ udf_RiskGrade_Mandate = f.udf(RiskGrade_Mandate,
                               returnType=t.FloatType())
 
 
-def Risk_Grade_Matrix(sdf_inp, RiskGrade, SA1, SA2, SA3, SA4, SA5, SA6,
-                      CustomScore, SB1, SB2, SB3, SB4, SB5, SB6):
-    sdf_0 = sdf_inp\
-        .withColumn("Decision_Services_Outcome",
-                    f.when(f.col("Decision_Services_Waterfall") == "",
-                           f.concat(f.lit("Approve "), f.lit(RiskGrade)))
-                     .otherwise(f.lit("Decline")))\
-        .withColumn("Decision_Services_Waterfall",
-                    f.when(f.col("Decision_Services_Waterfall") == "",
-                           f.lit("P. Pass Credit Policies"))
-                     .otherwise(f.col("Decision_Services_Waterfall")))
+def Risk_Grade_Matrix(RiskGrade, SA1, SA2, SA3, SA4, SA5, SA6, CustomScore, SB1, SB2, SB3, SB4, SB5, SB6,
+                      Decision_Services_Waterfall, CBX_Prism_TM):
+    if (Decision_Services_Waterfall == "") or (Decision_Services_Waterfall is None):
+        Decision_Services_Outcome = "Approve " + str(RiskGrade)
+        Decision_Services_Waterfall = "P. Pass Credit Policies"
+    else:
+        Decision_Services_Outcome = "Decline"
 
-    sdf_1 = sdf_0\
-        .withColumn("CBX_Prism_TM_BND",
-                    f.when(f.col("CBX_Prism_TM") < SA1,
-                           f.lit("001"))
-                     .when(f.col("CBX_Prism_TM") < SA2,
-                           f.lit(SA1))
-                     .when(f.col("CBX_Prism_TM") < SA3,
-                           f.lit(SA2))
-                     .when(f.col("CBX_Prism_TM") < SA4,
-                           f.lit(SA3))
-                     .when(f.col("CBX_Prism_TM") < SA5,
-                           f.lit(SA4))
-                     .when(f.col("CBX_Prism_TM") < SA6,
-                           f.lit(SA5))
-                     .otherwise(f.lit(SA6)))
+    if CBX_Prism_TM < SA1:
+        CBX_Prism_TM_BND = "001"
+    elif CBX_Prism_TM < SA2:
+        CBX_Prism_TM_BND = SA1
+    elif CBX_Prism_TM < SA3:
+        CBX_Prism_TM_BND = SA2
+    elif CBX_Prism_TM < SA4:
+        CBX_Prism_TM_BND = SA3
+    elif CBX_Prism_TM < SA5:
+        CBX_Prism_TM_BND = SA4
+    elif CBX_Prism_TM < SA6:
+        CBX_Prism_TM_BND = SA5
+    else:
+        CBX_Prism_TM_BND = SA6
 
-    sdf_2 = sdf_1\
-        .withColumn((CustomScore + "_BND"),
-                    f.when(f.col(CustomScore) < SB1,
-                           f.lit("001"))
-                     .when(f.col(CustomScore) < SB2,
-                           f.lit(SB1))
-                     .when(f.col(CustomScore) < SB3,
-                           f.lit(SB2))
-                     .when(f.col(CustomScore) < SB4,
-                           f.lit(SB3))
-                     .when(f.col(CustomScore) < SB5,
-                           f.lit(SB4))
-                     .when(f.col(CustomScore) < SB6,
-                           f.lit(SB5))
-                     .otherwise(f.lit(SB6)))
+    if CustomScore < SB1:
+        y_BND = "001"
+    elif CustomScore < SB2:
+        y_BND = SB1
+    elif CustomScore < SB3:
+        y_BND = SB2
+    elif CustomScore < SB4:
+        y_BND = SB3
+    elif CustomScore < SB5:
+        y_BND = SB4
+    elif CustomScore < SB6:
+        y_BND = SB5
+    else:
+        y_BND = SB6
 
-    sdf_3 = sdf_2\
-        .withColumn("Decision_Services_Matrix",
-                    f.concat(f.col("CBX_Prism_TM_BND"), f.lit("x"), f.col(CustomScore + "_BND")))
+    Decision_Services_Matrix = str(CBX_Prism_TM_BND) + "x" + str(y_BND)
 
-    return sdf_3
+    return Decision_Services_Outcome, Decision_Services_Waterfall, Decision_Services_Matrix
+
+
+schema_Risk_Grade_Matrix = t.StructType([
+    t.StructField("Decision_Services_Outcome", t.StringType(), True),
+    t.StructField("Decision_Services_Waterfall", t.StringType(), True),
+    t.StructField("Decision_Services_Matrix", t.StringType(), True)
+])
+
+udf_Risk_Grade_Matrix = f.udf(Risk_Grade_Matrix, returnType=schema_Risk_Grade_Matrix)
+
+
+# def Risk_Grade_Matrix(sdf_inp, RiskGrade, SA1, SA2, SA3, SA4, SA5, SA6,
+#                       CustomScore, SB1, SB2, SB3, SB4, SB5, SB6):
+#     sdf_0 = sdf_inp\
+#         .withColumn("Decision_Services_Outcome",
+#                     f.when(f.col("Decision_Services_Waterfall") == "",
+#                            f.concat(f.lit("Approve "), f.lit(RiskGrade)))
+#                      .otherwise(f.lit("Decline")))\
+#         .withColumn("Decision_Services_Waterfall",
+#                     f.when(f.col("Decision_Services_Waterfall") == "",
+#                            f.lit("P. Pass Credit Policies"))
+#                      .otherwise(f.col("Decision_Services_Waterfall")))
+#
+#     sdf_1 = sdf_0\
+#         .withColumn("CBX_Prism_TM_BND",
+#                     f.when(f.col("CBX_Prism_TM") < SA1,
+#                            f.lit("001"))
+#                      .when(f.col("CBX_Prism_TM") < SA2,
+#                            f.lit(SA1))
+#                      .when(f.col("CBX_Prism_TM") < SA3,
+#                            f.lit(SA2))
+#                      .when(f.col("CBX_Prism_TM") < SA4,
+#                            f.lit(SA3))
+#                      .when(f.col("CBX_Prism_TM") < SA5,
+#                            f.lit(SA4))
+#                      .when(f.col("CBX_Prism_TM") < SA6,
+#                            f.lit(SA5))
+#                      .otherwise(f.lit(SA6)))
+#
+#     sdf_2 = sdf_1\
+#         .withColumn((CustomScore + "_BND"),
+#                     f.when(f.col(CustomScore) < SB1,
+#                            f.lit("001"))
+#                      .when(f.col(CustomScore) < SB2,
+#                            f.lit(SB1))
+#                      .when(f.col(CustomScore) < SB3,
+#                            f.lit(SB2))
+#                      .when(f.col(CustomScore) < SB4,
+#                            f.lit(SB3))
+#                      .when(f.col(CustomScore) < SB5,
+#                            f.lit(SB4))
+#                      .when(f.col(CustomScore) < SB6,
+#                            f.lit(SB5))
+#                      .otherwise(f.lit(SB6)))
+#
+#     sdf_3 = sdf_2\
+#         .withColumn("Decision_Services_Matrix",
+#                     f.concat(f.col("CBX_Prism_TM_BND"), f.lit("x"), f.col(CustomScore + "_BND")))
+#
+#     return sdf_3
