@@ -317,6 +317,10 @@ def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
                       f.col("APP_Date").desc(),
                       f.col("APP_Record_Number").asc()])
         sdf_1 = sdf_0\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").desc(),
+                      f.col("APP_Record_Number").asc()])\
             .withColumn("APP_Record_Number", f.monotonically_increasing_id())
         sdf_2 = sdf_1\
             .repartition(1)\
@@ -336,6 +340,10 @@ def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
                       f.col("APP_Date").asc(),
                       f.col("APP_Record_Number").desc()])
         sdf_1 = sdf_0\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").asc(),
+                      f.col("APP_Record_Number").desc()])\
             .withColumn("APP_Record_Number", f.monotonically_increasing_id())
         sdf_2 = sdf_1 \
             .repartition(1) \
@@ -395,7 +403,13 @@ def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
                            f.lit(0))
                     .otherwise(f.col("RET_Application_Sequence")))
 
-    return sdf_5
+    sdf_6 = sdf_5\
+        .drop(*["RET_IDKey",
+                "RET_Date",
+                "RET_Days_Between_Applications",
+                "RET_Application_Sequence"])
+
+    return sdf_6
 
 
 # def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
