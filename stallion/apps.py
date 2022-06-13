@@ -304,7 +304,7 @@ udf_Applications_Contracts_Update = f.udf(Applications_Contracts_Update,
                                           returnType=schema_Applications_Contracts_Update)
 
 
-def Flag_Dup_Applicant(SRT, sdf_inp, DAY=14):
+def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
     if SRT.upper() == "DESCENDING":
         sdf_0 = sdf_inp\
             .repartition(1)\
