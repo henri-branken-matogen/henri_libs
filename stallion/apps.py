@@ -370,11 +370,11 @@ def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
                                             f.col("DUP_Days_Between_Applications")]))
                          .otherwise(f.col("RET_Days_Between_Applications")))\
             .withColumn("RET_Days_Between_Applications",
-                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between") > f.lit(DAY)),
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between_Applications") > f.lit(DAY)),
                                f.lit(None))
                          .otherwise(f.col("RET_Days_Between_Applications")))\
             .withColumn("RET_Application_Sequence",
-                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between") > f.lit(DAY)),
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between_Applications") > f.lit(DAY)),
                                reduce(add, [f.col("RET_Application_Sequence"), f.lit(1)]))
                          .otherwise(f.lit(None)))\
             .withColumn("DUP_Application_Sequence",
