@@ -47,6 +47,8 @@ udf_avg_rem_time_fix = f.udf(avg_rem_time_fix,
 def ecl_n(BAL_TOTAL, PIT_PD_ADJ, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, EAD,
           LGD_NEW_TO_NPL, LGD_CURVE, PIT_LGD_ADJ, TTD, TTWO,
           INTEREST_RATE, INTEREST_PWOR, n):
+    if TTWO is None:
+        TTWO = 0
     if n == 1:
         A = BAL_TOTAL * PIT_PD_ADJ * PD_STAGE_1 * EAD * LGD_NEW_TO_NPL * PIT_LGD_ADJ * (1 - INTEREST_PWOR)
     elif n == 2:
