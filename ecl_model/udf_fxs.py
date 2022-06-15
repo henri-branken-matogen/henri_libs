@@ -69,6 +69,8 @@ udf_ecl_n = f.udf(ecl_n, returnType=t.DoubleType())
 def ECL(PD_USE, EAD, LGD_USE, PIT_LGD_ADJ, PIT_PD_ADJ,
         BAL_TOTAL, TTD, TTWO, STAGE_FIX, BDT_ALL,
         PWOR, INTEREST_RATE):
+    if TTWO is None:
+        TTWO = 0
     A = PD_USE * EAD * LGD_USE * PIT_LGD_ADJ * (1 - PWOR)
     B = (1 + INTEREST_RATE)**(-1 * (TTD + TTWO) / 12)
     if STAGE_FIX == 5:
@@ -180,6 +182,8 @@ udf_LGD_Downside = f.udf(LGD_Downside,
 # Dependent on `WOF_NOV21`
 def ECL_Base(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_BASE, EAD, LGD_BASE, TTD, TTWO,
              INTEREST_PWOR, INTEREST_RATE):
+    if TTWO is None:
+        TTWO = 0
     if STAGE_FIX == 5:
         return max([0, BDT_ALL])
     else:
@@ -198,6 +202,8 @@ udf_ECL_Base = f.udf(ECL_Base, returnType=t.DoubleType())
 # Dependent on `WOF_NOV21`
 def ECL_Upside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_UPSIDE, EAD, LGD_UPSIDE, TTD, TTWO,
                INTEREST_PWOR, INTEREST_RATE):
+    if TTWO is None:
+        TTWO = 0
     if STAGE_FIX == 5:
         return max([0, BDT_ALL])
     else:
@@ -216,6 +222,8 @@ udf_ECL_Upside = f.udf(ECL_Upside, returnType=t.DoubleType())
 # Dependent on `WOF_NOV21`
 def ECL_Downside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_DOWNSIDE, EAD, LGD_DOWNSIDE, TTD, TTWO,
                INTEREST_PWOR, INTEREST_RATE):
+    if TTWO is None:
+        TTWO = 0
     if STAGE_FIX == 5:
         return max([0, BDT_ALL])
     else:
