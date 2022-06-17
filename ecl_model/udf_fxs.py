@@ -49,6 +49,28 @@ def ecl_n(BAL_TOTAL, PIT_PD_ADJ, PD_STAGE_1, PD_STAGE_2, PD_STAGE_3, EAD,
           INTEREST_RATE, INTEREST_PWOR, n):
     if TTWO is None:
         TTWO = 0
+    if BAL_TOTAL is None:
+        BAL_TOTAL = 0
+    if PIT_PD_ADJ is None:
+        PIT_PD_ADJ = 0
+    if EAD is None:
+        EAD = 0
+    if LGD_NEW_TO_NPL is None:
+        LGD_NEW_TO_NPL = 0
+    if PIT_LGD_ADJ is None:
+        PIT_LGD_ADJ = 0
+    if INTEREST_PWOR is None:
+        INTEREST_PWOR = 0
+    if PD_STAGE_1 is None:
+        PD_STAGE_1 = 0
+    if PD_STAGE_2 is None:
+        PD_STAGE_2 = 0
+    if PD_STAGE_3 is None:
+        PD_STAGE_3 = 0
+    if TTD is None:
+        TTD = 0
+    if INTEREST_RATE is None:
+        INTEREST_RATE = 0
     if n == 1:
         A = BAL_TOTAL * PIT_PD_ADJ * PD_STAGE_1 * EAD * LGD_NEW_TO_NPL * PIT_LGD_ADJ * (1 - INTEREST_PWOR)
     elif n == 2:
