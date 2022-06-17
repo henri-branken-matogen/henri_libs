@@ -208,6 +208,8 @@ def ECL_Base(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_BASE, EAD, LGD_BASE, TTD, TTWO,
              INTEREST_PWOR, INTEREST_RATE):
     if TTWO is None:
         TTWO = 0
+    if BAL_TOTAL is None:
+        BAL_TOTAL = 0
     if STAGE_FIX == 5:
         return max([0, BDT_ALL])
     else:
@@ -228,6 +230,8 @@ def ECL_Upside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_UPSIDE, EAD, LGD_UPSIDE, TTD, T
                INTEREST_PWOR, INTEREST_RATE):
     if TTWO is None:
         TTWO = 0
+    if BAL_TOTAL is None:
+        BAL_TOTAL = 0
     if STAGE_FIX == 5:
         return max([0, BDT_ALL])
     else:
@@ -248,6 +252,8 @@ def ECL_Downside(STAGE_FIX, BDT_ALL, BAL_TOTAL, PD_DOWNSIDE, EAD, LGD_DOWNSIDE, 
                INTEREST_PWOR, INTEREST_RATE):
     if TTWO is None:
         TTWO = 0
+    if BAL_TOTAL is None:
+        BAL_TOTAL = 0
     if STAGE_FIX == 5:
         return max([0, BDT_ALL])
     else:
