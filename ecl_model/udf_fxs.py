@@ -91,6 +91,8 @@ udf_ecl_n = f.udf(ecl_n, returnType=t.DoubleType())
 def ECL(PD_USE, EAD, LGD_USE, PIT_LGD_ADJ, PIT_PD_ADJ,
         BAL_TOTAL, TTD, TTWO, STAGE_FIX, BDT_ALL,
         PWOR, INTEREST_RATE):
+    if BAL_TOTAL is None:
+        BAL_TOTAL = 0
     if TTWO is None:
         TTWO = 0
     A = PD_USE * EAD * LGD_USE * PIT_LGD_ADJ * (1 - PWOR)
