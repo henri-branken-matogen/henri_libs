@@ -128,9 +128,9 @@ def Decision_Services_Waterfall(sdf_inp):
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
                            (f.col("Filter_Channel_Outbound").isNotNull())),
-                           udf_Risk_Grade_Matrix(f.lit("RG8"), f.lit(580), f.lit(640), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG9"), f.lit(580), f.lit(999), f.lit(999), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("NEW_Customer_Score"), f.lit(555),
-                                                 f.lit(585), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
+                                                 f.lit(999), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
@@ -184,10 +184,10 @@ def Decision_Services_Waterfall(sdf_inp):
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
                            (f.col("Filter_Channel_Inbound").isNotNull())),
-                           udf_Risk_Grade_Matrix(f.lit("RG8"), f.lit(580), f.lit(600), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG8"), f.lit(580), f.lit(999), f.lit(999), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("NEW_Customer_Score"), f.lit(555),
-                                                 f.lit(585), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
-                                                 f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM")))) \
+                                                 f.lit(999), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
+                                                 f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
                            (f.col("Filter_Channel_Inbound").isNotNull())),
@@ -240,7 +240,7 @@ def Decision_Services_Waterfall(sdf_inp):
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
                            (f.col("Filter_Channel_Online").isNotNull())),
-                           udf_Risk_Grade_Matrix(f.lit("RG5"), f.lit(580), f.lit(999), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG7"), f.lit(580), f.lit(999), f.lit(999), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("NEW_Customer_Score"), f.lit(555),
                                                  f.lit(999), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
@@ -279,9 +279,9 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_5b = sdf_5a\
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State") == ""),
-                           udf_Risk_Grade_Matrix(f.lit("RG5"), f.lit(580), f.lit(640), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG7"), f.lit(580), f.lit(625), f.lit(655), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("NEW_Customer_Score"), f.lit(555),
-                                                 f.lit(565), f.lit(585), f.lit(590), f.lit(615), f.lit(999),
+                                                 f.lit(590), f.lit(605), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State") == ""),
@@ -302,23 +302,21 @@ def Decision_Services_Waterfall(sdf_inp):
                     f.when((f.col("APP_Customer_State") == "") &
                            (f.col("Decision_Services_Matrix") == "580x555"), f.lit("9"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "580x565"), f.lit("8"))
+                           (f.col("Decision_Services_Matrix") == "580x590"), f.lit("7"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "580x585"), f.lit("8"))
+                           (f.col("Decision_Services_Matrix") == "580x605"), f.lit("6"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "580x590"), f.lit("5"))
+                           (f.col("Decision_Services_Matrix") == "625x555"), f.lit("7"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "580x615"), f.lit("4"))
+                           (f.col("Decision_Services_Matrix") == "625x590"), f.lit("6"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "640x5555"), f.lit("8"))
+                           (f.col("Decision_Services_Matrix") == "625x605"), f.lit("5"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "640x565"), f.lit("7"))
+                           (f.col("Decision_Services_Matrix") == "655x555"), f.lit("5"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "640x585"), f.lit("5"))
+                           (f.col("Decision_Services_Matrix") == "655x590"), f.lit("5"))
                      .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "640x590"), f.lit("4"))
-                     .when((f.col("APP_Customer_State") == "") &
-                           (f.col("Decision_Services_Matrix") == "640x615"), f.lit("3"))
+                           (f.col("Decision_Services_Matrix") == "655x605"), f.lit("4"))
                      .otherwise(f.col("Decision_Services_Risk_Grade")))
     # IMM
     sdf_6a = sdf_5c\
@@ -339,9 +337,9 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_6b = sdf_6a\
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State") == ""),
-                           udf_Risk_Grade_Matrix(f.lit("RG5"), f.lit(580), f.lit(635), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG7"), f.lit(580), f.lit(640), f.lit(999), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("NEW_Customer_Score"), f.lit(555),
-                                                 f.lit(590), f.lit(605), f.lit(999), f.lit(999), f.lit(999),
+                                                 f.lit(590), f.lit(615), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State") == "IMM MOB 00-05"),
@@ -362,15 +360,15 @@ def Decision_Services_Waterfall(sdf_inp):
                     f.when((f.col("APP_Customer_State") == "IMM MOB 00-05") &
                            (f.col("Decision_Services_Matrix") == "580x555"), f.lit("8"))
                     .when((f.col("APP_Customer_State") == "IMM MOB 00-05") &
-                          (f.col("Decision_Services_Matrix") == "580x590"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "580x590"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "IMM MOB 00-05") &
-                          (f.col("Decision_Services_Matrix") == "580x605"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "580x615"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "IMM MOB 00-05") &
-                          (f.col("Decision_Services_Matrix") == "635x555"), f.lit("6"))
+                          (f.col("Decision_Services_Matrix") == "640x555"), f.lit("7"))
                     .when((f.col("APP_Customer_State") == "IMM MOB 00-05") &
-                          (f.col("Decision_Services_Matrix") == "635x590"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "640x590"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "IMM MOB 00-05") &
-                          (f.col("Decision_Services_Matrix") == "635x605"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "640x615"), f.lit("4"))
                     .otherwise(f.col("Decision_Services_Risk_Grade")))
     # PUP
     sdf_7a = sdf_6c \
@@ -391,7 +389,7 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_7b = sdf_7a\
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State") == "PUP Paid-Up"),
-                           udf_Risk_Grade_Matrix(f.lit("RG6"), f.lit(570), f.lit(999), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG7"), f.lit(570), f.lit(999), f.lit(999), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("EST_Customer_Score"), f.lit(540),
                                                  f.lit(615), f.lit(630), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
@@ -412,11 +410,11 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_7c = sdf_7b\
         .withColumn("Decision_Services_Risk_Grade",
                     f.when((f.col("APP_Customer_State") == "PUP Paid-Up") &
-                           (f.col("Decision_Services_Matrix") == "570x540"), f.lit("7"))
+                           (f.col("Decision_Services_Matrix") == "570x540"), f.lit("8"))
                      .when((f.col("APP_Customer_State") == "PUP Paid-Up") &
-                          (f.col("Decision_Services_Matrix") == "570x615"), f.lit("6"))
+                          (f.col("Decision_Services_Matrix") == "570x615"), f.lit("7"))
                      .when((f.col("APP_Customer_State") == "PUP Paid-Up") &
-                          (f.col("Decision_Services_Matrix") == "570x630"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "570x630"), f.lit("6"))
                      .otherwise(f.col("Decision_Services_Risk_Grade")))
     # CRD
     sdf_8a = sdf_7c \
@@ -437,9 +435,9 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_8b = sdf_8a\
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State") == "CRD Credit Balance"),
-                           udf_Risk_Grade_Matrix(f.lit("RG3"), f.lit(570), f.lit(625), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG3"), f.lit(570), f.lit(630), f.lit(999), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("EST_Customer_Score"), f.lit(540),
-                                                 f.lit(600), f.lit(635), f.lit(999), f.lit(999), f.lit(999),
+                                                 f.lit(605), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State") == "CRD Credit Balance"),
@@ -458,17 +456,13 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_8c = sdf_8b\
         .withColumn("Decision_Services_Risk_Grade",
                     f.when((f.col("APP_Customer_State") == "CRD Credit Balance") &
-                           (f.col("Decision_Services_Matrix") == "570x540"), f.lit("4"))
+                           (f.col("Decision_Services_Matrix") == "570x540"), f.lit("5"))
                      .when((f.col("APP_Customer_State") == "CRD Credit Balance") &
-                           (f.col("Decision_Services_Matrix") == "570x600"), f.lit("4"))
+                           (f.col("Decision_Services_Matrix") == "570x605"), f.lit("4"))
                      .when((f.col("APP_Customer_State") == "CRD Credit Balance") &
-                           (f.col("Decision_Services_Matrix") == "570x635"), f.lit("3"))
+                           (f.col("Decision_Services_Matrix") == "630x540"), f.lit("5"))
                      .when((f.col("APP_Customer_State") == "CRD Credit Balance") &
-                           (f.col("Decision_Services_Matrix") == "625x540"), f.lit("4"))
-                     .when((f.col("APP_Customer_State") == "CRD Credit Balance") &
-                           (f.col("Decision_Services_Matrix") == "625x600"), f.lit("3"))
-                     .when((f.col("APP_Customer_State") == "CRD Credit Balance") &
-                           (f.col("Decision_Services_Matrix") == "625x635"), f.lit("2"))
+                           (f.col("Decision_Services_Matrix") == "630x605"), f.lit("3"))
                      .otherwise(f.col("Decision_Services_Risk_Grade")))
     # CLR
     sdf_9a = sdf_8c \
@@ -487,9 +481,9 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_9b = sdf_9a\
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State") == "CLR Clear"),
-                           udf_Risk_Grade_Matrix(f.lit("RG2"), f.lit(100), f.lit(640), f.lit(680), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG2"), f.lit(100), f.lit(625), f.lit(635), f.lit(665),
                                                  f.lit(999), f.lit(999), f.col("EST_Customer_Score"), f.lit(540),
-                                                 f.lit(585), f.lit(610), f.lit(635), f.lit(660), f.lit(999),
+                                                 f.lit(600), f.lit(645), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State") == "CLR Clear"),
@@ -510,33 +504,27 @@ def Decision_Services_Waterfall(sdf_inp):
                     f.when((f.col("APP_Customer_State") == "CLR Clear") &
                            (f.col("Decision_Services_Matrix") == "100x540"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "100x585"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "100x600"), f.lit("4"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "100x610"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "100x645"), f.lit("3"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "100x635"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "625x540"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "100x660"), f.lit("2"))
+                          (f.col("Decision_Services_Matrix") == "625x600"), f.lit("3"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "640x540"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "625x645"), f.lit("3"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "640x585"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "635x540"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "640x610"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "635x600"), f.lit("3"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "640x635"), f.lit("2"))
+                          (f.col("Decision_Services_Matrix") == "635x645"), f.lit("2"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "640x660"), f.lit("1"))
+                          (f.col("Decision_Services_Matrix") == "665x540"), f.lit("3"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "680x540"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "665x600"), f.lit("2"))
                     .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "680x585"), f.lit("2"))
-                    .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "680x610"), f.lit("1"))
-                    .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "680x635"), f.lit("1"))
-                    .when((f.col("APP_Customer_State") == "CLR Clear") &
-                          (f.col("Decision_Services_Matrix") == "680x660"), f.lit("1"))
+                          (f.col("Decision_Services_Matrix") == "665x645"), f.lit("1"))
                     .otherwise(f.col("Decision_Services_Risk_Grade")))
     # RES
     sdf_10a = sdf_9c \
@@ -555,9 +543,9 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_10b = sdf_10a \
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State") == "RES Responsible"),
-                           udf_Risk_Grade_Matrix(f.lit("RG5"), f.lit(100), f.lit(645), f.lit(670), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG5"), f.lit(100), f.lit(640), f.lit(670), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("EST_Customer_Score"), f.lit(540),
-                                                 f.lit(585), f.lit(630), f.lit(655), f.lit(999), f.lit(999),
+                                                 f.lit(570), f.lit(610), f.lit(640), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM")))) \
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State") == "RES Responsible"),
@@ -576,29 +564,29 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_10c = sdf_10b \
         .withColumn("Decision_Services_Risk_Grade",
                     f.when((f.col("APP_Customer_State") == "RES Responsible") &
-                           (f.col("Decision_Services_Matrix") == "100x540"), f.lit("7"))
+                           (f.col("Decision_Services_Matrix") == "100x540"), f.lit("8"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "100x585"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "100x570"), f.lit("7"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "100x630"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "100x610"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "100x655"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "100x640"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "645x540"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "640x540"), f.lit("7"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "645x585"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "640x570"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "645x630"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "640x610"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "645x655"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "640x640"), f.lit("4"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "670x540"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "670x540"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "670x585"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "670x570"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "670x630"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "670x610"), f.lit("4"))
                     .when((f.col("APP_Customer_State") == "RES Responsible") &
-                          (f.col("Decision_Services_Matrix") == "670x655"), f.lit("3"))
+                          (f.col("Decision_Services_Matrix") == "670x640"), f.lit("3"))
                     .otherwise(f.col("Decision_Services_Risk_Grade")))
     #  ERR
     sdf_11a = sdf_10c \
@@ -617,10 +605,10 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_11b = sdf_11a \
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State") == "ERR Erratic"),
-                           udf_Risk_Grade_Matrix(f.lit("RG7"), f.lit(580), f.lit(615), f.lit(640), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG7"), f.lit(580), f.lit(640), f.lit(670), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("EST_Customer_Score"), f.lit(555),
-                                                 f.lit(570), f.lit(590), f.lit(615), f.lit(625), f.lit(999),
-                                                 f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM")))) \
+                                                 f.lit(605), f.lit(625), f.lit(635), f.lit(645), f.lit(999),
+                                                 f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State") == "ERR Erratic"),
                            f.col("nest.Decision_Services_Outcome"))
@@ -638,35 +626,35 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_11c = sdf_11b \
         .withColumn("Decision_Services_Risk_Grade",
                     f.when((f.col("APP_Customer_State") == "ERR Erratic") &
-                           (f.col("Decision_Services_Matrix") == "580x555"), f.lit("9"))
+                           (f.col("Decision_Services_Matrix") == "580x555"), f.lit("8"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "580x570"), f.lit("8"))
+                          (f.col("Decision_Services_Matrix") == "580x605"), f.lit("7"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "580x590"), f.lit("8"))
+                          (f.col("Decision_Services_Matrix") == "580x625"), f.lit("7"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "580x615"), f.lit("7"))
+                          (f.col("Decision_Services_Matrix") == "580x635"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "580x625"), f.lit("6"))
+                          (f.col("Decision_Services_Matrix") == "580x645"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "615x555"), f.lit("9"))
+                          (f.col("Decision_Services_Matrix") == "640x555"), f.lit("7"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "615x570"), f.lit("8"))
+                          (f.col("Decision_Services_Matrix") == "640x605"), f.lit("7"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "615x590"), f.lit("7"))
+                          (f.col("Decision_Services_Matrix") == "640x625"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "615x615"), f.lit("6"))
+                          (f.col("Decision_Services_Matrix") == "640x635"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "615x625"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "640x645"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "640x555"), f.lit("8"))
+                          (f.col("Decision_Services_Matrix") == "670x555"), f.lit("6"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "640x570"), f.lit("7"))
+                          (f.col("Decision_Services_Matrix") == "670x605"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "640x590"), f.lit("6"))
+                          (f.col("Decision_Services_Matrix") == "670x625"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "640x615"), f.lit("5"))
+                          (f.col("Decision_Services_Matrix") == "670x635"), f.lit("5"))
                     .when((f.col("APP_Customer_State") == "ERR Erratic") &
-                          (f.col("Decision_Services_Matrix") == "640x625"), f.lit("4"))
+                          (f.col("Decision_Services_Matrix") == "670x645"), f.lit("4"))
                     .otherwise(f.col("Decision_Services_Risk_Grade")))
     # ARR
     sdf_12a = sdf_11c\
@@ -686,9 +674,9 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_12b = sdf_12a\
         .withColumn("nest",
                     f.when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])),
-                           udf_Risk_Grade_Matrix(f.lit("RG8"), f.lit(615), f.lit(650), f.lit(999), f.lit(999),
+                           udf_Risk_Grade_Matrix(f.lit("RG8"), f.lit(615), f.lit(690), f.lit(999), f.lit(999),
                                                  f.lit(999), f.lit(999), f.col("EST_Customer_Score"), f.lit(590),
-                                                 f.lit(605), f.lit(630), f.lit(655), f.lit(999), f.lit(999),
+                                                 f.lit(655), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
         .withColumn("Decision_Services_Outcome",
                     f.when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])),
@@ -707,21 +695,13 @@ def Decision_Services_Waterfall(sdf_inp):
     sdf_12c = sdf_12b \
         .withColumn("Decision_Services_Risk_Grade",
                     f.when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
-                           (f.col("Decision_Services_Matrix") == "615x590"), f.lit("9"))
-                    .when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
-                          (f.col("Decision_Services_Matrix") == "615x605"), f.lit("8"))
-                    .when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
-                          (f.col("Decision_Services_Matrix") == "615x630"), f.lit("8"))
+                           (f.col("Decision_Services_Matrix") == "615x590"), f.lit("8"))
                     .when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
                           (f.col("Decision_Services_Matrix") == "615x655"), f.lit("7"))
                     .when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
-                          (f.col("Decision_Services_Matrix") == "650x590"), f.lit("8"))
+                          (f.col("Decision_Services_Matrix") == "690x590"), f.lit("7"))
                     .when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
-                          (f.col("Decision_Services_Matrix") == "650x605"), f.lit("8"))
-                    .when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
-                          (f.col("Decision_Services_Matrix") == "650x630"), f.lit("7"))
-                    .when((f.col("APP_Customer_State").isin(["EXT Extended", "DIS Distressed", "DBT Doubtful Debt"])) &
-                          (f.col("Decision_Services_Matrix") == "650x655"), f.lit("6"))
+                          (f.col("Decision_Services_Matrix") == "690x655"), f.lit("6"))
                     .otherwise(f.col("Decision_Services_Risk_Grade")))
     # Catch-All
     sdf_13 = sdf_12c\
@@ -1330,291 +1310,6 @@ schema_dsw_TSO = t.StructType([
     t.StructField("DECISION_SERVICES_WATERFALL", t.StringType(), True)
 ])
 udf_dsw_TSO = f.udf(dsw_TSO, returnType=schema_dsw_TSO)
-
-
-# def Decision_Service_Waterfallxxx(sdf_inp):
-#     sdf_0 = sdf_inp \
-#         .withColumn("Decision_Services_Segment",
-#                     f.when((f.col("All_TimeOldestTrade") < 3),
-#                            f.lit("NTC"))
-#                      .otherwise(f.lit(None)))\
-#         .withColumn("Filter_New_To_Credit",
-#                     f.when((f.col("All_TimeOldestTrade") < 3),
-#                            f.lit(1))
-#                      .otherwise(f.lit(None)))\
-#         .withColumn("Decision_Services_Waterfall",
-#                     f.when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_Deceased") == "Y"), f.lit("P01 Consumer Deceased"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_CustomerAge") < 1800), f.lit("P02 Consumer Age < 18"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_Fraud") == "Y"), f.lit("P03 Payment Profile Fraud"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_Sequestration") == "Y"), f.lit("P04 Consumer Sequestrated"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_Dispute") == "Y"), f.lit("P05 Payment Profile Dispute"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_Emigrated") == "Y"), f.lit("P06 Consumer Emigrated"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("ALL_Notices5Years") == "Y"), f.lit("P07 Public Notice Issued"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_DebtReviewGranted") == "Y"), f.lit("P08 Debt Review Granted"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("CST_DebtReviewRequested") == "Y"), f.lit("G01 Debt Review Requested"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("APP_Gross_Income") < 1500), f.lit("G06 Gross Income < R1500"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("NTC_Accept_Final_Score_V01") < 580), f.lit("C01 Accept Final Score V01 < 580"))
-#                      .when((f.col("All_TimeOldestTrade") < 3) &
-#                            (f.col("NTC_Accept_Risk_Score_V01") < 580), f.lit("C01 Accept Risk Score V01 < 580")))\
-#         .withColumn("nest",
-#                     f.when((f.col("All_TimeOldestTrade") < 3),
-#                            udf_Risk_Grade_Matrix(f.lit("RG9"), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
-#                                                  f.lit(999), f.lit(999), f.col("NEW_Customer_Score"), f.lit(999),
-#                                                  f.lit(999), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
-#                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM"))))\
-#         .withColumn("Decision_Services_Outcome",
-#                     f.when((f.col("All_TimeOldestTrade") < 3),
-#                            f.col("nest.Decision_Services_Outcome"))
-#                      .otherwise(f.col("Decision_Services_Outcome")))\
-#         .withColumn("Decision_Services_Waterfall",
-#                     f.when((f.col("All_TimeOldestTrade") < 3),
-#                            f.col("nest.Decision_Services_Waterfall"))
-#                      .otherwise(f.col("Decision_Services_Waterfall")))\
-#         .withColumn("Decision_Services_Matrix",
-#                     f.when((f.col("All_TimeOldestTrade") < 3),
-#                            f.col("nest.Decision_Services_Matrix"))
-#                      .otherwise(f.col("Decision_Services_Matrix")))\
-#         .drop(*["nest"])
-#
-#     sdf_1 = sdf_0\
-#         .withColumn("Decision_Services_Segment",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()),
-#                            f.lit("TSO"))
-#                      .otherwise(f.col("Decision_Services_Segment")))\
-#         .withColumn("Filter_Telesales_Outbound",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()),
-#                            f.lit("1"))
-#                      .otherwise(f.lit(None)))\
-#         .withColumn("Decision_Services_Waterfall",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_Deceased") == "Y"),
-#                            f.lit("P01 Customer Deceased"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_CustomerAge") < 1800),
-#                            f.lit("P02 Customer Age < 18"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_Fraud") == "Y"),
-#                            f.lit("P03 Payment Profile Fraud"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_Sequestration") == "Y"),
-#                            f.lit("P04 Consumer Sequestrated"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_Dispute") == "Y"),
-#                            f.lit("P05 Payment Profile Dispute"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_Emigrated") == "Y"),
-#                            f.lit("P06 Consumer Emigrated"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_Notices5Years") == "Y"),
-#                            f.lit("P07 Public Notice Issued"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_DebtReviewGranted") == "Y"),
-#                            f.lit("P08 Debt Review Granted"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CST_DebtReviewRequested") == "Y"),
-#                            f.lit("G01 Debt Review Requested"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("APP_Gross_Income") < 1500),
-#                            f.lit("C06 Gross Income < R1500"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("CBX_Prism_TM") < 580),
-#                            f.lit("C01 Prism TM < 580"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("NEW_Customer_Score") < 555),
-#                            f.lit("C01 New Customer Score < 555"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("ALL_Perc0Delq90Days") < 60),
-#                            f.lit("G02 UTD bureau trades last 90 days < 60%"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()) &
-#                            (f.col("ALL_NumPayments90Days") == 0),
-#                            f.lit("G04 Number bureau payments last 90 days = 0")))\
-#         .withColumn("nest",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()),
-#                            udf_Risk_Grade_Matrix(f.lit("RG8"), f.lit(580), f.lit(640), f.lit(999), f.lit(999),
-#                                                  f.lit(999), f.lit(999), f.col("NEW_Customer_Score"), f.lit(555),
-#                                                  f.lit(585), f.lit(999), f.lit(999), f.lit(999), f.lit(999),
-#                                                  f.col("Decision_Services_Waterfall"), f.col("CBX_Prism_TM")))) \
-#         .withColumn("Decision_Services_Outcome",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()),
-#                            f.col("nest.Decision_Services_Outcome"))
-#                      .otherwise(f.col("Decision_Services_Outcome")))\
-#         .withColumn("Decision_Services_Waterfall",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()),
-#                            f.col("nest.Decision_Services_Waterfall"))
-#                      .otherwise(f.col("Decision_Services_Waterfall")))\
-#         .withColumn("Decision_Services_Matrix",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull()),
-#                            f.col("nest.Decision_Services_Matrix"))
-#                      .otherwise(f.col("Decision_Services_Matrix")))\
-#         .drop(*["nest"])\
-#         .withColumn("Decision_Services_Risk_Grade",
-#                     f.when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull() &
-#                            f.col("Decision_Services_Matrix") == "580x555"),
-#                            f.lit("9"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull() &
-#                            f.col("Decision_Services_Matrix") == "580x585"),
-#                            f.lit("8"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull() &
-#                            f.col("Decision_Services_Matrix") == "640x555"),
-#                            f.lit("8"))
-#                      .when((f.col("APP_Customer_State").isin(["", "IMM MOB 00-05"]) &
-#                            f.col("Filter_Channel_Outbound").isNotNull() &
-#                            f.col("Decision_Services_Matrix") == "640x585"),
-#                            f.lit("8")))
-
-
-# def Decision_Service_Waterfall(CST_Deceased, CST_Customer_Age, CST_Fraud, CST_Sequestration, CST_Dispute,
-#                                APP_Customer_State, CST_Emigrated, ALL_Notices5Years, CST_DebtReviewGranted,
-#                                All_TimeOldestTrade, APP_Gross_Income, APP_Subscriptions, Customer_State,
-#                                Filter_Clear_State, Filter_Responsible_State, Filter_Erratic_State,
-#                                Filter_Arrears_State, Filter_Channel_Outbound, Filter_Channel_Inbound,
-#                                Filter_Channel_Online):
-#     Filter_New_To_Credit = Filter_Telesales_Outbound = Filter_Telesales_Inbound = None
-#     Filter_Web_Service = Filter_First_Account_Applicant = Filter_XXXXXX_State = Filter_Immature_Activations = None
-#     Filter_Clear_Activations = Filter_Responsible_Activations = Filter_Erratic_Activations = None
-#     Filter_Arrears_Activations = Filter_Other_Activations = Filter_Immature_State = None
-#
-#     if CST_Deceased == "Y":
-#         APP_Decision_Service_Waterfall = "A.01 Bureau Policy Decline (P01=Consumer Deceased)"
-#     elif CST_Customer_Age < 1800:
-#         APP_Decision_Service_Waterfall = "A.02 Bureau Policy Decline (P02=Consumer Age < 18)"
-#     elif CST_Fraud == "Y":
-#         APP_Decision_Service_Waterfall = "A.03 Bureau Policy Decline (P03=Payment Profile Fraud)"
-#     elif CST_Sequestration == "Y":
-#         APP_Decision_Service_Waterfall = "A.04 Bureau Policy Decline (P04=Consumer Sequestrated)"
-#     elif (CST_Dispute == "Y") and (APP_Customer_State != "CLR Clear"):
-#         APP_Decision_Service_Waterfall = "A.05 Bureau Policy Decline (P05=Payment Profile Dispute, except CLR)"
-#     elif CST_Emigrated == "Y":
-#         APP_Decision_Service_Waterfall = "A.06 Bureau Policy Decline (P06=Consumer Immigrated)"
-#     elif ALL_Notices5Years == "Y":
-#         APP_Decision_Service_Waterfall = "A.07 Bureau Policy Decline (P07=Public Notice Issued)"
-#     elif (CST_DebtReviewGranted == "Y") and (APP_Customer_State != "CLR Clear"):
-#         APP_Decision_Service_Waterfall = "A.08 Bureau Policy Decline (P08=Debt Review Granted, except CLR)"
-#     elif (All_TimeOldestTrade < 3) and (APP_Gross_Income < 1500):
-#         APP_Decision_Service_Waterfall = "B.01 Thin File (C05=Gross Income < R1500)"
-#     elif (APP_Customer_State == "") and (APP_Gross_Income < 1500):
-#         APP_Decision_Service_Waterfall = "B.02 New To Credit (C05=Gross Income < R1500)"
-#     elif (APP_Customer_State == "IMM MOB 00-05") and (APP_Gross_Income < 1500):
-#         APP_Decision_Service_Waterfall = "B.03 Immature Customer State (C05=Gross Income < R1500)"
-#     elif All_TimeOldestTrade < 3:
-#         APP_Decision_Service_Waterfall = "C. New To Credit (Thin File)"
-#         Filter_New_To_Credit = 1
-#     elif (APP_Customer_State in ["", "IMM MOB 00-05"]) and (Filter_Channel_Outbound is not None):
-#         APP_Decision_Service_Waterfall = "D. Telesales Outbound"
-#         Filter_Telesales_Outbound = 1
-#     elif (APP_Customer_State in ["", "IMM MOB 00-05"]) and (Filter_Channel_Inbound is not None):
-#         APP_Decision_Service_Waterfall = "E. Telesales Inbound"
-#         Filter_Telesales_Inbound = 1
-#     elif (APP_Customer_State in ["", "IMM MOB 00-05"]) and (Filter_Channel_Online is not None):
-#         APP_Decision_Service_Waterfall = "F. World Wide Web"
-#         Filter_Web_Service = 1
-#     elif APP_Customer_State == "":
-#         APP_Decision_Service_Waterfall = "G. First Account Applicant"
-#         Filter_First_Account_Applicant = 1
-#     elif APP_Customer_State == "IMM MOB 00-05":
-#         APP_Decision_Service_Waterfall = "H. Immature Customer State"
-#         Filter_Immature_State = 1
-#     elif APP_Customer_State == "CLR Clear":
-#         APP_Decision_Service_Waterfall = "I. Clear Customer State"
-#         Filter_Clear_State = 1
-#     elif APP_Customer_State == "RES Responsible":
-#         APP_Decision_Service_Waterfall = "J. Responsible Customer State"
-#         Filter_Responsible_State = 1
-#     elif APP_Customer_State == "ERR Erratic":
-#         APP_Decision_Service_Waterfall = "K. Erratic Customer State"
-#         Filter_Erratic_State = 1
-#     elif APP_Customer_State == "EXT Extended":
-#         APP_Decision_Service_Waterfall = "L. Arrears Customer State"
-#         Filter_Arrears_State = 1
-#     elif APP_Customer_State == "DIS Distressed":
-#         APP_Decision_Service_Waterfall = "L. Arrears Customer State"
-#         Filter_Arrears_State = 1
-#     elif APP_Customer_State == "DBT Doubtful Debt":
-#         APP_Decision_Service_Waterfall = "L. Arrears Customer State"
-#         Filter_Arrears_State = 1
-#     elif APP_Customer_State == "CRD Credit Balance":
-#         APP_Decision_Service_Waterfall = "X.01 Catch-All (Credit Balance)"
-#         Filter_XXXXXX_State = 1
-#     elif APP_Customer_State == "PUP Paid-Up":
-#         APP_Decision_Service_Waterfall = "X.02 Catch-All (Paid Up)"
-#         Filter_XXXXXX_State = 1
-#     else:
-#         APP_Decision_Service_Waterfall = "X.03 Catch-All"
-#         Filter_XXXXXX_State = 1
-#
-#     if APP_Subscriptions is not None:
-#         if Customer_State == "IMM MOB 00-05":
-#             Filter_Immature_Activations = 1
-#         elif Filter_Clear_State == 1:
-#             Filter_Clear_Activations = 1
-#         elif Filter_Responsible_State == 1:
-#             Filter_Responsible_Activations = 1
-#         elif Filter_Erratic_State == 1:
-#             Filter_Erratic_Activations = 1
-#         elif Filter_Arrears_State == 1:
-#             Filter_Arrears_Activations = 1
-#         else:
-#             Filter_Other_Activations = 1
-#
-#     return (APP_Decision_Service_Waterfall, Filter_New_To_Credit, Filter_Telesales_Outbound, Filter_Telesales_Inbound,
-#             Filter_Web_Service, Filter_First_Account_Applicant, Filter_XXXXXX_State, Filter_Immature_Activations,
-#             Filter_Clear_Activations, Filter_Responsible_Activations, Filter_Erratic_Activations,
-#             Filter_Arrears_Activations, Filter_Other_Activations, Filter_Immature_State)
-#
-#
-# schema_Decision_Service_Waterfall = t.StructType([
-#     t.StructField("APP_Decision_Service_Waterfall", t.StringType(), True),
-#     t.StructField("Filter_New_To_Credit", t.IntegerType(), True),
-#     t.StructField("Filter_Telesales_Outbound", t.IntegerType(), True),
-#     t.StructField("Filter_Telesales_Inbound", t.IntegerType(), True),
-#     t.StructField("Filter_Web_Service", t.IntegerType(), True),
-#     t.StructField("Filter_First_Account_Applicant", t.IntegerType(), True),
-#     t.StructField("Filter_XXXXXX_State", t.IntegerType(), True),
-#     t.StructField("Filter_Immature_Activations", t.IntegerType(), True),
-#     t.StructField("Filter_Clear_Activations", t.IntegerType(), True),
-#     t.StructField("Filter_Responsible_Activations", t.IntegerType(), True),
-#     t.StructField("Filter_Erratic_Activations", t.IntegerType(), True),
-#     t.StructField("Filter_Arrears_Activations", t.IntegerType(), True),
-#     t.StructField("Filter_Other_Activations", t.IntegerType(), True),
-#     t.StructField("Filter_Immature_State", t.IntegerType(), True)
-# ])
-#
-# udf_Decision_Service_Waterfall = f.udf(Decision_Service_Waterfall,
-#                                        returnType=schema_Decision_Service_Waterfall)
 
 
 def Decision_Services_Metrics(sdf_0):

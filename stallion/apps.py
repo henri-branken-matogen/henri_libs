@@ -241,7 +241,7 @@ def DUP_subroutine(sdf_inp):
     sdf_0 = sdf_inp\
         .repartition(1)\
         .orderBy([f.col("IDKey").asc(),
-                  f.col("DUP_Application").asc(),
+                  f.col("DUP_Application_Sequence").asc(),
                   f.col("Filter_Decision_Outcome_SEQ").asc(),
                   f.col("APP_Risk_Grade").asc(),
                   f.col("APP_Gross_Income").desc(),
@@ -251,7 +251,7 @@ def DUP_subroutine(sdf_inp):
     windowspecIDKEY = Window \
         .partitionBy(f.col("IDKey")) \
         .orderBy([f.col("IDKey").asc(),
-                  f.col("DUP_Application").asc(),
+                  f.col("DUP_Application_Sequence").asc(),
                   f.col("Filter_Decision_Outcome_SEQ").asc(),
                   f.col("APP_Risk_Grade").asc(),
                   f.col("APP_Gross_Income").desc(),
@@ -355,7 +355,25 @@ def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
                         f.lag(f.col("DUP_Days_Between_Applications"), 1).over(windowspecASC)) \
             .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecASC))
 
-    sdf_3 = sdf_2\
+    sdf_2a = sdf_2\
+        .withColumn("RET_IDKey", f.when(f.col("IDKey").isNotNull() & f.col("RET_IDKey").isNull(),
+                                        f.col("IDKey"))
+                                  .otherwise(f.col("RET_IDKey")))\
+        .withColumn("RET_Date", f.when(f.col("APP_Date").isNotNull() & f.col("RET_Date").isNull(),
+                                       f.col("APP_Date"))
+                                 .otherwise(f.col("RET_Date")))\
+        .withColumn("RET_Days_Between_Applications",
+                    f.when(f.col("DUP_Days_Between_Applications").isNotNull() &
+                           f.col("RET_Days_Between_Applications").isNull(),
+                           f.col("DUP_Days_Between_Applications"))
+                     .otherwise(f.col("RET_Days_Between_Applications")))\
+        .withColumn("RET_Application_Sequence",
+                    f.when(f.col("DUP_Application_Sequence").isNotNull() &
+                           f.col("RET_Application_Sequence").isNull(),
+                           f.col("DUP_Application_Sequence"))
+                     .otherwise(f.col("RET_Application_Sequence")))
+
+    sdf_3 = sdf_2a\
         .withColumn("DUP_Applicant", f.when((f.col("IDKey") == f.col("RET_IDKey")),
                                             f.lit("Y"))
                                       .otherwise(f.lit("N")))
