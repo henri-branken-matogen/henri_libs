@@ -209,18 +209,21 @@ def Customer_Type(type_sas, type_sla):
 udf_Customer_Type = udf(Customer_Type, returnType=StringType())
 
 
-def Customer_Type2(TYP, IDT, ANB):
+def Customer_Type2(IDT, TYP, ANB):
     """
+    IDT:  IDTYPE
+    TYP:  ID_TYPE
+    ANB:  AN_B
     Invoked in `1_sanitise_slaf`.
     :param IDT:  Of type String.  This comes from the ID Validation Routine.
     :param TYP:  This comes from the Service Line Age File, supplied by Cell C / CEC.  The Account Type.
     :param ANB:  `Analysis_B` field in the Service Line Age File.  This is an Infinity Collections field.
     """
 
-    if TYP is None:
-        TYP = ""
     if IDT is None:
         IDT = ""
+    if TYP is None:
+        TYP = ""
     if ANB is None:
         ANB = ""
 
