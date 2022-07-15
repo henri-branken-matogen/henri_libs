@@ -15,7 +15,7 @@ def stage_fix_func(ACCOUNT_GBX, BD_USE, ACCOUNT_DLQ, STAGE_2):
         result = STAGE_2
     return result
 
-udf_stage_fix = f.udf(stage_fix,
+udf_stage_fix = f.udf(stage_fix_func,
                       returnType=t.IntegerType())
 
 # --------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ udf_cure = f.udf(cure_func,
 
 def cure_adjustment_func(cure_bool, cure, NON_DEF_2_C, vlu_cure):
     if(cure_bool == "No"):
-        result = 1
+         result = 1
     elif (cure == "PARTIAL CURE"):
         result = vlu_cure.loc[vlu_cure.Lookup == NON_DEF_2_C,"Adjustment"]
     else:
@@ -73,7 +73,7 @@ udf_cure_adjustment = f.udf(cure_adjustment_func,
 # Column AC: Stage Cure
 
 def stage_cure_func(stage_fix, cure, ACCOUNT_DLQ):
-    if(stage_fix==3 and (cure="PURE CURE" or cure="PARTIAL CURE")):
+    if(stage_fix==3 and (cure=="PURE CURE" or cure=="PARTIAL CURE")):
         if(ACCOUNT_DLQ == "C"):
             result = 1
         elif(ACCOUNT_DLQ == "P"):
@@ -104,7 +104,11 @@ udf_stage_cure = f.udf(stage_cure_func,
 # Column AG: PD - Use 
 
 def PD_use_func(cure_bool, stage_fix, stage_cure, PD_stage1, PD_stage2, PD_stage3):
-    stage = stage_fix if cure_bool=="No" else stage = stage_cure    
+    if cure_bool=="No":
+        stage = stage_fix
+    else:
+        stage = stage_cure
+
     if(stage == 2 or stage_fix in [4,5]):
         result = PD_stage3
     elif(stage == 2):
@@ -113,7 +117,7 @@ def PD_use_func(cure_bool, stage_fix, stage_cure, PD_stage1, PD_stage2, PD_stage
         result = PD_stage1
     return result
 
-udf_pd_use = f.udf(pd_use_func,
+udf_pd_use = f.udf(PD_use_func,
                    returnType=t.DoubleType())
 
 # -----------------------------------------------------------------------------------------------------
@@ -127,7 +131,11 @@ udf_pd_use = f.udf(pd_use_func,
 # Column AJ: avg_rem_time_fix
     
 def avg_rem_time_fix(cure_bool, stage_fix, stage_cure, TTD, avg_rem_time_red):
-    stage = stage_fix if cure_bool=="No" else stage = stage_cure
+    if cure_bool == "No":
+        stage = stage_fix
+    else:
+        stage = stage_cure
+
     if (stage == 3 or stage_fix in [4, 5]):
         return avg_rem_time_red
     else:
@@ -196,10 +204,14 @@ udf_ECL_stage = f.udf(ECL_1_2_3,
 # Column AU: ECL
 
 def ECL_func(interest_rate, PWOR, TTD, TTWO, PIT_PD_Adj, PIT_LGD_Adj, EAD, bal_total, updated_stage, WOF_ALL, PD_use, LGD_use):
+    if updated_stage == 1:
+        PIT_PD = 1
+    else:
+        PIT_PD = PIT_PD_Adj
+
     if(updated_stage == 5):
         result = WOF_ALL
     else:
-        PIT_PD = 1 if updated_stage=1 else PIT_PD = PIT_PD_Adj
         A = ((bal_total * PIT_PD) * PD_use * EAD * (LGD_use * PIT_LGD_Adj * (1-PWOR)))
         B = ((1+interest_rate) ** (-(TTD+TTWO)/12))
         result = A * B
@@ -304,7 +316,7 @@ def ecl_scenario_func(interest_rate, PWOR, TTD, TTWO, EAD, bal_total, stage_fix,
     if PD_scenario is None:
         PD_scenario = 0
     
-    if (stage_fix = 5):
+    if (stage_fix == 5):
         interim = WOF_ALL
     else:
         A = bal_total * PD_scenario * EAD * LGD_scenario * (1-PWOR)
