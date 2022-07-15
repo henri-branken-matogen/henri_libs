@@ -109,7 +109,7 @@ def PD_use_func(cure_bool, stage_fix, stage_cure, PD_stage1, PD_stage2, PD_stage
     else:
         stage = stage_cure
 
-    if(stage == 2 or stage_fix in [4,5]):
+    if(stage == 3 or stage_fix in [4,5]):
         result = PD_stage3
     elif(stage == 2):
         result = PD_stage2
