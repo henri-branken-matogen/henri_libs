@@ -594,7 +594,7 @@ def Decision_Services_Waterfall(sdf_inp):
     #  ERR
     sdf_11a = sdf_10c \
         .withColumn("nest",
-                    udf_dsw_RES(f.col("APP_Customer_State"),
+                    udf_dsw_ERR(f.col("APP_Customer_State"),
                                 f.col("Decision_Services_Segment"), f.col("Filter_Erratic_State"),
                                 f.col("Decision_Services_Waterfall"), f.col("CST_Deceased"), f.col("CST_CustomerAge"),
                                 f.col("CST_Fraud"), f.col("CST_Sequestration"), f.col("CST_Dispute"),
