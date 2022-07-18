@@ -262,11 +262,11 @@ udf_updated_stage = f.udf(updated_stage_func,
 # for these 3 PD scenario columns only one variable differs: scenario_PD_input
 def PD_scenario_func(scenario_PD_input, PIT_PD_Adj, updated_stage, PD_stage1, PD_stage2, PD_stage3, cure_adjustment):
     if (updated_stage in [3,4,5]):
-        interim = PD_stage3 
+        interim = float(PD_stage3)
     elif (updated_stage == 2):
-        interim = PD_stage2 * scenario_PD_input
+        interim = float(PD_stage2) * scenario_PD_input
     else:
-        interim = PD_stage1 * PIT_PD_Adj * cure_adjustment * scenario_PD_input
+        interim = float(PD_stage1) * PIT_PD_Adj * cure_adjustment * scenario_PD_input
     result = min(1, interim)
     return result
 
@@ -284,9 +284,9 @@ udf_PD_scenario = f.udf(PD_scenario_func,
 #for these 3 LGD scenario columns only one variable differs: scenario_LGD
 def LGD_scenario_func(scenario_LGD_input, PIT_LGD_Adj, updated_stage, LGD_New_to_NPL, LGD_Curve):
     if (updated_stage in [1, 2]):
-        interim = LGD_New_to_NPL
+        interim = float(LGD_New_to_NPL)
     else:
-        interim = LGD_Curve
+        interim = float(LGD_Curve)
     result = interim * PIT_LGD_Adj * scenario_LGD_input
     return result
 
