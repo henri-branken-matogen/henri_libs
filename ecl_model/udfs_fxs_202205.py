@@ -67,7 +67,7 @@ def cure_adjustment_func(cure_bool, cure, NON_DEF_2_C):
     if(cure_bool == "No"):
          result = 1
     elif (cure == "PARTIAL CURE"):
-        result = vlu_cure.loc[vlu_cure.Lookup == NON_DEF_2_C,"Adjustment"]
+        result = int(vlu_cure.loc[vlu_cure.Lookup == NON_DEF_2_C,"Adjustment"])
     else:
         result = 1
     
@@ -113,9 +113,9 @@ udf_stage_cure = f.udf(stage_cure_func,
 
 def PD_use_func(cure_bool, stage_fix, stage_cure, PD_stage1, PD_stage2, PD_stage3):
     if cure_bool=="No":
-        stage = stage_fix
+        stage = int(stage_fix)
     else:
-        stage = stage_cure
+        stage = int(stage_cure)
 
     if(stage == 3 or stage_fix in [4,5]):
         result = PD_stage3
@@ -140,9 +140,9 @@ udf_pd_use = f.udf(PD_use_func,
     
 def avg_rem_time_fix(cure_bool, stage_fix, stage_cure, TTD, avg_rem_time_red):
     if cure_bool == "No":
-        stage = stage_fix
+        stage = int(stage_fix)
     else:
-        stage = stage_cure
+        stage = int(stage_cure)
 
     if (stage == 3 or stage_fix in [4, 5]):
         return avg_rem_time_red
