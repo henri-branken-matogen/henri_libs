@@ -15,6 +15,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
 
     APP_Subscriber_Number1 = APP_Subscriber_Number2 = APP_Subscriber_Number3 = APP_Subscriber_Number4 = APP_Subscriber_Number5 = None
     APP_Activation_Date1 = APP_Activation_Date2 = APP_Activation_Date3 = APP_Activation_Date4 = APP_Activation_Date5 = None
+    APP_Activation_Days1 = APP_Activation_Days2 = APP_Activation_Days3 = APP_Activation_Days4 = APP_Activation_Days5 = None
     APP_Activation_Weeks1 = APP_Activation_Weeks2 = APP_Activation_Weeks3 = APP_Activation_Weeks4 = APP_Activation_Weeks5 = None
     APP_Activation_Month1 = APP_Activation_Month2 = APP_Activation_Month3 = APP_Activation_Month4 = APP_Activation_Month5 = None
 
@@ -30,10 +31,10 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Account1 = "1"
         elif APP_Account_Number2 is None:
             APP_Account_Number2 = Account
-            APP_Account1 = "1"
+            APP_Account1 = "2"
         elif APP_Account_Number3 is None:
             APP_Account_Number3 = Account
-            APP_Account1 = "1"
+            APP_Account1 = "3"
         else:
             APP_Account1 = None
         APP_Accounts = APP_Account1
@@ -63,10 +64,10 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Account2 = "1"
         elif APP_Account_Number2 is None:
             APP_Account_Number2 = Account
-            APP_Account2 = "1"
+            APP_Account2 = "2"
         elif APP_Account_Number3 is None:
             APP_Account_Number3 = Account
-            APP_Account2 = "1"
+            APP_Account2 = "3"
         else:
             APP_Account2 = None
         APP_Accounts = APP_Account2
@@ -96,10 +97,10 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Account3 = "1"
         elif APP_Account_Number2 is None:
             APP_Account_Number2 = Account
-            APP_Account3 = "1"
+            APP_Account3 = "2"
         elif APP_Account_Number3 is None:
             APP_Account_Number3 = Account
-            APP_Account3 = "1"
+            APP_Account3 = "3"
         else:
             APP_Account3 = None
         APP_Accounts = APP_Account3
@@ -129,10 +130,10 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Account4 = "1"
         elif APP_Account_Number2 is None:
             APP_Account_Number2 = Account
-            APP_Account4 = "1"
+            APP_Account4 = "2"
         elif APP_Account_Number3 is None:
             APP_Account_Number3 = Account
-            APP_Account4 = "1"
+            APP_Account4 = "3"
         else:
             APP_Account4 = None
         APP_Accounts = APP_Account4
@@ -150,7 +151,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
         else:
             pass
         APP_Activation_Month4 = CON_Period
-    else:
+    elif NBR == 5:
         if APP_Account_Number1 == Account:
             APP_Account5 = "1"
         elif APP_Account_Number2 == Account:
@@ -162,10 +163,10 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Account5 = "1"
         elif APP_Account_Number2 is None:
             APP_Account_Number2 = Account
-            APP_Account5 = "1"
+            APP_Account5 = "2"
         elif APP_Account_Number3 is None:
             APP_Account_Number3 = Account
-            APP_Account5 = "1"
+            APP_Account5 = "3"
         else:
             APP_Account5 = None
         APP_Accounts = APP_Account5
@@ -183,10 +184,13 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
         else:
             pass
         APP_Activation_Month5 = CON_Period
+    else:
+        APP_Accounts = None
 
     return (APP_Subscriptions, APP_Account_Number1, APP_Account_Number2, APP_Account_Number3, APP_Accounts,
             APP_Subscriber_Number1, APP_Subscriber_Number2, APP_Subscriber_Number3, APP_Subscriber_Number4, APP_Subscriber_Number5,
             APP_Activation_Date1, APP_Activation_Date2, APP_Activation_Date3, APP_Activation_Date4, APP_Activation_Date5,
+            APP_Activation_Days1, APP_Activation_Days2, APP_Activation_Days3, APP_Activation_Days4, APP_Activation_Days5,
             APP_Activation_Weeks1, APP_Activation_Weeks2, APP_Activation_Weeks3, APP_Activation_Weeks4, APP_Activation_Weeks5,
             APP_Activation_Month1, APP_Activation_Month2, APP_Activation_Month3, APP_Activation_Month4, APP_Activation_Month5)
 
@@ -207,6 +211,11 @@ schema_Applications_Contracts_Update = t.StructType([
     t.StructField("APP_Activation_Date3", t.DateType(), True),
     t.StructField("APP_Activation_Date4", t.DateType(), True),
     t.StructField("APP_Activation_Date5", t.DateType(), True),
+    t.StructField("APP_Activation_Days1", t.IntegerType(), True),
+    t.StructField("APP_Activation_Days2", t.IntegerType(), True),
+    t.StructField("APP_Activation_Days3", t.IntegerType(), True),
+    t.StructField("APP_Activation_Days4", t.IntegerType(), True),
+    t.StructField("APP_Activation_Days5", t.IntegerType(), True),
     t.StructField("APP_Activation_Weeks1", t.IntegerType(), True),
     t.StructField("APP_Activation_Weeks2", t.IntegerType(), True),
     t.StructField("APP_Activation_Weeks3", t.IntegerType(), True),
@@ -432,81 +441,20 @@ def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
     return sdf_6
 
 
-# def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
-#     """
-#     This is the Python translation of the SAS Code `Flag_DUP_Applicant.sas`.
-#     """
-#     if SRT.upper() == "ASCENDING":
-#         sdf_0 = sdf_inp\
-#             .repartition(1)\
-#             .orderBy([f.col("IDKey").asc(),
-#                       f.col("APP_Date").asc(),
-#                       f.col("DUP_Application").asc()])
-#
-#         windowspecIDKEY = Window \
-#             .partitionBy(f.col("IDKey")) \
-#             .orderBy([f.col("IDKey").asc(),
-#                       f.col("APP_Date").asc(),
-#                       f.col("DUP_Application").asc()])
-#
-#         sdf_1 = sdf_0\
-#             .repartition(1)\
-#             .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
-#             .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
-#             .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
-#                                           .otherwise(f.lit(None)))
-#     else:
-#         sdf_0 = sdf_inp\
-#             .repartition(1)\
-#             .orderBy([f.col("IDKey").asc(),
-#                       f.col("APP_Date").desc(),
-#                       f.col("DUP_Application").desc()])
-#
-#         windowspecIDKEY = Window \
-#             .partitionBy(f.col("IDKey")) \
-#             .orderBy([f.col("IDKey").asc(),
-#                       f.col("APP_Date").desc(),
-#                       f.col("DUP_Application").desc()])
-#
-#         sdf_1 = sdf_0 \
-#             .repartition(1) \
-#             .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY)) \
-#             .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
-#             .withColumn("DUP_Applicant", f.when(f.col("IDKey") == f.col("RET_IDKey"), f.lit("Y"))
-#                                           .otherwise(f.lit(None)))
-#
-#     if SRT.upper() == "ASCENDING":
-#         sdf_2 = sdf_1\
-#             .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
-#                                                                 f.datediff(f.col("APP_Date"), f.col("RET_Date")))
-#                                                           .otherwise(f.lit(None)))
-#     else:
-#         sdf_2 = sdf_1 \
-#             .withColumn("DUP_Days_Between_Applications", f.when(f.col("IDKey") == f.col("RET_IDKey"),
-#                                                                 f.datediff(f.col("RET_Date"), f.col("APP_Date")))
-#                                                           .otherwise(f.lit(None)))
-#
-#     sdf_3 = sdf_2\
-#         .withColumn("DUP_Application", f.when((f.col("DUP_Days_Between_Applications") >= f.lit(0)) &
-#                                               (f.col("DUP_Days_Between_Applications") <= f.lit(DAY)), f.lit(1))
-#                                         .otherwise(f.col("DUP_Application")))\
-#         .drop(*["RET_IDKey", "RET_Date"])
-#     return sdf_3
-
-
 def Match_Applications_Contracts(sdf_0):
-    sdf_0a = sdf_0\
-        .repartition(1)\
+    windowspec = Window\
+        .partitionBy()\
         .orderBy([f.col("APP_Record_Number").asc()])
 
-    windowspec = Window\
-        .partitionBy(f.col("APP_Record_Number"))\
+    sdf_0a = sdf_0\
+        .repartition(1)\
         .orderBy([f.col("APP_Record_Number").asc()])
 
     sdf_0b = sdf_0a\
         .repartition(1)\
         .withColumn("RET_Record_Number", f.lag(f.col("APP_Record_Number"), 1).over(windowspec))
 
+    # Only keep the application record.
     sdf_1 = sdf_0b\
         .filter(f.col("APP_Date").isNotNull())
 
@@ -556,7 +504,6 @@ def Match_Applications_Contracts(sdf_0):
                                                              f.col("Matched_Distance"),
                                                              f.col("CON_Period")))
                      .when(f.col("Matched_Distance").isNotNull() &
-                           (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                            (f.col("APP_Subscriptions") == 1),
                            udf_Applications_Contracts_Update(f.lit(2),
                                                              f.col("Account"),
@@ -568,7 +515,6 @@ def Match_Applications_Contracts(sdf_0):
                                                              f.col("Matched_Distance"),
                                                              f.col("CON_Period")))
                     .when(f.col("Matched_Distance").isNotNull() &
-                          (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                           (f.col("APP_Subscriptions") == 2),
                           udf_Applications_Contracts_Update(f.lit(3),
                                                             f.col("Account"),
@@ -580,7 +526,6 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Matched_Distance"),
                                                             f.col("CON_Period")))
                     .when(f.col("Matched_Distance").isNotNull() &
-                          (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                           (f.col("APP_Subscriptions") == 3),
                           udf_Applications_Contracts_Update(f.lit(4),
                                                             f.col("Account"),
@@ -592,7 +537,6 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Matched_Distance"),
                                                             f.col("CON_Period")))
                     .when(f.col("Matched_Distance").isNotNull() &
-                          (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                           (f.col("APP_Subscriptions") == 4),
                           udf_Applications_Contracts_Update(f.lit(5),
                                                             f.col("Account"),
@@ -620,6 +564,11 @@ def Match_Applications_Contracts(sdf_0):
         .withColumn("APP_Activation_Date3", f.col("nest.APP_Activation_Date3"))\
         .withColumn("APP_Activation_Date4", f.col("nest.APP_Activation_Date4"))\
         .withColumn("APP_Activation_Date5", f.col("nest.APP_Activation_Date5"))\
+        .withColumn("APP_Activation_Days1", f.col("nest.APP_Activation_Days1"))\
+        .withColumn("APP_Activation_Days2", f.col("nest.APP_Activation_Days2"))\
+        .withColumn("APP_Activation_Days3", f.col("nest.APP_Activation_Days3"))\
+        .withColumn("APP_Activation_Days4", f.col("nest.APP_Activation_Days4"))\
+        .withColumn("APP_Activation_Days5", f.col("nest.APP_Activation_Days5"))\
         .withColumn("APP_Activation_Weeks1", f.col("nest.APP_Activation_Weeks1"))\
         .withColumn("APP_Activation_Weeks2", f.col("nest.APP_Activation_Weeks2"))\
         .withColumn("APP_Activation_Weeks3", f.col("nest.APP_Activation_Weeks3"))\
@@ -713,11 +662,14 @@ def Match_Applications_Contracts(sdf_0):
         "APP_Subscriptions",
         "BNK_NumOpenTrades",
         "CAM_Customer_Score",
+        "CAM_Customer_Score_BND",
         "CAM_Customer_Score_CNT",
         "CAM_Risk_Grade",
         "CBX_Prism_TM",
+        "CBS_Prism_TM_BND",
         "CBX_Prism_TM_CNT",
         "CBX_Sabre_TM",
+        "CBX_Sabre_TM_BND",
         "CBX_Sabre_TM_CNT",
         "COM_NumOpenTrades",
         "COM_NumTrades2Years",
@@ -732,6 +684,11 @@ def Match_Applications_Contracts(sdf_0):
         "CST_Emigrated",
         "CST_Fraud",
         "CST_Sequestration",
+        "Decision_Services_Segment",
+        "Decision_Services_Waterfall",
+        "Decision_Services_Outcome",
+        "Decision_Services_Matrix",
+        "Decision_Services_Risk_Grade",
         "DUP_Applicant",
         "DUP_Application_Sequence",
         "DUP_Calendar_Months_Skipped",
@@ -739,6 +696,7 @@ def Match_Applications_Contracts(sdf_0):
         "DUP_Decision_Outcome",
         "DUP_Risk_Grade",
         "EST_Customer_Score",
+        "EST_Customer_Score_BND",
         "EST_Customer_Score_CNT",
         "EST_Risk_Grade",
         "Filter_Approved_No_Activations",
@@ -798,6 +756,7 @@ def Match_Applications_Contracts(sdf_0):
         "IDKey",
         "IDNumber",
         "NEW_Customer_Score",
+        "NEW_Customer_Score_BND",
         "NEW_Customer_Score_CNT",
         "NEW_Risk_Grade",
         "NTC_Accept_Final_Score_V01",
