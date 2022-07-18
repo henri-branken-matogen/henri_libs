@@ -1,7 +1,15 @@
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
 import math
+import pandas as pd
 
+vlu_cure = pd.DataFrame({
+                         "Lookup":[2,3,4,5,6],
+                         "Type":["1st Default","2nd Default","3rd Default","4th Default","5th Default"],
+                         "First Cure":[3,6,6,6,999],
+                         "Adjustment":[1.568250136, 1.526799282, 1.628589246, 1.759179777, 1],
+                         "Full Cure": [24,24,24,24,999]
+                         })
 
 # Column Z:  Stage Fix
 def stage_fix_func(ACCOUNT_GBX, BD_USE, ACCOUNT_DLQ, STAGE_2):
@@ -22,7 +30,7 @@ udf_stage_fix = f.udf(stage_fix_func,
 
 # Column AA: Cure
 
-def cure_func(stage_fix, ACCOUNT_DLQ, NON_DEF_2_C, NON_DEF_2_TIME, vlu_cure):
+def cure_func(stage_fix, ACCOUNT_DLQ, NON_DEF_2_C, NON_DEF_2_TIME):
     try:
         if (stage_fix == 4):
             result = "DECEASED"
@@ -55,7 +63,7 @@ udf_cure = f.udf(cure_func,
 
 # Column AB: Cure Adjustment
 
-def cure_adjustment_func(cure_bool, cure, NON_DEF_2_C, vlu_cure):
+def cure_adjustment_func(cure_bool, cure, NON_DEF_2_C):
     if(cure_bool == "No"):
          result = 1
     elif (cure == "PARTIAL CURE"):
