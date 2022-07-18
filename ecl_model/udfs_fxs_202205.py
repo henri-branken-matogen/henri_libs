@@ -12,7 +12,7 @@ def stage_fix_func(ACCOUNT_GBX, BD_USE, ACCOUNT_DLQ, STAGE_2):
     elif ACCOUNT_DLQ == "4":
         result = 3
     else:
-        result = STAGE_2
+        result = int(STAGE_2)
     return result
 
 udf_stage_fix = f.udf(stage_fix_func,
