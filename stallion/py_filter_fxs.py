@@ -98,7 +98,7 @@ def Filter_Activation_Status(Matched_Distance, Filter_Decision_Outcome_Declined,
         Filter_Activation_SEQ = 1
         Filter_Referred_With_Activations += 1
     elif (Matched_Distance is not None) and (Filter_Decision_Outcome_Approved is not None):
-        Filter_Activation_SEQ = 1
+        Filter_Activation_SEQ = 0
         Filter_Approved_With_Activations += 1
     else:
         pass
