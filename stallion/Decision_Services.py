@@ -465,17 +465,20 @@ def Decision_Services_Waterfall(sdf_inp):
                            (f.col("Decision_Services_Matrix") == "630x605"), f.lit("3"))
                      .otherwise(f.col("Decision_Services_Risk_Grade")))
     # CLR
+    # dsw_CLR(APP_Customer_State, Decision_Services_Segment, Filter_Clear_State, Decision_Services_Waterfall,
+    #         CST_Deceased, CST_CustomerAge, CST_Fraud, CST_Sequestration, CST_Dispute, CST_Emigrated, ALL_Notices5Years,
+    #         CST_DebtReviewGranted, EST_Customer_Score):
     sdf_9a = sdf_8c \
         .withColumn("nest",
-                    udf_dsw_PUP(f.col("APP_Customer_State"),
+                    udf_dsw_CLR(f.col("APP_Customer_State"),
                                 f.col("Decision_Services_Segment"), f.col("Filter_Clear_State"),
                                 f.col("Decision_Services_Waterfall"), f.col("CST_Deceased"), f.col("CST_CustomerAge"),
                                 f.col("CST_Fraud"), f.col("CST_Sequestration"), f.col("CST_Dispute"),
                                 f.col("CST_Emigrated"), f.col("ALL_Notices5Years"), f.col("CST_DebtReviewGranted"),
-                                f.col("EST_Customer_Score"))) \
-        .withColumn("DECISION_SERVICES_SEGMENT", f.col("nest.DECISION_SERVICES_SEGMENT")) \
-        .withColumn("FILTER_CLEAR_STATE", f.col("nest.FILTER_CLEAR_STATE")) \
-        .withColumn("DECISION_SERVICES_WATERFALL", f.col("nest.DECISION_SERVICES_WATERFALL")) \
+                                f.col("EST_Customer_Score")))\
+        .withColumn("DECISION_SERVICES_SEGMENT", f.col("nest.DECISION_SERVICES_SEGMENT"))\
+        .withColumn("FILTER_CLEAR_STATE", f.col("nest.FILTER_CLEAR_STATE"))\
+        .withColumn("DECISION_SERVICES_WATERFALL", f.col("nest.DECISION_SERVICES_WATERFALL"))\
         .drop(*["nest"])
 
     sdf_9b = sdf_9a\
