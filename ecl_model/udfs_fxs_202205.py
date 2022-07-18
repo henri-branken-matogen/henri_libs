@@ -262,12 +262,12 @@ udf_updated_stage = f.udf(updated_stage_func,
 # for these 3 PD scenario columns only one variable differs: scenario_PD_input
 def PD_scenario_func(scenario_PD_input, PIT_PD_Adj, updated_stage, PD_stage1, PD_stage2, PD_stage3, cure_adjustment):
     if (updated_stage in [3,4,5]):
-        interim = float(PD_stage3)
+        interim = PD_stage3
     elif (updated_stage == 2):
-        interim = float(PD_stage2) * scenario_PD_input
+        interim = PD_stage2 * scenario_PD_input
     else:
-        interim = float(PD_stage1) * PIT_PD_Adj * cure_adjustment * scenario_PD_input
-    result = min(1, interim)
+        interim = PD_stage1 * PIT_PD_Adj * cure_adjustment * scenario_PD_input
+    result = min(1.0, interim)
     return result
 
 udf_PD_scenario = f.udf(PD_scenario_func,
@@ -284,9 +284,9 @@ udf_PD_scenario = f.udf(PD_scenario_func,
 #for these 3 LGD scenario columns only one variable differs: scenario_LGD
 def LGD_scenario_func(scenario_LGD_input, PIT_LGD_Adj, updated_stage, LGD_New_to_NPL, LGD_Curve):
     if (updated_stage in [1, 2]):
-        interim = float(LGD_New_to_NPL)
+        interim = LGD_New_to_NPL
     else:
-        interim = float(LGD_Curve)
+        interim = LGD_Curve
     result = interim * PIT_LGD_Adj * scenario_LGD_input
     return result
 
@@ -330,7 +330,7 @@ def ecl_scenario_func(interest_rate, PWOR, TTD, TTWO, EAD, bal_total, stage_fix,
         A = bal_total * PD_scenario * EAD * LGD_scenario * (1-PWOR)
         B = (1+interest_rate) ** (-(TTD+TTWO)/12)
         interim = A * B
-    result = max(interim, 0)
+    result = max(interim, 0.0)
     return result
 
 udf_ecl_scenario = f.udf(ecl_scenario_func,
