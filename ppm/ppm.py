@@ -15,6 +15,10 @@ def ECL_Features(SME, CME, sdf_0):
 
 
 def Portfolio_Segmentation(Analysis_A, Analysis_B, CRD_NBR, PUP_NBR, Filter_Waterfall):
+    if Analysis_A is None:
+        Analysis_A = ""
+    if Analysis_B is None:
+        Analysis_B = ""
     Analysis_A = Analysis_A.upper()
     Analysis_B = Analysis_B.upper()
 
