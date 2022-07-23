@@ -7,7 +7,7 @@ from stallion.py_filter_fxs import *
 
 
 def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account_Number2, APP_Account_Number3,
-                                  Subscriber_Number, CON_Start_Date, Matched_Distance, CON_Period):
+                                  Subscriber_Number, CON_Start_Date, Matched_Distance, CON_PERIOD):
     APP_Subscriptions = NBR
 
     APP_Subscriber_Number1 = APP_Subscriber_Number2 = APP_Subscriber_Number3 = APP_Subscriber_Number4 = APP_Subscriber_Number5 = None
@@ -48,7 +48,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Activation_Weeks1 = int((APP_Activation_Days1 - 1) / 7) + 1
         else:
             pass
-        APP_Activation_Month1 = CON_Period
+        APP_Activation_Month1 = CON_PERIOD
     elif NBR == 2:
         if APP_Account_Number1 == Account:
             APP_Account2 = "1"
@@ -81,7 +81,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Activation_Weeks2 = int((APP_Activation_Days2 - 1) / 7) + 1
         else:
             pass
-        APP_Activation_Month2 = CON_Period
+        APP_Activation_Month2 = CON_PERIOD
     elif NBR == 3:
         if APP_Account_Number1 == Account:
             APP_Account3 = "1"
@@ -114,7 +114,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Activation_Weeks3 = int((APP_Activation_Days3 - 1) / 7) + 1
         else:
             pass
-        APP_Activation_Month3 = CON_Period
+        APP_Activation_Month3 = CON_PERIOD
     elif NBR == 4:
         if APP_Account_Number1 == Account:
             APP_Account4 = "1"
@@ -147,7 +147,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Activation_Weeks4 = int((APP_Activation_Days4 - 1) / 7) + 1
         else:
             pass
-        APP_Activation_Month4 = CON_Period
+        APP_Activation_Month4 = CON_PERIOD
     elif NBR == 5:
         if APP_Account_Number1 == Account:
             APP_Account5 = "1"
@@ -180,7 +180,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
             APP_Activation_Weeks5 = int((APP_Activation_Days5 - 1) / 7) + 1
         else:
             pass
-        APP_Activation_Month5 = CON_Period
+        APP_Activation_Month5 = CON_PERIOD
     else:
         APP_Accounts = None
 
@@ -290,7 +290,7 @@ def Match_Applications_Contracts(sdf_0):
                                                              f.col("Subscriber_Number"),
                                                              f.col("CON_Start_Date"),
                                                              f.col("Matched_Distance"),
-                                                             f.col("CON_Period")))
+                                                             f.col("CON_PERIOD")))
                      .when(f.col("Matched_Distance").isNotNull() &
                            (f.col("APP_Subscriptions") == 1),
                            udf_Applications_Contracts_Update(f.lit(2),
@@ -301,7 +301,7 @@ def Match_Applications_Contracts(sdf_0):
                                                              f.col("Subscriber_Number"),
                                                              f.col("CON_Start_Date"),
                                                              f.col("Matched_Distance"),
-                                                             f.col("CON_Period")))
+                                                             f.col("CON_PERIOD")))
                     .when(f.col("Matched_Distance").isNotNull() &
                           (f.col("APP_Subscriptions") == 2),
                           udf_Applications_Contracts_Update(f.lit(3),
@@ -312,7 +312,7 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Subscriber_Number"),
                                                             f.col("CON_Start_Date"),
                                                             f.col("Matched_Distance"),
-                                                            f.col("CON_Period")))
+                                                            f.col("CON_PERIOD")))
                     .when(f.col("Matched_Distance").isNotNull() &
                           (f.col("APP_Subscriptions") == 3),
                           udf_Applications_Contracts_Update(f.lit(4),
@@ -323,7 +323,7 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Subscriber_Number"),
                                                             f.col("CON_Start_Date"),
                                                             f.col("Matched_Distance"),
-                                                            f.col("CON_Period")))
+                                                            f.col("CON_PERIOD")))
                     .when(f.col("Matched_Distance").isNotNull() &
                           (f.col("APP_Subscriptions") == 4),
                           udf_Applications_Contracts_Update(f.lit(5),
@@ -334,7 +334,7 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Subscriber_Number"),
                                                             f.col("CON_Start_Date"),
                                                             f.col("Matched_Distance"),
-                                                            f.col("CON_Period"))))
+                                                            f.col("CON_PERIOD"))))
 
     sdf_6 = sdf_5\
         .withColumn("APP_Subscriptions", f.col("nest.APP_Subscriptions"))\
