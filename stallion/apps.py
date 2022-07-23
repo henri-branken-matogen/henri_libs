@@ -298,7 +298,7 @@ def Match_Applications_Contracts(sdf_0):
                     f.when(f.col("Matched_Distance").isNotNull() &
                            (f.col("APP_Record_Number") != f.col("RET_Record_Number")),
                            udf_Applications_Contracts_Update(f.lit(1),
-                                                             f.col("Account"),
+                                                             f.col("ACCOUNT"),
                                                              f.col("APP_Account_Number1"),
                                                              f.col("APP_Account_Number2"),
                                                              f.col("APP_Account_Number3"),
@@ -309,7 +309,7 @@ def Match_Applications_Contracts(sdf_0):
                      .when(f.col("Matched_Distance").isNotNull() &
                            (f.col("APP_Subscriptions") == 1),
                            udf_Applications_Contracts_Update(f.lit(2),
-                                                             f.col("Account"),
+                                                             f.col("ACCOUNT"),
                                                              f.col("APP_Account_Number1"),
                                                              f.col("APP_Account_Number2"),
                                                              f.col("APP_Account_Number3"),
@@ -320,7 +320,7 @@ def Match_Applications_Contracts(sdf_0):
                     .when(f.col("Matched_Distance").isNotNull() &
                           (f.col("APP_Subscriptions") == 2),
                           udf_Applications_Contracts_Update(f.lit(3),
-                                                            f.col("Account"),
+                                                            f.col("ACCOUNT"),
                                                             f.col("APP_Account_Number1"),
                                                             f.col("APP_Account_Number2"),
                                                             f.col("APP_Account_Number3"),
@@ -331,7 +331,7 @@ def Match_Applications_Contracts(sdf_0):
                     .when(f.col("Matched_Distance").isNotNull() &
                           (f.col("APP_Subscriptions") == 3),
                           udf_Applications_Contracts_Update(f.lit(4),
-                                                            f.col("Account"),
+                                                            f.col("ACCOUNT"),
                                                             f.col("APP_Account_Number1"),
                                                             f.col("APP_Account_Number2"),
                                                             f.col("APP_Account_Number3"),
@@ -342,7 +342,7 @@ def Match_Applications_Contracts(sdf_0):
                     .when(f.col("Matched_Distance").isNotNull() &
                           (f.col("APP_Subscriptions") == 4),
                           udf_Applications_Contracts_Update(f.lit(5),
-                                                            f.col("Account"),
+                                                            f.col("ACCOUNT"),
                                                             f.col("APP_Account_Number1"),
                                                             f.col("APP_Account_Number2"),
                                                             f.col("APP_Account_Number3"),
@@ -426,7 +426,6 @@ def Match_Applications_Contracts(sdf_0):
         "APP_Activation_Days3",
         "APP_Activation_Days4",
         "APP_Activation_Days5",
-        "CON_PERIOD",
         "APP_Activation_Month1",
         "APP_Activation_Month2",
         "APP_Activation_Month3",
