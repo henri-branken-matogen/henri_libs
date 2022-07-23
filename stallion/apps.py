@@ -229,215 +229,6 @@ udf_Applications_Contracts_Update = f.udf(Applications_Contracts_Update,
                                           returnType=schema_Applications_Contracts_Update)
 
 
-def DUP_subroutine(sdf_inp):
-    """
-    This is the Python translation of STEP 4 in `Input_Applications_DMP.sas`.
-    In STEP 4, we sort by the optimal decision services outcome, best risk grade obtained, and highest subscription
-    limit within the acceptable period.
-    """
-    def change_day(x_dte):
-        if x_dte is None:
-            return None
-        else:
-            y_dte = x_dte.replace(day=1)
-            return y_dte
-    udf_change_day = f.udf(change_day,
-                           returnType=t.DateType())
-
-    sdf_0 = sdf_inp\
-        .repartition(1)\
-        .orderBy([f.col("IDKey").asc(),
-                  f.col("DUP_Application_Sequence").asc(),
-                  f.col("Filter_Decision_Outcome_SEQ").asc(),
-                  f.col("APP_Risk_Grade").asc(),
-                  f.col("APP_Gross_Income").desc(),
-                  f.col("APP_Subscription_Limit").desc(),
-                  f.col("APP_Date").asc()])
-
-    windowspecIDKEY = Window \
-        .partitionBy(f.col("IDKey")) \
-        .orderBy([f.col("IDKey").asc(),
-                  f.col("DUP_Application_Sequence").asc(),
-                  f.col("Filter_Decision_Outcome_SEQ").asc(),
-                  f.col("APP_Risk_Grade").asc(),
-                  f.col("APP_Gross_Income").desc(),
-                  f.col("APP_Subscription_Limit").desc(),
-                  f.col("APP_Date").asc()])
-
-    sdf_1 = sdf_0\
-        .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
-        .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
-        .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecIDKEY))\
-        .withColumn("APP_Month_dte", udf_change_day(f.col("APP_Date")))\
-        .withColumn("RET_Month", f.lag(f.col("APP_Month"), 1).over(windowspecIDKEY))\
-        .withColumn("RET_Month_dte", udf_change_day(f.col("RET_Date")))\
-        .withColumn("RET_Decision_Outcome", f.lag(f.col("Filter_Decision_Outcome_SEQ"), 1).over(windowspecIDKEY))\
-        .withColumn("RET_Risk_Grade", f.lag(f.col("APP_Risk_Grade"), 1).over(windowspecIDKEY))\
-        .withColumn("DUP_Days_Between_Applications", f.lit(None))
-
-    sdf_2 = sdf_1\
-        .withColumn("DUP_Days_Between_Applications", f.when((f.col("IDKey") == f.col("RET_IDKey")),
-                                                            f.datediff(f.col("APP_Date"), f.col("RET_Date")))
-                                                      .otherwise(f.lit(None)))\
-        .withColumn("DUP_Applicant", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
-                                            (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")),
-                                            f.lit("Z"))
-                                      .otherwise(f.col("DUP_Applicant")))\
-        .withColumn("DUP_Calendar_Months_Skipped", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
-                                                          (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")) &
-                                                          (f.col("APP_Month") != f.col("RET_Month")),
-                                                          f.months_between(f.col("APP_Month_dte"), f.col("RET_Month_dte")))
-                                                    .otherwise(f.lit(None)))\
-        .withColumn("DUP_Decision_Outcome", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
-                                                   (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")) &
-                                                   f.col("Filter_Decision_Outcome_SEQ").isin([1, 2, 3]) &
-                                                   f.col("RET_Decision_Outcome").isin([1, 2, 3]) &
-                                                   (f.col("Filter_Decision_Outcome_SEQ") != f.col("RET_Decision_Outcome")),
-                                                   f.col("RET_Decision_Outcome").astype(t.IntegerType()) - f.col("Filter_Decision_Outcome_SEQ").astype(t.IntegerType()))
-                                            .otherwise(f.lit(None)))\
-        .withColumn("DUP_Risk_Grade", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
-                                             (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")) &
-                                             f.col("APP_Risk_Grade").isNotNull() &
-                                             f.col("RET_Risk_Grade").isNotNull() &
-                                             (f.col("APP_Risk_Grade") != f.col("RET_Risk_Grade")),
-                                             f.col("RET_Risk_Grade").astype(t.IntegerType()) - f.col("APP_Risk_Grade").astype(t.IntegerType()))
-                                       .otherwise(f.lit(None)))\
-        .drop(*["RET_IDKey",
-                "RET_Date",
-                "RET_Application_Sequence",
-                "RET_Month",
-                "RET_Decision_Outcome",
-                "RET_Risk_Grade"])
-
-    return sdf_2
-
-
-def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
-    if SRT.upper() == "DESCENDING":
-        sdf_0 = sdf_inp\
-            .repartition(1)\
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").desc(),
-                      f.col("APP_Record_Number").asc()])
-        windowspecDESC = Window\
-            .partitionBy(f.col("IDKey")) \
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").desc(),
-                      f.col("APP_Record_Number").asc()])
-        sdf_1 = sdf_0\
-            .repartition(1)\
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").desc(),
-                      f.col("APP_Record_Number").asc()])\
-            .withColumn("APP_Record_Number", f.monotonically_increasing_id())
-        sdf_2 = sdf_1\
-            .repartition(1)\
-            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecDESC))\
-            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecDESC))\
-            .withColumn("RET_Days_Between_Applications", f.lag(f.col("DUP_Days_Between_Applications"), 1).over(windowspecDESC))\
-            .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecDESC))
-    else:
-        sdf_0 = sdf_inp\
-            .repartition(1)\
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").asc(),
-                      f.col("APP_Record_Number").desc()])
-        windowspecASC = Window \
-            .partitionBy(f.col("IDKey")) \
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").asc(),
-                      f.col("APP_Record_Number").desc()])
-        sdf_1 = sdf_0\
-            .repartition(1)\
-            .orderBy([f.col("IDKey").asc(),
-                      f.col("APP_Date").asc(),
-                      f.col("APP_Record_Number").desc()])\
-            .withColumn("APP_Record_Number", f.monotonically_increasing_id())
-        sdf_2 = sdf_1 \
-            .repartition(1) \
-            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecASC)) \
-            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecASC)) \
-            .withColumn("RET_Days_Between_Applications",
-                        f.lag(f.col("DUP_Days_Between_Applications"), 1).over(windowspecASC)) \
-            .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecASC))
-
-    sdf_2a = sdf_2\
-        .withColumn("RET_IDKey", f.when(f.col("IDKey").isNotNull() & f.col("RET_IDKey").isNull(),
-                                        f.col("IDKey"))
-                                  .otherwise(f.col("RET_IDKey")))\
-        .withColumn("RET_Date", f.when(f.col("APP_Date").isNotNull() & f.col("RET_Date").isNull(),
-                                       f.col("APP_Date"))
-                                 .otherwise(f.col("RET_Date")))\
-        .withColumn("RET_Days_Between_Applications",
-                    f.when(f.col("DUP_Days_Between_Applications").isNotNull() &
-                           f.col("RET_Days_Between_Applications").isNull(),
-                           f.col("DUP_Days_Between_Applications"))
-                     .otherwise(f.col("RET_Days_Between_Applications")))\
-        .withColumn("RET_Application_Sequence",
-                    f.when(f.col("DUP_Application_Sequence").isNotNull() &
-                           f.col("RET_Application_Sequence").isNull(),
-                           f.col("DUP_Application_Sequence"))
-                     .otherwise(f.col("RET_Application_Sequence")))
-
-    sdf_3 = sdf_2a\
-        .withColumn("DUP_Applicant", f.when((f.col("IDKey") == f.col("RET_IDKey")),
-                                            f.lit("Y"))
-                                      .otherwise(f.lit("N")))
-
-    if SRT.upper() == "ASCENDING":
-        sdf_4 = sdf_3\
-            .withColumn("DUP_Days_Between_Applications",
-                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
-                               f.datediff(f.col("APP_Date"), f.col("RET_Date")))
-                         .otherwise(f.col("DUP_Days_Between_Applications")))\
-            .withColumn("RET_Days_Between_Applications",
-                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
-                               reduce(add, [f.col("RET_Days_Between_Applications"),
-                                            f.col("DUP_Days_Between_Applications")]))
-                         .otherwise(f.col("RET_Days_Between_Applications")))\
-            .withColumn("RET_Days_Between_Applications",
-                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between_Applications") > f.lit(DAY)),
-                               f.lit(None))
-                         .otherwise(f.col("RET_Days_Between_Applications")))\
-            .withColumn("RET_Application_Sequence",
-                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between_Applications") > f.lit(DAY)),
-                               reduce(add, [f.col("RET_Application_Sequence"), f.lit(1)]))
-                         .otherwise(f.lit(None)))\
-            .withColumn("DUP_Application_Sequence",
-                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
-                               f.col("RET_Application_Sequence"))
-                         .otherwise(f.col("DUP_Application_Sequence")))
-    else:
-        sdf_4 = sdf_3\
-            .select("*")
-
-    sdf_5 = sdf_4\
-        .withColumn("DUP_Days_Between_Applications",
-                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
-                           f.lit(None))
-                     .otherwise(f.col("DUP_Days_Between_Applications")))\
-        .withColumn("RET_Days_Between_Applications",
-                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
-                           f.lit(None))
-                    .otherwise(f.col("RET_Days_Between_Applications"))) \
-        .withColumn("DUP_Application_Sequence",
-                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
-                           f.lit(0))
-                    .otherwise(f.col("DUP_Application_Sequence"))) \
-        .withColumn("RET_Application_Sequence",
-                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
-                           f.lit(0))
-                    .otherwise(f.col("RET_Application_Sequence")))
-
-    sdf_6 = sdf_5\
-        .drop(*["RET_IDKey",
-                "RET_Date",
-                "RET_Days_Between_Applications",
-                "RET_Application_Sequence"])
-
-    return sdf_6
-
-
 def Match_Applications_Contracts(sdf_0):
     windowspec = Window\
         .partitionBy()\
@@ -620,6 +411,7 @@ def Match_Applications_Contracts(sdf_0):
         "APP_Activation_Days3",
         "APP_Activation_Days4",
         "APP_Activation_Days5",
+        "CON_PERIOD",
         "APP_Activation_Month1",
         "APP_Activation_Month2",
         "APP_Activation_Month3",
@@ -914,6 +706,215 @@ schema_Risk_Grade_Matrix = t.StructType([
 ])
 
 udf_Risk_Grade_Matrix = f.udf(Risk_Grade_Matrix, returnType=schema_Risk_Grade_Matrix)
+
+
+def DUP_subroutine(sdf_inp):
+    """
+    This is the Python translation of STEP 4 in `Input_Applications_DMP.sas`.
+    In STEP 4, we sort by the optimal decision services outcome, best risk grade obtained, and highest subscription
+    limit within the acceptable period.
+    """
+    def change_day(x_dte):
+        if x_dte is None:
+            return None
+        else:
+            y_dte = x_dte.replace(day=1)
+            return y_dte
+    udf_change_day = f.udf(change_day,
+                           returnType=t.DateType())
+
+    sdf_0 = sdf_inp\
+        .repartition(1)\
+        .orderBy([f.col("IDKey").asc(),
+                  f.col("DUP_Application_Sequence").asc(),
+                  f.col("Filter_Decision_Outcome_SEQ").asc(),
+                  f.col("APP_Risk_Grade").asc(),
+                  f.col("APP_Gross_Income").desc(),
+                  f.col("APP_Subscription_Limit").desc(),
+                  f.col("APP_Date").asc()])
+
+    windowspecIDKEY = Window \
+        .partitionBy(f.col("IDKey")) \
+        .orderBy([f.col("IDKey").asc(),
+                  f.col("DUP_Application_Sequence").asc(),
+                  f.col("Filter_Decision_Outcome_SEQ").asc(),
+                  f.col("APP_Risk_Grade").asc(),
+                  f.col("APP_Gross_Income").desc(),
+                  f.col("APP_Subscription_Limit").desc(),
+                  f.col("APP_Date").asc()])
+
+    sdf_1 = sdf_0\
+        .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecIDKEY))\
+        .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecIDKEY))\
+        .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecIDKEY))\
+        .withColumn("APP_Month_dte", udf_change_day(f.col("APP_Date")))\
+        .withColumn("RET_Month", f.lag(f.col("APP_Month"), 1).over(windowspecIDKEY))\
+        .withColumn("RET_Month_dte", udf_change_day(f.col("RET_Date")))\
+        .withColumn("RET_Decision_Outcome", f.lag(f.col("Filter_Decision_Outcome_SEQ"), 1).over(windowspecIDKEY))\
+        .withColumn("RET_Risk_Grade", f.lag(f.col("APP_Risk_Grade"), 1).over(windowspecIDKEY))\
+        .withColumn("DUP_Days_Between_Applications", f.lit(None))
+
+    sdf_2 = sdf_1\
+        .withColumn("DUP_Days_Between_Applications", f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                                                            f.datediff(f.col("APP_Date"), f.col("RET_Date")))
+                                                      .otherwise(f.lit(None)))\
+        .withColumn("DUP_Applicant", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
+                                            (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")),
+                                            f.lit("Z"))
+                                      .otherwise(f.col("DUP_Applicant")))\
+        .withColumn("DUP_Calendar_Months_Skipped", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
+                                                          (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")) &
+                                                          (f.col("APP_Month") != f.col("RET_Month")),
+                                                          f.months_between(f.col("APP_Month_dte"), f.col("RET_Month_dte")))
+                                                    .otherwise(f.lit(None)))\
+        .withColumn("DUP_Decision_Outcome", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
+                                                   (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")) &
+                                                   f.col("Filter_Decision_Outcome_SEQ").isin([1, 2, 3]) &
+                                                   f.col("RET_Decision_Outcome").isin([1, 2, 3]) &
+                                                   (f.col("Filter_Decision_Outcome_SEQ") != f.col("RET_Decision_Outcome")),
+                                                   f.col("RET_Decision_Outcome").astype(t.IntegerType()) - f.col("Filter_Decision_Outcome_SEQ").astype(t.IntegerType()))
+                                            .otherwise(f.lit(None)))\
+        .withColumn("DUP_Risk_Grade", f.when((f.col("IDKey") == f.col("RET_IDKey")) &
+                                             (f.col("RET_Application_Sequence") == f.col("DUP_Application_Sequence")) &
+                                             f.col("APP_Risk_Grade").isNotNull() &
+                                             f.col("RET_Risk_Grade").isNotNull() &
+                                             (f.col("APP_Risk_Grade") != f.col("RET_Risk_Grade")),
+                                             f.col("RET_Risk_Grade").astype(t.IntegerType()) - f.col("APP_Risk_Grade").astype(t.IntegerType()))
+                                       .otherwise(f.lit(None)))\
+        .drop(*["RET_IDKey",
+                "RET_Date",
+                "RET_Application_Sequence",
+                "RET_Month",
+                "RET_Decision_Outcome",
+                "RET_Risk_Grade"])
+
+    return sdf_2
+
+
+def Flag_DUP_Applicant(SRT, sdf_inp, DAY=14):
+    if SRT.upper() == "DESCENDING":
+        sdf_0 = sdf_inp\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").desc(),
+                      f.col("APP_Record_Number").asc()])
+        windowspecDESC = Window\
+            .partitionBy(f.col("IDKey")) \
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").desc(),
+                      f.col("APP_Record_Number").asc()])
+        sdf_1 = sdf_0\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").desc(),
+                      f.col("APP_Record_Number").asc()])\
+            .withColumn("APP_Record_Number", f.monotonically_increasing_id())
+        sdf_2 = sdf_1\
+            .repartition(1)\
+            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecDESC))\
+            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecDESC))\
+            .withColumn("RET_Days_Between_Applications", f.lag(f.col("DUP_Days_Between_Applications"), 1).over(windowspecDESC))\
+            .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecDESC))
+    else:
+        sdf_0 = sdf_inp\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").asc(),
+                      f.col("APP_Record_Number").desc()])
+        windowspecASC = Window \
+            .partitionBy(f.col("IDKey")) \
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").asc(),
+                      f.col("APP_Record_Number").desc()])
+        sdf_1 = sdf_0\
+            .repartition(1)\
+            .orderBy([f.col("IDKey").asc(),
+                      f.col("APP_Date").asc(),
+                      f.col("APP_Record_Number").desc()])\
+            .withColumn("APP_Record_Number", f.monotonically_increasing_id())
+        sdf_2 = sdf_1 \
+            .repartition(1) \
+            .withColumn("RET_IDKey", f.lag(f.col("IDKey"), 1).over(windowspecASC)) \
+            .withColumn("RET_Date", f.lag(f.col("APP_Date"), 1).over(windowspecASC)) \
+            .withColumn("RET_Days_Between_Applications",
+                        f.lag(f.col("DUP_Days_Between_Applications"), 1).over(windowspecASC)) \
+            .withColumn("RET_Application_Sequence", f.lag(f.col("DUP_Application_Sequence"), 1).over(windowspecASC))
+
+    sdf_2a = sdf_2\
+        .withColumn("RET_IDKey", f.when(f.col("IDKey").isNotNull() & f.col("RET_IDKey").isNull(),
+                                        f.col("IDKey"))
+                                  .otherwise(f.col("RET_IDKey")))\
+        .withColumn("RET_Date", f.when(f.col("APP_Date").isNotNull() & f.col("RET_Date").isNull(),
+                                       f.col("APP_Date"))
+                                 .otherwise(f.col("RET_Date")))\
+        .withColumn("RET_Days_Between_Applications",
+                    f.when(f.col("DUP_Days_Between_Applications").isNotNull() &
+                           f.col("RET_Days_Between_Applications").isNull(),
+                           f.col("DUP_Days_Between_Applications"))
+                     .otherwise(f.col("RET_Days_Between_Applications")))\
+        .withColumn("RET_Application_Sequence",
+                    f.when(f.col("DUP_Application_Sequence").isNotNull() &
+                           f.col("RET_Application_Sequence").isNull(),
+                           f.col("DUP_Application_Sequence"))
+                     .otherwise(f.col("RET_Application_Sequence")))
+
+    sdf_3 = sdf_2a\
+        .withColumn("DUP_Applicant", f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                                            f.lit("Y"))
+                                      .otherwise(f.lit("N")))
+
+    if SRT.upper() == "ASCENDING":
+        sdf_4 = sdf_3\
+            .withColumn("DUP_Days_Between_Applications",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                               f.datediff(f.col("APP_Date"), f.col("RET_Date")))
+                         .otherwise(f.col("DUP_Days_Between_Applications")))\
+            .withColumn("RET_Days_Between_Applications",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                               reduce(add, [f.col("RET_Days_Between_Applications"),
+                                            f.col("DUP_Days_Between_Applications")]))
+                         .otherwise(f.col("RET_Days_Between_Applications")))\
+            .withColumn("RET_Days_Between_Applications",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between_Applications") > f.lit(DAY)),
+                               f.lit(None))
+                         .otherwise(f.col("RET_Days_Between_Applications")))\
+            .withColumn("RET_Application_Sequence",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")) & (f.col("RET_Days_Between_Applications") > f.lit(DAY)),
+                               reduce(add, [f.col("RET_Application_Sequence"), f.lit(1)]))
+                         .otherwise(f.lit(None)))\
+            .withColumn("DUP_Application_Sequence",
+                        f.when((f.col("IDKey") == f.col("RET_IDKey")),
+                               f.col("RET_Application_Sequence"))
+                         .otherwise(f.col("DUP_Application_Sequence")))
+    else:
+        sdf_4 = sdf_3\
+            .select("*")
+
+    sdf_5 = sdf_4\
+        .withColumn("DUP_Days_Between_Applications",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(None))
+                     .otherwise(f.col("DUP_Days_Between_Applications")))\
+        .withColumn("RET_Days_Between_Applications",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(None))
+                    .otherwise(f.col("RET_Days_Between_Applications"))) \
+        .withColumn("DUP_Application_Sequence",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(0))
+                    .otherwise(f.col("DUP_Application_Sequence"))) \
+        .withColumn("RET_Application_Sequence",
+                    f.when((f.col("IDKey") != f.col("RET_IDKey")),
+                           f.lit(0))
+                    .otherwise(f.col("RET_Application_Sequence")))
+
+    sdf_6 = sdf_5\
+        .drop(*["RET_IDKey",
+                "RET_Date",
+                "RET_Days_Between_Applications",
+                "RET_Application_Sequence"])
+
+    return sdf_6
 
 
 # def Risk_Grade_Matrix(sdf_inp, RiskGrade, SA1, SA2, SA3, SA4, SA5, SA6,
