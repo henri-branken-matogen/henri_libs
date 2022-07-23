@@ -10,6 +10,7 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
                                   Subscriber_Number, CON_Start_Date, Matched_Distance, CON_PERIOD):
     APP_Subscriptions = NBR
 
+    APP_Account1 = APP_Account2 = APP_Account3 = APP_Account4 = APP_Account5 = None
     APP_Subscriber_Number1 = APP_Subscriber_Number2 = APP_Subscriber_Number3 = APP_Subscriber_Number4 = APP_Subscriber_Number5 = None
     APP_Activation_Date1 = APP_Activation_Date2 = APP_Activation_Date3 = APP_Activation_Date4 = APP_Activation_Date5 = None
     APP_Activation_Days1 = APP_Activation_Days2 = APP_Activation_Days3 = APP_Activation_Days4 = APP_Activation_Days5 = None
@@ -199,7 +200,9 @@ def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account
     else:
         APP_Accounts = None
 
-    return (APP_Subscriptions, APP_Account_Number1, APP_Account_Number2, APP_Account_Number3, APP_Accounts,
+    return (APP_Subscriptions,
+            APP_Account_Number1, APP_Account_Number2, APP_Account_Number3, APP_Accounts,
+            APP_Account1, APP_Account2, APP_Account3, APP_Account4, APP_Account5,
             APP_Subscriber_Number1, APP_Subscriber_Number2, APP_Subscriber_Number3, APP_Subscriber_Number4, APP_Subscriber_Number5,
             APP_Activation_Date1, APP_Activation_Date2, APP_Activation_Date3, APP_Activation_Date4, APP_Activation_Date5,
             APP_Activation_Days1, APP_Activation_Days2, APP_Activation_Days3, APP_Activation_Days4, APP_Activation_Days5,
@@ -213,6 +216,11 @@ schema_Applications_Contracts_Update = t.StructType([
     t.StructField("APP_Account_Number2", t.LongType(), True),
     t.StructField("APP_Account_Number3", t.LongType(), True),
     t.StructField("APP_Accounts", t.StringType(), True),
+    t.StructField("APP_Account1", t.StringType(), True),
+    t.StructField("APP_Account2", t.StringType(), True),
+    t.StructField("APP_Account3", t.StringType(), True),
+    t.StructField("APP_Account4", t.StringType(), True),
+    t.StructField("APP_Account5", t.StringType(), True),
     t.StructField("APP_Subscriber_Number1", t.LongType(), True),
     t.StructField("APP_Subscriber_Number2", t.LongType(), True),
     t.StructField("APP_Subscriber_Number3", t.LongType(), True),
@@ -357,6 +365,11 @@ def Match_Applications_Contracts(sdf_0):
         .withColumn("APP_Account_Number2", f.col("nest.APP_Account_Number2"))\
         .withColumn("APP_Account_Number3", f.col("nest.APP_Account_Number3"))\
         .withColumn("APP_Accounts", f.col("nest.APP_Accounts"))\
+        .withColumn("APP_Account1", f.col("nest.APP_Account1"))\
+        .withColumn("APP_Account2", f.col("nest.APP_Account2"))\
+        .withColumn("APP_Account3", f.col("nest.APP_Account3"))\
+        .withColumn("APP_Account4", f.col("nest.APP_Account4"))\
+        .withColumn("APP_Account5", f.col("nest.APP_Account5"))\
         .withColumn("APP_Subscriber_Number1", f.col("nest.APP_Subscriber_Number1"))\
         .withColumn("APP_Subscriber_Number2", f.col("nest.APP_Subscriber_Number2"))\
         .withColumn("APP_Subscriber_Number3", f.col("nest.APP_Subscriber_Number3"))\
