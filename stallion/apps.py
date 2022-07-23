@@ -9,6 +9,14 @@ from stallion.py_filter_fxs import *
 def Applications_Contracts_Update(NBR, Account, APP_Account_Number1, APP_Account_Number2, APP_Account_Number3,
                                   Subscriber_Number, CON_Start_Date, Matched_Distance, CON_PERIOD):
     APP_Subscriptions = NBR
+    if Account is None:
+        pass
+    else:
+        Account = int(Account)
+    if Subscriber_Number is None:
+        pass
+    else:
+        Subscriber_Number = int(Subscriber_Number)
 
     APP_Account1 = APP_Account2 = APP_Account3 = APP_Account4 = APP_Account5 = None
     APP_Subscriber_Number1 = APP_Subscriber_Number2 = APP_Subscriber_Number3 = APP_Subscriber_Number4 = APP_Subscriber_Number5 = None
