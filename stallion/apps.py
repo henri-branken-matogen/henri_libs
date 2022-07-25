@@ -271,7 +271,8 @@ def Match_Applications_Contracts(sdf_0):
 
     sdf_0b = sdf_0a\
         .repartition(1)\
-        .withColumn("RET_Record_Number", f.lag(f.col("APP_Record_Number"), 1).over(windowspec))
+        .withColumn("RET_Record_Number", f.lag(f.col("APP_Record_Number"), 1).over(windowspec))\
+        .withColumn("RET_invocationId", f.lag(f.col("invocationId"), 1).over(windowspec))
 
     # Only keep the application record.
     sdf_1 = sdf_0b\
@@ -323,6 +324,7 @@ def Match_Applications_Contracts(sdf_0):
                                                              f.col("Matched_Distance"),
                                                              f.col("CON_PERIOD")))
                      .when(f.col("Matched_Distance").isNotNull() &
+                           (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                            (f.col("APP_Subscriptions") == 1),
                            udf_Applications_Contracts_Update(f.lit(2),
                                                              f.col("ACCOUNT"),
@@ -334,6 +336,7 @@ def Match_Applications_Contracts(sdf_0):
                                                              f.col("Matched_Distance"),
                                                              f.col("CON_PERIOD")))
                     .when(f.col("Matched_Distance").isNotNull() &
+                          (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                           (f.col("APP_Subscriptions") == 2),
                           udf_Applications_Contracts_Update(f.lit(3),
                                                             f.col("ACCOUNT"),
@@ -345,6 +348,7 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Matched_Distance"),
                                                             f.col("CON_PERIOD")))
                     .when(f.col("Matched_Distance").isNotNull() &
+                          (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                           (f.col("APP_Subscriptions") == 3),
                           udf_Applications_Contracts_Update(f.lit(4),
                                                             f.col("ACCOUNT"),
@@ -356,6 +360,7 @@ def Match_Applications_Contracts(sdf_0):
                                                             f.col("Matched_Distance"),
                                                             f.col("CON_PERIOD")))
                     .when(f.col("Matched_Distance").isNotNull() &
+                          (f.col("APP_Record_Number") == f.col("RET_Record_Number")) &
                           (f.col("APP_Subscriptions") == 4),
                           udf_Applications_Contracts_Update(f.lit(5),
                                                             f.col("ACCOUNT"),
