@@ -147,7 +147,7 @@ def avg_rem_time_fix(cure_bool, stage_fix, stage_cure, TTD, avg_rem_time_red):
     if (stage == 3 or stage_fix in [4, 5]):
         return avg_rem_time_red
     else:
-        return math.ceil(max([0, avg_rem_time_red - TTD + 2]))
+        return math.ceil(max([0, avg_rem_time_red - TTD + 2*0]))
 
 udf_avg_rem_time_fix = f.udf(avg_rem_time_fix,
                              returnType=t.IntegerType())
