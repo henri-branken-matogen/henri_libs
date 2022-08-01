@@ -74,7 +74,7 @@ def cure_adjustment_func(cure_bool, cure, NON_DEF_2_C):
     return result
 
 udf_cure_adjustment = f.udf(cure_adjustment_func,
-                             returnType=t.IntegerType())
+                             returnType=t.DoubleType())
 
 # -----------------------------------------------------------------------------------------------------
 
