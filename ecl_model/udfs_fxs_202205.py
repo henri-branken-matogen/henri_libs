@@ -65,11 +65,11 @@ udf_cure = f.udf(cure_func,
 
 def cure_adjustment_func(cure_bool, cure, NON_DEF_2_C):
     if(cure_bool == "No"):
-         result = 1
+         result = 1.0
     elif (cure == "PARTIAL CURE"):
-        result = int(vlu_cure.loc[vlu_cure.Lookup == NON_DEF_2_C,"Adjustment"].iloc[0])
+        result = vlu_cure.loc[vlu_cure.Lookup == NON_DEF_2_C,"Adjustment"].iloc[0]
     else:
-        result = 1
+        result = 1.0
     
     return result
 
