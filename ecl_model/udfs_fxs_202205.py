@@ -7,7 +7,7 @@ vlu_cure = pd.DataFrame({
                          "Lookup":[2,3,4,5,6],
                          "Type":["1st Default","2nd Default","3rd Default","4th Default","5th Default"],
                          "First Cure":[3,6,6,6,999],
-                         "Adjustment":[1.568250136, 1.526799282, 1.628589246, 1.759179777, 1],
+                         "Adjustment":[1.568250136, 1.526799282, 1.628589246, 1.759179777, 1.0],
                          "Full Cure": [24,24,24,24,999]
                          })
 
@@ -67,7 +67,7 @@ def cure_adjustment_func(cure_bool, cure, NON_DEF_2_C):
     if(cure_bool == "No"):
          result = 1.0
     elif (cure == "PARTIAL CURE"):
-        result = vlu_cure.loc[vlu_cure.Lookup == NON_DEF_2_C,"Adjustment"].iloc[0]
+        result = float(vlu_cure.loc[vlu_cure.Lookup == NON_DEF_2_C,"Adjustment"].iloc[0])
     else:
         result = 1.0
     
