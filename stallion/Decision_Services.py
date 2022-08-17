@@ -76,17 +76,30 @@ def Decision_Services_Waterfall(sdf_inp):
     # NTC
     sdf_1a = sdf_0\
         .withColumn("nest",
-                    udf_dsw_NTC(f.col("ALL_TimeOldestTrade"), f.col("Decision_Services_Segment"),
-                                f.col("Filter_New_To_Credit"), f.col("Decision_Services_Waterfall"),
-                                f.col("CST_Deceased"), f.col("CST_CustomerAge"), f.col("CST_Fraud"),
-                                f.col("CST_Sequestration"), f.col("CST_Dispute"), f.col("CST_Emigrated"),
-                                f.col("ALL_Notices5Years"), f.col("CST_DebtReviewGranted"),
-                                f.col("CST_DebtReviewRequested"), f.col("APP_Gross_Income"),
-                                f.col("NTC_Accept_Final_Score_V01"), f.col("NTC_Accept_Risk_Score_V01")))\
+                    udf_dsw_NTC2(f.col("ALL_TimeOldestTrade"), f.col("Decision_Services_Segment"),
+                                 f.col("Filter_New_To_Credit"), f.col("Decision_Services_Waterfall"),
+                                 f.col("CST_Deceased"), f.col("CST_CustomerAge"), f.col("CST_Fraud"),
+                                 f.col("CST_Sequestration"), f.col("CST_Dispute"), f.col("CST_Emigrated"),
+                                 f.col("ALL_Notices5Years"), f.col("CST_DebtReviewGranted"),
+                                 f.col("CST_DebtReviewRequested"), f.col("APP_Gross_Income"),
+                                 f.col("NTC_Accept_Final_Score_V01"), f.col("NTC_Accept_Risk_Score_V01")))\
         .withColumn("DECISION_SERVICES_SEGMENT", f.col("nest.DECISION_SERVICES_SEGMENT"))\
         .withColumn("FILTER_NEW_TO_CREDIT", f.col("nest.FILTER_NEW_TO_CREDIT"))\
         .withColumn("DECISION_SERVICES_WATERFALL", f.col("nest.DECISION_SERVICES_WATERFALL"))\
         .drop(*["nest"])
+
+        # .withColumn("nest",
+        #         udf_dsw_NTC(f.col("ALL_TimeOldestTrade"), f.col("Decision_Services_Segment"),
+        #                     f.col("Filter_New_To_Credit"), f.col("Decision_Services_Waterfall"),
+        #                     f.col("CST_Deceased"), f.col("CST_CustomerAge"), f.col("CST_Fraud"),
+        #                     f.col("CST_Sequestration"), f.col("CST_Dispute"), f.col("CST_Emigrated"),
+        #                     f.col("ALL_Notices5Years"), f.col("CST_DebtReviewGranted"),
+        #                     f.col("CST_DebtReviewRequested"), f.col("APP_Gross_Income"),
+        #                     f.col("NTC_Accept_Final_Score_V01"), f.col("NTC_Accept_Risk_Score_V01"))) \
+        # .withColumn("DECISION_SERVICES_SEGMENT", f.col("nest.DECISION_SERVICES_SEGMENT")) \
+        # .withColumn("FILTER_NEW_TO_CREDIT", f.col("nest.FILTER_NEW_TO_CREDIT")) \
+        # .withColumn("DECISION_SERVICES_WATERFALL", f.col("nest.DECISION_SERVICES_WATERFALL")) \
+        # .drop(*["nest"])
 
     sdf_1b = sdf_1a \
             .withColumn("nest",
@@ -1222,16 +1235,59 @@ schema_dsw_TSI = t.StructType([
 udf_dsw_TSI = f.udf(dsw_TSI, returnType=schema_dsw_TSI)
 
 
-def dsw_NTC(ALL_TimeOldestTrade, Decision_Services_Segment, Filter_New_To_Credit, Decision_Services_Waterfall,
-            CST_Deceased, CST_CustomerAge, CST_Fraud, CST_Sequestration, CST_Dispute, CST_Emigrated, ALL_Notices5Years,
-            CST_DebtReviewGranted, CST_DebtReviewRequested, APP_Gross_Income, NTC_Accept_Final_Score_V01,
-            NTC_Accept_Risk_Score_V01):
+# def dsw_NTC(ALL_TimeOldestTrade, Decision_Services_Segment, Filter_New_To_Credit, Decision_Services_Waterfall,
+#             CST_Deceased, CST_CustomerAge, CST_Fraud, CST_Sequestration, CST_Dispute, CST_Emigrated, ALL_Notices5Years,
+#             CST_DebtReviewGranted, CST_DebtReviewRequested, APP_Gross_Income, NTC_Accept_Final_Score_V01,
+#             NTC_Accept_Risk_Score_V01):
+#     if ALL_TimeOldestTrade < 3:
+#         Decision_Services_Segment = "NTC"
+#         Filter_New_To_Credit = 1
+#         if CST_Deceased == "Y":
+#             Decision_Services_Waterfall = "P01 Consumer Deceased"
+#         elif CST_CustomerAge < 1800:
+#             Decision_Services_Waterfall = "P02 Consumer Age < 18"
+#         elif CST_Fraud == "Y":
+#             Decision_Services_Waterfall = "P03 Payment Profile Fraud"
+#         elif CST_Sequestration == "Y":
+#             Decision_Services_Waterfall = "P04 Consumer Sequestrated"
+#         elif CST_Dispute == "Y":
+#             Decision_Services_Waterfall = "P05 Payment Profile Dispute"
+#         elif CST_Emigrated == "Y":
+#             Decision_Services_Waterfall = "P06 Consumer Emigrated"
+#         elif ALL_Notices5Years == "Y":
+#             Decision_Services_Waterfall = "P07 Public Notice Issued"
+#         elif CST_DebtReviewGranted == "Y":
+#             Decision_Services_Waterfall = "P08 Debt Review Granted"
+#         elif CST_DebtReviewRequested == "Y":
+#             Decision_Services_Waterfall = "G01 Debt Review Requested"
+#         elif APP_Gross_Income < 1500:
+#             Decision_Services_Waterfall = "C06 Gross Income < R1500"
+#         elif NTC_Accept_Final_Score_V01 < 580:
+#             Decision_Services_Waterfall = "C01 Accept Final Score V01 < 580"
+#         elif NTC_Accept_Risk_Score_V01 < 580:
+#             Decision_Services_Waterfall = "C01 Accept Risk Score V01 < 580"
+#         else:
+#             pass
+#     return Decision_Services_Segment, Filter_New_To_Credit, Decision_Services_Waterfall
+#
+# schema_dsw_NTC = t.StructType([
+#     t.StructField("DECISION_SERVICES_SEGMENT", t.StringType(), True),
+#     t.StructField("FILTER_NEW_TO_CREDIT", t.IntegerType(), True),
+#     t.StructField("DECISION_SERVICES_WATERFALL", t.StringType(), True)
+# ])
+# udf_dsw_NTC = f.udf(dsw_NTC, returnType=schema_dsw_NTC)
+
+
+def dsw_NTC2(ALL_TimeOldestTrade, Decision_Services_Segment, Filter_New_To_Credit, Decision_Services_Waterfall,
+             CST_Deceased, CST_CustomerAge, CST_Fraud, CST_Sequestration, CST_Dispute, CST_Emigrated, ALL_Notices5Years,
+             CST_DebtReviewGranted, CST_DebtReviewRequested, APP_Gross_Income, NTC_Accept_Final_Score_V01,
+             NTC_Accept_Risk_Score_V01):
     if ALL_TimeOldestTrade < 3:
         Decision_Services_Segment = "NTC"
         Filter_New_To_Credit = 1
         if CST_Deceased == "Y":
             Decision_Services_Waterfall = "P01 Consumer Deceased"
-        elif CST_CustomerAge < 1800:
+        elif (CST_CustomerAge is not None) and (CST_CustomerAge < 1800):
             Decision_Services_Waterfall = "P02 Consumer Age < 18"
         elif CST_Fraud == "Y":
             Decision_Services_Waterfall = "P03 Payment Profile Fraud"
@@ -1247,24 +1303,23 @@ def dsw_NTC(ALL_TimeOldestTrade, Decision_Services_Segment, Filter_New_To_Credit
             Decision_Services_Waterfall = "P08 Debt Review Granted"
         elif CST_DebtReviewRequested == "Y":
             Decision_Services_Waterfall = "G01 Debt Review Requested"
-        elif APP_Gross_Income < 1500:
+        elif (APP_Gross_Income is not None) and (APP_Gross_Income < 1500):
             Decision_Services_Waterfall = "C06 Gross Income < R1500"
-        elif NTC_Accept_Final_Score_V01 < 580:
+        elif (NTC_Accept_Final_Score_V01 is not None) and (NTC_Accept_Final_Score_V01 < 580):
             Decision_Services_Waterfall = "C01 Accept Final Score V01 < 580"
-        elif NTC_Accept_Risk_Score_V01 < 580:
+        elif (NTC_Accept_Risk_Score_V01 is not None) and (NTC_Accept_Risk_Score_V01 < 580):
             Decision_Services_Waterfall = "C01 Accept Risk Score V01 < 580"
         else:
             pass
     return Decision_Services_Segment, Filter_New_To_Credit, Decision_Services_Waterfall
 
 
-schema_dsw_NTC = t.StructType([
+schema_dsw_NTC2 = t.StructType([
     t.StructField("DECISION_SERVICES_SEGMENT", t.StringType(), True),
     t.StructField("FILTER_NEW_TO_CREDIT", t.IntegerType(), True),
     t.StructField("DECISION_SERVICES_WATERFALL", t.StringType(), True)
 ])
-udf_dsw_NTC = f.udf(dsw_NTC, returnType=schema_dsw_NTC)
-
+udf_dsw_NTC2 = f.udf(dsw_NTC2, returnType=schema_dsw_NTC2)
 
 def dsw_TSO(APP_Customer_State, Filter_Channel_Outbound, Decision_Services_Segment, Filter_Telesales_Outbound,
             Decision_Services_Waterfall, CST_Deceased, CST_CustomerAge, CST_Fraud, CST_Sequestration, CST_Dispute,
