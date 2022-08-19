@@ -1287,7 +1287,7 @@ def dsw_NTC2(ALL_TimeOldestTrade, Decision_Services_Segment, Filter_New_To_Credi
         Filter_New_To_Credit = 1
         if CST_Deceased == "Y":
             Decision_Services_Waterfall = "P01 Consumer Deceased"
-        elif (CST_CustomerAge is not None) and (CST_CustomerAge < 1800):
+        elif (CST_CustomerAge is None) or (CST_CustomerAge < 1800):
             Decision_Services_Waterfall = "P02 Consumer Age < 18"
         elif CST_Fraud == "Y":
             Decision_Services_Waterfall = "P03 Payment Profile Fraud"
@@ -1303,11 +1303,15 @@ def dsw_NTC2(ALL_TimeOldestTrade, Decision_Services_Segment, Filter_New_To_Credi
             Decision_Services_Waterfall = "P08 Debt Review Granted"
         elif CST_DebtReviewRequested == "Y":
             Decision_Services_Waterfall = "G01 Debt Review Requested"
-        elif (APP_Gross_Income is not None) and (APP_Gross_Income < 1500):
+        elif (APP_Gross_Income is None) or (APP_Gross_Income < 1500):
             Decision_Services_Waterfall = "C06 Gross Income < R1500"
-        elif (NTC_Accept_Final_Score_V01 is not None) and (NTC_Accept_Final_Score_V01 < 580):
+        elif (NTC_Accept_Final_Score_V01 is None):
+            Decision_Services_Waterfall = "C01 Accept Final Score V01 is None"
+        elif (NTC_Accept_Final_Score_V01 < 580):
             Decision_Services_Waterfall = "C01 Accept Final Score V01 < 580"
-        elif (NTC_Accept_Risk_Score_V01 is not None) and (NTC_Accept_Risk_Score_V01 < 580):
+        elif (NTC_Accept_Risk_Score_V01 is None):
+            Decision_Services_Waterfall = "C01 Accept Risk Score V01 is None"
+        elif (NTC_Accept_Risk_Score_V01 < 580):
             Decision_Services_Waterfall = "C01 Accept Risk Score V01 < 580"
         else:
             pass
