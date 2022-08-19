@@ -103,6 +103,23 @@ def Filter_Activation_Status(Matched_Distance, Filter_Decision_Outcome_Declined,
     else:
         pass
 
+    if Filter_Declined_No_Activations == 0:
+        Filter_Declined_No_Activations = None
+    if Filter_Arrears_No_Activations == 0:
+        Filter_Arrears_No_Activations = None
+    if Filter_Referred_No_Activations == 0:
+        Filter_Referred_No_Activations = None
+    if Filter_Approved_No_Activations == 0:
+        Filter_Approved_No_Activations = None
+    if Filter_Declined_With_Activations == 0:
+        Filter_Declined_With_Activations = None
+    if Filter_Arrears_With_Activations == 0:
+        Filter_Arrears_With_Activations = None
+    if Filter_Referred_With_Activations == 0:
+        Filter_Referred_With_Activations = None
+    if Filter_Approved_With_Activations == 0:
+        Filter_Approved_With_Activations = None
+
     return (Filter_Activation_SEQ, Filter_Declined_No_Activations, Filter_Arrears_No_Activations,
             Filter_Referred_No_Activations, Filter_Approved_No_Activations, Filter_Declined_With_Activations,
             Filter_Arrears_With_Activations, Filter_Referred_With_Activations, Filter_Approved_With_Activations)
