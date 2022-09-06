@@ -825,7 +825,7 @@ def Filter_Enterprise(SEQ, Customer_TYP, Filter_Waterfall, Trigger_Analysis_B, T
 
 
 schema_Filter_Enterprise = t.StructType([
-    t.StructField("FILTER_WATERFALL", t.IntegerType(), True),
+    t.StructField("FILTER_WATERFALL", t.StringType(), True),
     t.StructField("FILTER_ENTERPRISE", t.IntegerType(), True),
     t.StructField("ENTERPRISE_PER", t.IntegerType(), True),
     t.StructField("ENTERPRISE_ANALYSIS_B", t.StringType(), True),
