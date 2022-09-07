@@ -829,7 +829,7 @@ def Filter_Fraud(SEQ, Delinquency_Trigger, Filter_Waterfall):
     if Delinquency_Trigger == "B. Fraud":
         if Filter_Waterfall == "":
             cat = str(SEQ) + " Account is fraudulent"
-            Filter_Waterfall = re.sub(" +", "", cat)
+            Filter_Waterfall = re.sub(" +", " ", cat)
         Filter_Fraud = 1  # Account is fraudulent.
         Fraud_PER = 1  # % number of accounts flagged as fraudulent.
     return Filter_Waterfall, Filter_Fraud, Fraud_PER
