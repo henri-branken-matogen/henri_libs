@@ -201,15 +201,6 @@ def Filter_Bad_Debt(SEQ, BAD_Month, Analysis_A, Analysis_B, Filter_Waterfall):
         if Analysis_B == "PRE_LEGAL":
             Bad_Debt_Analysis_B = 1  # ANALYSIS_B = PRE_LEGAL
 
-        """
-        The following is marked as `TMP`:
-        """
-        if Analysis_A == "PREWRITEOF":
-            Analysis_A = "---"
-        if (Analysis_A == "COLLECTION") and (Analysis_B == "PRE_LEGAL"):
-            Analysis_A = "---"
-        if Analysis_B == "PRE_LEGAL":
-            Analysis_B = "---"
 
     return (Filter_Waterfall, Filter_Bad_Debt, Bad_Debt_PER, Bad_Debt_Extract_File,
             Bad_Debt_Analysis_A, Bad_Debt_Analysis_B, Analysis_A, Analysis_B)
@@ -289,8 +280,6 @@ def Filter_CD0_Collection(CD0_NBR, Analysis_A, Filter_Waterfall):
         Filter_CD0_Collection = 1  # UTD account flagged as being in COLLECTION by Infinity
         CD0_Collection_PER = 1  # % UTD account flagged as being in COLLECTION by Infinity
 
-        # The following is marked as /* TMP */.
-        Analysis_A = "---"
     return Filter_Waterfall, Filter_CD0_Collection, CD0_Collection_PER, Analysis_A
 
 
@@ -322,9 +311,6 @@ def Filter_CD0_Current(CD0_NBR, Analysis_A, Filter_Waterfall):
             Filter_Waterfall = "00 UTD account and CURRENT per Infinity"
         Filter_CD0_Current = 1  # UTD account and CURRENT per Infinity.
         CD0_Current_PER = 1  # % UTD account and CURRENT per Infinity.
-
-        # The following is marked as /* TMP */:
-        Analysis_A = "---"
 
     return Filter_Waterfall, Filter_CD0_Current, CD0_Current_PER, Analysis_A
 
@@ -360,9 +346,6 @@ def Filter_CDX_Collection(CD1_NBR, CD2_NBR, CD3_NBR, CD4_NBR, Analysis_A, Filter
             Filter_Waterfall = re.sub(" +", " ", cat)
         Filter_CDX_Collection = 1  # Delinquent account flagged as being in COLLECTION by Infinity
         CDX_Collection_PER = 1  # % Delinqeunt account flagged as being in COLLECTION by Infinity
-
-        # The following is being marked as /* TMP */:
-        Analysis_A = "---"
 
     return Filter_Waterfall, Filter_CDX_Collection, CDX_Collection_PER, Analysis_A
 
@@ -400,9 +383,6 @@ def Filter_CDX_Current(CD1_NBR, CD2_NBR, CD3_NBR, CD4_NBR, Analysis_A, Filter_Wa
             Filter_Waterfall = re.sub(" +", " ", cat)
         Filter_CDX_Current = 1  # Delinquent account and CURRENT per Infinity.
         CDX_Current_PER = 1  # % Delinquent account and CURRENT per Infinity.
-
-        # The following are being marked as /* TMP */:
-        Analysis_A = "---"
 
     return Filter_Waterfall, Filter_CDX_Current, CDX_Current_PER, Analysis_A
 
@@ -813,12 +793,6 @@ def Filter_Enterprise(SEQ, Customer_TYP, Filter_Waterfall, Trigger_Analysis_B, T
         Enterprise_Analysis_B = Trigger_Analysis_B  # ANALYSIS_B = BUSINESS
         Enterprise_Account_Type = Trigger_Account_Type  # Account_Type = Enterprise
         Enterprise_IDValidate = Trigger_IDValidate  # ID Validation = Enterprise
-        # The following is marked as `TMP`:
-        if Trigger_Analysis_B == 1:
-            Analysis_B = "---"
-    # The following is marked as `TMP`:
-    if Analysis_B == "INDIVIDUAL":
-        Analysis_B = "---"
 
     return (Filter_Waterfall, Filter_Enterprise, Enterprise_PER, Enterprise_Analysis_B,
             Enterprise_Account_Type, Enterprise_IDValidate, Analysis_B)
@@ -1117,16 +1091,9 @@ def Filter_Written_Off(SEQ, Delinquency_Trigger, Analysis_A, Analysis_B, Filter_
         if Analysis_B == "LEGAL":
             Written_Off_Analysis_B = 1  # ANALYSIS_B = LEGAL.
 
-        # The following is to be derived from the **FUTURTE WRITE-OFF FILE**.
+        # The following is to be derived from the **FUTURE WRITE-OFF FILE**.
         Written_Off_Extract_File = None
 
-        # The following fields are marked as /* TMP */:
-        if Analysis_A == "WRITEOFF":
-            Analysis_A = "---"
-        if (Analysis_A == "COLLECTION") and (Analysis_B == "LEGAL"):
-            Analysis_A = "---"
-        if Analysis_B == "LEGAL":
-            Analysis_B = "---"
 
     return (Filter_Waterfall, Filter_Written_Off, Written_Off_DLQ_Trigger,
             Written_Off_Analysis_A, Written_Off_Analysis_B, Written_Off_Extract_File,
