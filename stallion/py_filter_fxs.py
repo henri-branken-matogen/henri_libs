@@ -465,7 +465,7 @@ def Filter_Contract_Abnormal_Date(SEQ, CON_Abnormal_Date, Filter_Waterfall):
     if CON_Abnormal_Date is not None:
         if Filter_Waterfall == "":
             cat = str(SEQ) + " Subscription has an abnormal start date"
-            Filter_Waterfall = re.sub(" +", "", cat)
+            Filter_Waterfall = re.sub(" +", " ", cat)
         Filter_Contract_Abnormal_Date = 1  # Subscription has an abnormal start date.
         Contract_Abnormal_Date_PER = 1  # % subscriptions with abnormal start dates.
     return Filter_Waterfall, Filter_Contract_Abnormal_Date, Contract_Abnormal_Date_PER
@@ -494,7 +494,7 @@ def Filter_Contract_Barred(SEQ, CON_Status_Bar_Outgoing, Filter_Waterfall):
     if CON_Status_Bar_Outgoing is not None:
         if Filter_Waterfall == "":
             cat = str(SEQ) + " Subscriptions barred from outgoing calls"
-            Filter_Waterfall = re.sub(" +", "", cat)
+            Filter_Waterfall = re.sub(" +", " ", cat)
         Filter_Contract_Barred = 1  # Subscriptions barred from outgoing calls
         Contract_Barred_PER = 1  # % subscriptions barred from outgoing calls
 
