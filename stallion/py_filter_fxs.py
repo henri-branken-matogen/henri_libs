@@ -611,6 +611,11 @@ def Filter_Deceased(SEQ, Delinquency_Trigger, Filter_Waterfall):
     Filter accounts when the customer is deceased.  Same principle but just where the account is deceased.
     """
 
+    Filter_Deceased = None
+    Deceased_PER = None
+    Deceased_DLQ_Trigger = None
+    Deceased_Credit_Bureau = None
+
     if Delinquency_Trigger == "A. Deceased":
         if Filter_Waterfall == "":
             cat = str(SEQ) + " Customer is deceased"
@@ -621,8 +626,8 @@ def Filter_Deceased(SEQ, Delinquency_Trigger, Filter_Waterfall):
         # Following to be derived from the EXPERIAN Future File:
         Deceased_Credit_Bureau = None  # Credit bureau identified customer as deceased.
 
-        return (Filter_Waterfall, Filter_Deceased, Deceased_PER,
-                Deceased_DLQ_Trigger, Deceased_Credit_Bureau)
+    return (Filter_Waterfall, Filter_Deceased, Deceased_PER,
+            Deceased_DLQ_Trigger, Deceased_Credit_Bureau)
 
 
 schema_Filter_Deceased = t.StructType([
