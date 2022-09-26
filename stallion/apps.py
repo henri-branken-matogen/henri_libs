@@ -411,6 +411,7 @@ def Match_Applications_Contracts(sdf_0):
         .drop(*["nest"])
 
     ls_keep = [
+        "INVOCATIONID",
         "AIL_AvgMonthsOnBook",
         "ALL_AvgMonthsOnBook",
         "ALL_DaysSinceMRPayment",
